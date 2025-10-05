@@ -1,11 +1,10 @@
 package Mercury.Android.Mercury_View.Utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,21 +20,13 @@ public class ToastWarning {
     private void showToast(int type, String text){
         // Inflar o layout customizado
         LayoutInflater inflater = LayoutInflater.from(context);
-        View layout = inflater.inflate(R.layout.toast, null);
+        View layout = inflater.inflate(R.layout.toast_01_login_credentials, null);
 
-        // Converter 300dp para pixels
-        int widthInDp = 350;
+        // Converter 350dp para pixels
+        int widthInDp = 360;
         float scale = context.getResources().getDisplayMetrics().density;
         int widthInPx = (int) (widthInDp * scale);
-
-        // Forçar o tamanho mínimo
         layout.setMinimumWidth(widthInPx);
-
-        // Obter o ViewGroup raiz (se necessário para manipular)
-        ViewGroup viewGroup = null;
-        if (context instanceof Activity) {
-            viewGroup = (ViewGroup) ((Activity) context).findViewById(android.R.id.content);
-        }
 
         // Encontrar o TextView no layout e definir o texto
         TextView textView = layout.findViewById(R.id.toast_text);
@@ -46,7 +37,6 @@ public class ToastWarning {
         // Configurar a aparência baseada no tipo (opcional)
         switch(type) {
             case 0: // Info
-                // Você pode mudar o background aqui se tiver diferentes estilos
                 break;
             case 1: // Warning
                 // layout.setBackgroundResource(R.drawable.toast_warning_bg);
@@ -56,11 +46,20 @@ public class ToastWarning {
                 break;
         }
 
-        // IMPORTANTE: Criar o toast e definir o layout customizado
+        // Criar o toast
         Toast toast = new Toast(context);
         toast.setDuration(type == 0 ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
-        toast.setView(layout); // Aqui você usa o layout inflado!
+        toast.setView(layout);
         toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 40);
+
+        // Adicionar animação de slide down
+        TranslateAnimation slideDown = new TranslateAnimation(
+                0, 0,     // fromXDelta, toXDelta
+                -200, 0   // fromYDelta (acima da tela), toYDelta
+        );
+        slideDown.setDuration(500); // 0.5s
+        layout.startAnimation(slideDown);
+
         toast.show();
     }
 

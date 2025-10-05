@@ -1,5 +1,6 @@
 package Mercury.Android.Mercury_View.RecyclerView;
 
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,15 @@ public class RV_Chat_01_Msg_Adapter extends RecyclerView.Adapter<RV_Chat_01_Msg_
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Entity_03_Message message = messages.get(position);
 
-        holder.textMessage.setText(message.getMessage());
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            holder.textMessage.setText(
+                    Html.fromHtml(message.getMessage(), Html.FROM_HTML_MODE_LEGACY)
+            );
+        } else {
+            holder.textMessage.setText(
+                    Html.fromHtml(message.getMessage())
+            );
+        }
 
         if (message.getDateTimeMessage() != null) {
             holder.textDate.setText(dateFormat.format(message.getDateTimeMessage()));

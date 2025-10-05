@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="06dp"
     android:orientation="horizontal"
-    android:padding="04dp">
+    android:padding="10dp">
 
     <ImageButton
         android:id="@+id/imageButton"
@@ -22,7 +21,8 @@
     </ImageButton>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginEnd="30dp"
         android:layout_height="match_parent"
         android:layout_marginStart="60dp"
         android:clickable="false"
@@ -52,10 +52,14 @@
 
         <TextView
             android:id="@+id/lastText"
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
             android:layout_height="20dp"
             android:textColor="#808080"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:scrollHorizontally="false"
+            android:marqueeRepeatLimit="marquee_forever"/>
 
     </LinearLayout>
 
@@ -67,11 +71,12 @@
         android:fontFamily="@font/space_mono_regular"
         android:paddingTop="04dp"
         android:textColor="#808080"
-        android:textSize="08sp"
+        android:textSize="9sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:layout_marginBottom="02dp"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:background="@drawable/ic_notification"
@@ -82,7 +87,6 @@
         android:textSize="08sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textDate"
         tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

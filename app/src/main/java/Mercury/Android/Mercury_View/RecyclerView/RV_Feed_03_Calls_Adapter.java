@@ -1,5 +1,6 @@
 package Mercury.Android.Mercury_View.RecyclerView;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import java.util.Locale;
 
 import Mercury.Android.Mercury_Model.Entitys.Entity_05_call;
 import Mercury.Android.Mercury_View.Dialogs.Dialog_Feed_01_Profile_Image;
+import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Call;
+import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Video_Call;
 import Mercury.Android.R;
 
 public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -32,7 +35,6 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public int getItemViewType(int position) {
-        // Posição 0 é header, resto são itens
         return (position == 0) ? HEADER_VIEW : ITEM_VIEW;
     }
 
@@ -54,9 +56,8 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderView) {
             HeaderView headerHolder = (HeaderView) holder;
-            headerHolder.contactHeader.setText("Histórico de Chamadas"); // título fixo ou dinâmico
+            headerHolder.contactHeader.setText("Histórico de Chamadas");
         } else if (holder instanceof MeuViewHolder) {
-            // Ajusta o índice, porque o header ocupa a posição 0
             Entity_05_call call = calls.get(position - 1);
 
             MeuViewHolder callHolder = (MeuViewHolder) holder;
@@ -64,8 +65,12 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
             callHolder.callTextDate.setText(dateFormat.format(call.getDateTimeCall()));
 
             callHolder.profileImage.setOnClickListener(v -> {
-                Dialog_Feed_01_Profile_Image dialog = new Dialog_Feed_01_Profile_Image(v.getContext());
-                dialog.show();
+                new Dialog_Feed_01_Profile_Image(v.getContext()).show();
+            });
+
+            callHolder.imageButton.setOnClickListener(v -> {
+                Activity activity = (Activity) v.getContext();
+                new Controller_Video_Call(activity).performVideoCall(activity);
             });
         }
     }
@@ -80,12 +85,14 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
         TextView callContactName;
         TextView callTextDate;
         ImageButton profileImage;
+        ImageButton imageButton;
 
         public MeuViewHolder(@NonNull View itemView) {
             super(itemView);
             callContactName = itemView.findViewById(R.id.call_contact_name);
             callTextDate = itemView.findViewById(R.id.call_text_date);
             profileImage = itemView.findViewById(R.id.call_profile_image);
+            imageButton = itemView.findViewById(R.id.call);
         }
     }
 

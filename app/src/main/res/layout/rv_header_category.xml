@@ -2,7 +2,7 @@
 <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="45dp"
+    android:layout_height="55dp"
     android:clipToPadding="false"
     android:overScrollMode="never"
     android:paddingStart="10dp"
@@ -18,18 +18,19 @@
         <Button
             android:id="@+id/category"
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_height="28dp"
             android:layout_gravity="center"
             android:layout_marginEnd="06dp"
-            android:background="@drawable/bg_category"
+            android:background="@drawable/bg_category_highlight"
             android:text="Todas"
             android:textAllCaps="false"
-            android:textColor="#808080"
-            android:textSize="12sp" />
+            android:textColor="#F7B2CA"
+            android:textSize="12sp"
+            android:stateListAnimator="@animator/scale_animation2"/>
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_height="28dp"
             android:layout_gravity="center"
             android:layout_marginEnd="06dp"
             android:background="@drawable/bg_category"
@@ -41,7 +42,7 @@
         <Button
             android:id="@+id/button6"
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_height="28dp"
             android:layout_gravity="center"
             android:layout_marginEnd="06dp"
             android:background="@drawable/bg_category"
@@ -52,7 +53,7 @@
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_height="28dp"
             android:layout_gravity="center"
             android:layout_marginEnd="06dp"
             android:background="@drawable/bg_category"
@@ -61,15 +62,17 @@
             android:textColor="#808080"
             android:textSize="12sp" />
 
-        <Button
-            android:layout_width="40dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/bg_category"
-            android:text="+"
-            android:textAllCaps="false"
-            android:textColor="#808080"
-            android:textSize="12sp" />
+        <!-- TODO: Adicionar botão de envio -->
+
+        <!-- <Button
+           android:layout_width="40dp"
+           android:layout_height="25dp"
+           android:layout_gravity="center"
+           android:background="@drawable/bg_category"
+           android:text="+"
+           android:textAllCaps="false"
+           android:textColor="#808080"
+           android:textSize="12sp" /> -->
 
     </LinearLayout>
 </HorizontalScrollView>

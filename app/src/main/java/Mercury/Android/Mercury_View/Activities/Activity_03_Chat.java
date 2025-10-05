@@ -1,6 +1,5 @@
 package Mercury.Android.Mercury_View.Activities;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -18,7 +17,6 @@ import android.widget.PopupMenu;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,9 +28,9 @@ import java.util.List;
 import java.util.Objects;
 
 import Mercury.Android.Mercury_Model.Entitys.Entity_03_Message;
-import Mercury.Android.Mercury_View.Fragments.Fragment_Auth_01_Login;
 import Mercury.Android.Mercury_View.RecyclerView.RV_Chat_01_Msg_Adapter;
 import Mercury.Android.Mercury_View.Utils.NavBar_Inserts;
+import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Video_Call;
 import Mercury.Android.R;
 import Mercury.Android.databinding.Activity03ChatBinding;
 
@@ -65,8 +63,7 @@ public class Activity_03_Chat extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.rv_message);
         EditText editMessage = findViewById(R.id.messageTextfield);
-        ImageButton buttonSend = findViewById(R.id.send);
-        button = findViewById(R.id.clipButton);
+        ImageButton buttonSend = findViewById(R.id.send);;
 
         messageList = new ArrayList<>();
         adapter = new RV_Chat_01_Msg_Adapter(messageList);
@@ -77,10 +74,7 @@ public class Activity_03_Chat extends AppCompatActivity {
         bottomBar = findViewById(R.id.bottom_bar);
         setupKeyboardListener();
 
-        binding.videoCall.setOnClickListener(v -> {
-            Intent intent = new Intent(this, Activity_05_Video_Call.class);
-            startActivity(intent);
-        });
+        binding.videoCall.setOnClickListener(v -> new Controller_Video_Call(this).performVideoCall(this));
 
         editMessage.addTextChangedListener(new TextWatcher() {
             @Override
@@ -95,12 +89,6 @@ public class Activity_03_Chat extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if (s.length() > 0) {
-                    button.setVisibility(View.GONE);
-                } else {
-                    button.setVisibility(View.VISIBLE);
-                }
             }
 
         });
@@ -111,8 +99,11 @@ public class Activity_03_Chat extends AppCompatActivity {
 
             if (!text.isEmpty()) {
 
+                // Aplica o syntax highlighting no texto
+                String highlightedText = applySyntaxHighlight(text);
+
                 Entity_03_Message newMessage = new Entity_03_Message();
-                newMessage.setMessage(text);
+                newMessage.setMessage(highlightedText);  // Salva o texto com HTML
                 newMessage.setDateTimeMessage(new Date());
                 newMessage.setWasVisualized(false);
 
@@ -190,6 +181,104 @@ public class Activity_03_Chat extends AppCompatActivity {
         });
 
     }
+
+    /**
+     * Aplica syntax highlighting estilo IntelliJ no código Java
+     */
+    private String applySyntaxHighlight(String code) {
+        String result = code;
+
+        // 1. Comentários
+        result = highlightComments(result);
+
+        // 2. Strings
+        result = highlightStrings(result);
+
+        // 3. Anotações
+        result = highlightAnnotations(result);
+
+        // 4. Palavras-chave
+        result = highlightKeywords(result);
+
+        // 5. Números
+        result = highlightNumbers(result);
+
+        // 6. Classes
+        result = highlightClasses(result);
+
+        // 7. Métodos
+        result = highlightMethods(result);
+
+        return result;
+    }
+
+    private String highlightComments(String code) {
+        code = code.replaceAll("(//.*?)(?=\n|$)",
+                "<font color='#808080'>$1</font>");
+
+        code = code.replaceAll("(/\\*.*?\\*/)",
+                "<font color='#808080'>$1</font>");
+
+        return code;
+    }
+
+    private String highlightStrings(String code) {
+        code = code.replaceAll("(\"(?:[^\"\\\\]|\\\\.)*\")",
+                "<font color='#6A8759'>$1</font>");
+
+        code = code.replaceAll("('(?:[^'\\\\]|\\\\.)*')",
+                "<font color='#6A8759'>$1</font>");
+
+        return code;
+    }
+
+    private String highlightAnnotations(String code) {
+        code = code.replaceAll("(@\\w+)",
+                "<font color='#BBB529'>$1</font>");
+
+        return code;
+    }
+
+    private String highlightKeywords(String code) {
+        String[] keywords = {
+                "abstract", "assert", "boolean", "break", "byte", "case", "catch",
+                "char", "class", "const", "continue", "default", "do", "double",
+                "else", "enum", "extends", "final", "finally", "float", "for",
+                "goto", "if", "implements", "import", "instanceof", "int", "interface",
+                "long", "native", "new", "package", "private", "protected", "public",
+                "return", "short", "static", "strictfp", "super", "switch", "synchronized",
+                "this", "throw", "throws", "transient", "try", "void", "volatile", "while"
+        };
+
+        for (String keyword : keywords) {
+            code = code.replaceAll("\\b(" + keyword + ")\\b",
+                    "<font color='#CC7832'>$1</font>");
+        }
+
+        return code;
+    }
+
+    private String highlightNumbers(String code) {
+        code = code.replaceAll("\\b(\\d+\\.?\\d*[fFdDlL]?)\\b",
+                "<font color='#6897BB'>$1</font>");
+
+        return code;
+    }
+
+    private String highlightClasses(String code) {
+        code = code.replaceAll("\\b([A-Z]\\w*)\\b",
+                "<font color='#A9B7C6'>$1</font>");
+
+        return code;
+    }
+
+    private String highlightMethods(String code) {
+        code = code.replaceAll("\\b([a-z]\\w*)(?=\\s*\\()",
+                "<font color='#FFC66D'>$1</font>");
+
+        return code;
+    }
+
     private void setupKeyboardListener() {
         View rootView = findViewById(android.R.id.content);
 
@@ -222,4 +311,3 @@ public class Activity_03_Chat extends AppCompatActivity {
     }
 
 }
-

@@ -51,7 +51,8 @@ public class Activity_00_OnBoard extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSIONS = 101;
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_CONTACTS
     };
 
     private Animation inForwardAnim;
@@ -201,6 +202,7 @@ public class Activity_00_OnBoard extends AppCompatActivity {
     private void startAuthActivity() {
         Intent intent = new Intent(Activity_00_OnBoard.this, Activity_01_Auth.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         finish();
     }
 

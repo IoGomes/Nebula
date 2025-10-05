@@ -3,20 +3,19 @@ package Mercury.Android.Mercury_View.Activities;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.View;
+import android.view.Choreographer;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import Mercury.Android.Mercury_View.Fragments.Fragment_Auth_01_Login;
 import Mercury.Android.Mercury_View.Fragments.Fragment_Auth_02_Register;
@@ -24,36 +23,58 @@ import Mercury.Android.Mercury_View.Utils.NavBar_Inserts;
 import Mercury.Android.R;
 import Mercury.Android.databinding.Activity01AuthBinding;
 
-/// @author Ítalo Oliveira Gomes
-
 @SuppressWarnings("SpellCheckingInspection")
-public class Activity_01_Auth extends AppCompatActivity {
+public class Activity_01_Auth extends AppCompatActivity implements Choreographer.FrameCallback {
 
+    private Activity01AuthBinding binding;
     private final Fragment fragmentAuth01Login = new Fragment_Auth_01_Login();
     private boolean isFragment01Visible = true;
-    private Activity01AuthBinding binding;
+
+    // FPS
+    private long lastFrameTimeNanos = 0;
+    private double fps = 0;
+    private TextView fpsTextView;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
+        super.onCreate(savedInstanceState);
 
         binding = Activity01AuthBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        fpsTextView = binding.fpsTextView;
 
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        View rootLayout = findViewById(R.id.root);
-        NavBar_Inserts.adjustPaddingForNavigationBar(rootLayout, this);
+        NavBar_Inserts.adjustPaddingForNavigationBar(findViewById(R.id.motionLayout), this);
 
         replaceFragment(fragmentAuth01Login);
 
         binding.returnButton.setOnClickListener(v -> alternarFragment());
         binding.text3.setOnClickListener(v -> alternarFragment());
-        binding.text3.setText(Html.fromHtml("<u><font color='#ffffff'>SignUp</font></u>"));
+        binding.text3.setText(Html.fromHtml("<u><font color='#ffffff'>Sign Up</font></u>"));
+
+        // Inicia FPS
+        Choreographer.getInstance().postFrameCallback(this);
+
+        // Simulação de carga em background para testar microstutter
+        simulateBackgroundLoad();
+    }
+
+    private void simulateBackgroundLoad() {
+        executor.submit(() -> {
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    // Simula cálculo pesado
+                    Thread.sleep(15); // 15ms de processamento
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
     }
 
     private void alternarFragment() {
@@ -83,11 +104,8 @@ public class Activity_01_Auth extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
         isFragment01Visible = savedInstanceState.getBoolean("isFragment01Visible", true);
-
         binding.text3.setText(Html.fromHtml(isFragment01Visible ? "<u>SignUp!</u>" : "<u>SignIn!</u>"));
-
         Fragment fragmentParaMostrar = isFragment01Visible ? new Fragment_Auth_01_Login() : new Fragment_Auth_02_Register();
         replaceFragment(fragmentParaMostrar);
     }
@@ -95,9 +113,8 @@ public class Activity_01_Auth extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (getWindow() != null && getWindow().getDecorView() != null) {
-            getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(null);
-        }
+        Choreographer.getInstance().removeFrameCallback(this);
+        executor.shutdownNow();
     }
 
     private void replaceFragment(Fragment fragment) {
@@ -108,9 +125,15 @@ public class Activity_01_Auth extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void doFrame(long frameTimeNanos) {
+        if (lastFrameTimeNanos > 0) {
+            long dt = frameTimeNanos - lastFrameTimeNanos;
+            if (dt > 0) {
+                fps = 1_000_000_000.0 / dt;
+                fpsTextView.setText(String.format("FPS: %.1f", fps));
+            }
         }
+        lastFrameTimeNanos = frameTimeNanos;
+        Choreographer.getInstance().postFrameCallback(this);
     }
-
+}

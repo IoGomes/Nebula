@@ -22,11 +22,11 @@ import Mercury.Android.Mercury_View.Dialogs.Dialog_Feed_Choose_Contact;
 import Mercury.Android.Mercury_View.RecyclerView.RV_Feed_01_Chat_Adapter;
 import Mercury.Android.databinding.Fragment01FeedInboxBinding;
 
-
 public class Fragment_Feed_01_Inbox extends Fragment {
 
     Fragment01FeedInboxBinding bind;
     private List<Entity_02_Chat_Session> chatSessions;
+    private RV_Feed_01_Chat_Adapter adapter;
 
     @Nullable
     @Override
@@ -40,117 +40,15 @@ public class Fragment_Feed_01_Inbox extends Fragment {
         List<String> users2 = Arrays.asList("userC", "userD");
         List<Date> date = Arrays.asList(new Date());
 
+
         chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
+                "chat",
                 users2,
                 date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                users2,
-                date,
-                "Reunião marcada para amanhã."
+                "Versão 1.0 -> 03/10/2025"
         ));
 
         bind.recyclerView.setAdapter(new RV_Feed_01_Chat_Adapter(chatSessions));
-
         bind.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         bind.recyclerView.setOnClickListener(v ->
@@ -163,4 +61,5 @@ public class Fragment_Feed_01_Inbox extends Fragment {
 
     }
 }
+
 

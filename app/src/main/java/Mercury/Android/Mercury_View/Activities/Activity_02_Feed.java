@@ -27,7 +27,6 @@ import Mercury.Android.databinding.Activity02FeedBinding;
 @SuppressWarnings("SpellCheckingInspection")
 public class Activity_02_Feed extends AppCompatActivity {
 
-    //Instancias dos Fragments
     Fragment fragment01 = new Fragment_Feed_01_Inbox();
     Fragment fragment02 = new Fragment_Feed_02_Contacts();
     Fragment fragment03 = new Fragment_Feed_03_Calls();
