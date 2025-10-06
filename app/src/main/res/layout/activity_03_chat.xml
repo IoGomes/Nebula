@@ -112,9 +112,12 @@
                 android:id="@+id/camera1"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_camera"
-                android:stateListAnimator="@animator/scale_animation" />
+                android:background="@drawable/keyboard_bg"
+                android:src="@drawable/code"
+                android:stateListAnimator="@animator/scale_animation"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/messageTextfield"

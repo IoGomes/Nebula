@@ -1,29 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="06dp"
-    android:orientation="horizontal"
-    android:padding="04dp">
+    android:orientation="horizontal">
 
     <ImageButton
         android:id="@+id/call_profile_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:background="@drawable/ic_profile_picture"
-        tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="4dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@android:color/transparent"
         android:clickable="true"
-        android:focusable="true" />
+        android:elevation="0dp"
+        android:focusable="true"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_profile_picture"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="84dp"
+        android:layout_marginTop="8dp"
         android:clickable="false"
         android:focusable="false"
         android:orientation="vertical"
@@ -52,15 +54,14 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_gravity="bottom"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <View
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                android:background="@drawable/ic_received_call"
-                />
+                android:background="@drawable/ic_received_call" />
 
             <Space
                 android:layout_width="04dp"
@@ -80,8 +81,8 @@
 
     <ImageButton
         android:id="@+id/call"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
