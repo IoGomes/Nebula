@@ -47,6 +47,157 @@ public class Fragment_Feed_01_Inbox extends Fragment {
                 date,
                 "Versão 1.0 -> 03/10/2025"
         ));
+        chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));chatSessions.add(new Entity_02_Chat_Session(
+                "chat",
+                users2,
+                date,
+                "Versão 1.0 -> 03/10/2025"
+        ));
 
         bind.recyclerView.setAdapter(new RV_Feed_01_Chat_Adapter(chatSessions));
         bind.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -25,6 +25,7 @@
         android:label="Nebula"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:largeHeap="true"
         android:theme="@style/Theme.App.Starting">
 
         <meta-data
@@ -50,8 +51,10 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
-            android:name=".Mercury_View.Activities.Activity_05_Video_Call"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:name=".Mercury_View.Activities.Activity_04_Voice_Call" />
+
+        <activity
+            android:name=".Mercury_View.Activities.Activity_05_Video_Call" />
 
     </application>
 </manifest>

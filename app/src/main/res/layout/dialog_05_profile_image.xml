@@ -2,16 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="250dp"
-    android:layout_height="330dp"
-    android:layout_margin="16dp"
-    android:clickable="false"
+    android:layout_height="wrap_content"
     android:background="@drawable/profile_background"
     android:stateListAnimator="@animator/scale_animation">
 
     <TextView
         android:id="@+id/nome_contato"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
         android:background="@drawable/deck_up"
         android:gravity="center"
         android:text="Nome do Contato"
@@ -25,45 +23,56 @@
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:src="@drawable/ic_user"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nome_contato">
-
-    </ImageView>
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/deck"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="@drawable/profile_options"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageView">
 
         <ImageButton
-            android:id="@+id/imageButton1"
+            android:id="@+id/textMessage"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:scaleType="centerInside"
             android:src="@drawable/ic_mesage"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/imageButton2"
+            app:layout_constraintEnd_toStartOf="@id/voice_call"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/voice_call"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:scaleType="centerInside"
             android:src="@drawable/ic_call"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/video_call"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/textMessage"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/video_call"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_video_call"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@id/imageButton1"
+            app:layout_constraintStart_toEndOf="@id/voice_call"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

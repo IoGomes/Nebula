@@ -6,11 +6,13 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -36,6 +38,9 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     private static final int VIEW_TYPE_ITEM = 2;
 
     private int selectedPosition = -1;
+
+    private int selectedCategoryId = R.id.all_category;
+
     public RV_Feed_01_Chat_Adapter(List<Entity_02_Chat_Session> chats) {
         this.chats = chats;
         this.filteredChats = new ArrayList<>(chats);
@@ -43,13 +48,9 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
-            return VIEW_TYPE_HEADER;
-        } else if (position == 1) {
-            return VIEW_TYPE_CATEGORY;
-        } else {
-            return VIEW_TYPE_ITEM;
-        }
+        if (position == 0) return VIEW_TYPE_HEADER;
+        else if (position == 1) return VIEW_TYPE_CATEGORY;
+        else return VIEW_TYPE_ITEM;
     }
 
     @NonNull
@@ -62,7 +63,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (viewType == VIEW_TYPE_CATEGORY) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.rv_header_category, parent, false);
-            return new SecondViewHolder(view);
+            return new SecondViewHolder(view, this);
         } else {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.rv_01_chat, parent, false);
@@ -87,7 +88,6 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                 Entity_02_Chat_Session chatSession = filteredChats.get(chatPosition);
                 bindChatData(messageHolder, chatSession);
             }
-
 
             if (chatPosition == selectedPosition) {
                 messageHolder.itemView.setBackgroundResource(R.drawable.shape_chat_selected);
@@ -177,6 +177,11 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         return filteredChats.size() + 2;
     }
 
+    private void selecionarCategoria(Button button) {
+        selectedCategoryId = button.getId();
+
+    }
+
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView lastText, textDate;
         ImageButton profileImage;
@@ -199,11 +204,41 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     static class SecondViewHolder extends RecyclerView.ViewHolder {
-        public SecondViewHolder(@NonNull View itemView) {
+
+        private final Button allCategory, notRead, favorite, groups;
+
+        public SecondViewHolder(@NonNull View itemView, RV_Feed_01_Chat_Adapter adapter) {
             super(itemView);
+
+            allCategory = itemView.findViewById(R.id.all_category);
+            notRead = itemView.findViewById(R.id.not_read);
+            favorite = itemView.findViewById(R.id.favorite);
+            groups = itemView.findViewById(R.id.groups);
+
+            Button[] buttons = new Button[]{allCategory, notRead, favorite, groups};
+
+            atualizarAparencia(buttons, adapter.selectedCategoryId);
+
+            for (Button button : buttons) {
+                button.setOnClickListener(v -> {
+                    adapter.selectedCategoryId = button.getId();
+                    atualizarAparencia(buttons, adapter.selectedCategoryId);
+                });
+            }
+        }
+
+        private void atualizarAparencia(Button[] buttons, int selectedId) {
+            for (Button button : buttons) {
+                if (button.getId() == selectedId) {
+                    button.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_selected_highlight));
+                    button.setTextColor(0xFFF7B2CA);
+                } else {
+                    button.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_category));
+                    button.setTextColor(0xFF808080);
+                }
+            }
         }
     }
+
+
 }
-
-
-

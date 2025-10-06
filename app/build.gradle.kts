@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.retrofit.v2110)
     implementation(libs.converter.gson)
     implementation(libs.gson)
+    implementation(libs.androidx.appcompat.v170)
 
     implementation(libs.androidx.core.splashscreen)
 

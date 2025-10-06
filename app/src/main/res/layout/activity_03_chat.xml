@@ -11,8 +11,9 @@
     <LinearLayout
         android:id="@+id/blurview"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:background="@drawable/bg_status_bar"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:background="#000000"
         android:clipToOutline="true"
         android:elevation="2dp"
         android:orientation="horizontal"
@@ -21,92 +22,74 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_gravity="bottom"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
-
             <ImageButton
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="32dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="@drawable/ic_return"
+                android:src="@drawable/ic_return"
+                android:background="@android:color/transparent"
                 android:contentDescription="@string/foto_de_perfil" />
 
             <ImageButton
                 android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="@drawable/ic_profile_picture"
+                android:src="@drawable/ic_profile_picture"
+                android:background="@android:color/transparent"
                 android:contentDescription="@string/foto_de_perfil" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
+                    android:paddingStart="8dp"
                     android:text="@string/nome_de_contato"
                     android:textColor="@color/white"
                     android:textSize="18dp"
                     tools:ignore="RtlSymmetry" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:fontFamily="@font/space_mono_regular"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
+                    android:paddingStart="8dp"
                     android:text="+55 75 98806-6952"
-                    android:textColor="#ffffff"
+                    android:textColor="#808080"
                     android:textSize="12dp"
                     tools:ignore="RtlSymmetry" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="104dp"
                 android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_height="match_parent">
 
                 <ImageButton
                     android:id="@+id/video_call"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="52dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginTop="02dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/ic_video_call"
-                    android:contentDescription="@string/info_button" />
+                    android:src="@drawable/ic_video_call"
+                    android:background="@android:color/transparent" />
 
                 <ImageButton
-                    android:id="@+id/menu"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:id="@+id/voice_call"
+                    android:layout_width="52dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginTop="02dp"
-                    android:layout_marginEnd="08dp"
-                    android:onClick="handleCall"
-                    android:background="@drawable/ic_call"
-                    android:contentDescription="@string/info_button" />
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_call" />
 
             </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar"
@@ -114,34 +97,44 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/deck"
         app:layout_constraintStart_toStartOf="parent"
         android:padding="04dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_marginEnd="04dp"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
             app:layout_constraintEnd_toStartOf="@+id/send"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/normal_textfield">
 
+            <ImageButton
+                android:id="@+id/camera1"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_camera"
+                android:stateListAnimator="@animator/scale_animation" />
+
             <EditText
                 android:id="@+id/messageTextfield"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:background="@android:color/transparent"
                 android:hint="@string/type"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+                android:paddingStart="16dp"
                 android:scrollHorizontally="false"
                 android:stateListAnimator="@animator/scale_animation"
                 android:textColor="@color/white"
                 android:textColorHint="#99ffffff"
                 app:layout_constraintBottom_toBottomOf="parent"
+
                 app:layout_constraintEnd_toStartOf="@+id/camera"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="Autofill" />
+                app:layout_constraintStart_toEndOf="@+id/camera1"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/camera"
@@ -155,8 +148,8 @@
 
         <ImageButton
             android:id="@+id/send"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@drawable/bg_login_button"
             android:padding="04dp"
             android:src="@drawable/ic_send"
@@ -171,12 +164,11 @@
         android:id="@+id/rv_message"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="04dp"
+        tools:listitem="@layout/rv_03_msg_received"
         app:layout_constraintBottom_toTopOf="@+id/bottom_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/blurview">
-
     </androidx.recyclerview.widget.RecyclerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

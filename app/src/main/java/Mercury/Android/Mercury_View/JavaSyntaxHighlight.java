@@ -7,14 +7,14 @@ public class JavaSyntaxHighlight {
 
     static {
         COLORS.put("KEYWORD", "#CC7832");           // Laranja - palavras-chave
-        COLORS.put("STRING", "#6A8759");            // Verde - strings
-        COLORS.put("COMMENT", "#808080");           // Cinza - comentários
-        COLORS.put("NUMBER", "#6897BB");            // Azul claro - números
-        COLORS.put("ANNOTATION", "#BBB529");        // Amarelo - anotações
-        COLORS.put("CLASS", "#A9B7C6");             // Branco azulado - classes
-        COLORS.put("METHOD", "#FFC66D");            // Amarelo claro - métodos
-        COLORS.put("FIELD", "#9876AA");             // Roxo - campos
-        COLORS.put("PARAM", "#A9B7C6");             // Branco azulado - parâmetros
+        COLORS.put("STRING", "#6A8759");
+        COLORS.put("COMMENT", "#808080");
+        COLORS.put("NUMBER", "#6897BB");
+        COLORS.put("ANNOTATION", "#BBB529");
+        COLORS.put("CLASS", "#A9B7C6");
+        COLORS.put("METHOD", "#FFC66D");
+        COLORS.put("FIELD", "#9876AA");
+        COLORS.put("PARAM", "#A9B7C6");
     }
     public static String highlightCode(String code) {
         String result = code;

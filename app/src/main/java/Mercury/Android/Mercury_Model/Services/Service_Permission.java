@@ -28,7 +28,13 @@ public class Service_Permission implements Permission_Interface {
 
     @Override
     public boolean hasContactListPermission() {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED;
+    }
 
-        return false;
+    @Override
+    public boolean hasRecordAudioPermission() {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED;
     }
 }

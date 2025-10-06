@@ -18,6 +18,7 @@ import Mercury.Android.Mercury_Model.Entitys.Entity_05_call;
 import Mercury.Android.Mercury_View.Dialogs.Dialog_Feed_01_Profile_Image;
 import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Call;
 import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Video_Call;
+import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Voice_Call;
 import Mercury.Android.R;
 
 public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -70,7 +71,7 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
 
             callHolder.imageButton.setOnClickListener(v -> {
                 Activity activity = (Activity) v.getContext();
-                new Controller_Video_Call(activity).performVideoCall(activity);
+                new Controller_Voice_Call(activity).performVoiceCall(activity);
             });
         }
     }

@@ -8,7 +8,8 @@
     android:paddingStart="10dp"
     android:paddingEnd="10dp"
     android:scrollbars="none"
-    tools:ignore="Typos">
+    tools:ignore="Typos"
+    android:layout_marginTop="10dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -16,19 +17,20 @@
         android:gravity="center">
 
         <Button
-            android:id="@+id/category"
+            android:id="@+id/all_category"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:layout_gravity="center"
-            android:layout_marginEnd="06dp"
-            android:background="@drawable/bg_category_highlight"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_category"
             android:text="Todas"
             android:textAllCaps="false"
             android:textColor="#F7B2CA"
             android:textSize="12sp"
-            android:stateListAnimator="@animator/scale_animation2"/>
+            android:paddingTop="0dp" />
 
         <Button
+            android:id="@+id/not_read"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:layout_gravity="center"
@@ -40,7 +42,7 @@
             android:textSize="12sp" />
 
         <Button
-            android:id="@+id/button6"
+            android:id="@+id/favorite"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:layout_gravity="center"
@@ -52,6 +54,7 @@
             android:textSize="12sp" />
 
         <Button
+            android:id="@+id/groups"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:layout_gravity="center"
@@ -62,7 +65,7 @@
             android:textColor="#808080"
             android:textSize="12sp" />
 
-        <!-- TODO: Adicionar botão de envio -->
+        <!-- TODO: Adicionar botão de adicionar -->
 
         <!-- <Button
            android:layout_width="40dp"

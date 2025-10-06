@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:foreground="?attr/selectableItemBackground"
+    >
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:background="@drawable/ic_profile_picture"
-        tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="4dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:padding="10dp"
+        android:elevation="0dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_profile_picture"
+        android:scaleType="fitCenter"
         android:clickable="true"
-        android:focusable="true">
-
+        android:focusable="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
     </ImageButton>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="60dp"
         android:clickable="false"
         android:focusable="false"
         android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imageButton"
         app:layout_constraintTop_toTopOf="parent">
 
         <Space
@@ -46,20 +49,18 @@
 
         <Space
             android:layout_width="0dp"
-            android:layout_height="08dp">
-
-        </Space>
+            android:layout_height="08dp" />
 
         <TextView
             android:id="@+id/lastText"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:textColor="#808080"
-            android:textSize="14sp"
             android:ellipsize="end"
-            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="false"
-            android:marqueeRepeatLimit="marquee_forever"/>
+            android:singleLine="true"
+            android:textColor="#808080"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -70,15 +71,17 @@
         android:layout_marginTop="2dp"
         android:fontFamily="@font/space_mono_regular"
         android:paddingTop="04dp"
+        android:layout_marginEnd="10dp"
         android:textColor="#808080"
         android:textSize="9sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:layout_marginBottom="02dp"
+        android:layout_marginEnd="10dp"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/ic_notification"
         android:gravity="center"
         android:text="1"
@@ -86,7 +89,6 @@
         android:textColor="@color/black"
         android:textSize="08sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

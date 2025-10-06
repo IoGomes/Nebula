@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="06dp"
@@ -13,11 +12,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center"
-        android:background="@drawable/ic_profile_picture"
-        tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="4dp"
-        android:clickable="true"
-        android:focusable="true">
+        android:background="@drawable/ic_profile_picture">
 
     </ImageButton>
 
@@ -52,6 +47,7 @@
         </Space>
 
         <TextView
+            android:text="(75) 991126575"
             android:id="@+id/number"
             android:layout_width="200dp"
             android:layout_height="20dp"
@@ -59,17 +55,5 @@
             android:textSize="14sp" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:fontFamily="@font/space_mono_regular"
-        android:paddingTop="04dp"
-        android:textColor="#808080"
-        android:textSize="08sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
