@@ -38,6 +38,7 @@ public class Activity_01_Auth extends AppCompatActivity implements Choreographer
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
         super.onCreate(savedInstanceState);
 

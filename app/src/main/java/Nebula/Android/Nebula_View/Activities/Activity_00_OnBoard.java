@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.Objects;
 
+import Nebula.Android.Nebula_Data.UserPreferences;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act00OnboardBinding;
@@ -64,6 +65,13 @@ public class Activity_00_OnBoard extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (new UserPreferences(this).isLoggedIn()) {
+            Intent intent = new Intent(Activity_00_OnBoard.this, Activity_02_Feed.class);
+            startActivity(intent);
+            finish();
+        }
+
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
 
         binding = Act00OnboardBinding.inflate(getLayoutInflater());
