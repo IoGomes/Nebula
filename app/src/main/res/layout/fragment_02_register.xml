@@ -111,7 +111,6 @@
             android:id="@+id/termos_e_condicoes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/space_mono_regular"
             app:thumbTint="@color/switch_thumb_selector"
             app:trackTint="@color/switch_track_selector"/>
 
@@ -139,7 +138,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:fontFamily="@font/space_mono_regular"
             android:textColor="@color/white"
             tools:ignore="UseSwitchCompatOrMaterialXml"
             app:thumbTint="@color/switch_thumb_selector"

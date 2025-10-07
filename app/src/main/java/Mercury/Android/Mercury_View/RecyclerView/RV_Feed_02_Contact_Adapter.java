@@ -43,7 +43,7 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             View view = inflater.inflate(R.layout.rv_05_search_layout, parent, false);
             return new HeaderViewHolder(view);
         } else if (viewType == TYPE_TITLE) {
-            View view = inflater.inflate(R.layout.contact_list_header, parent, false);
+            View view = inflater.inflate(R.layout.rv_contact_list_title, parent, false);
             return new TitleViewHolder(view);
         } else {
             View view = inflater.inflate(R.layout.rv_06_contact, parent, false);

@@ -57,7 +57,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
-                    android:fontFamily="@font/space_mono_regular"
                     android:paddingStart="8dp"
                     android:text="+55 75 98806-6952"
                     android:textColor="#808080"
