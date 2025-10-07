@@ -47,14 +47,6 @@ public class Dialog_Auth_01_Login_Credentials extends Dialog {
                 }
             }
         }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                context,
-                R.layout.item_list_center, // layout customizado
-                R.id.text_item,
-                items
-        );
-        listView.setAdapter(adapter);
     }
 
 }

@@ -150,7 +150,7 @@
             android:visibility="gone"
             app:lottie_autoPlay="false"
             app:lottie_loop="true"
-            app:lottie_rawRes="@raw/lottie_02_loading" />
+            app:lottie_rawRes="@raw/lottie_load_animation" />
 
     </androidx.cardview.widget.CardView>
 

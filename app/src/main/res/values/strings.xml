@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Mercury</string>
-    <string name="lorem_ipsumis_simply_dummy_text_of_the_printing_and_typesetting_industry_lorem">Lorem Ipsumis simply dummy text of the printing and typesetting industry. Lorem</string>
     <string name="mensagem">Mensagem</string>
     <string name="foto_de_perfil">Foto de Perfil</string>
     <string name="nome_de_contato">Nome de contato</string>
