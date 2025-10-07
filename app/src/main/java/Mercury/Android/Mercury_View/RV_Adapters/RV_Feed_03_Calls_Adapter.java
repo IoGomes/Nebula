@@ -1,4 +1,4 @@
-package Mercury.Android.Mercury_View.RecyclerView;
+package Mercury.Android.Mercury_View.RV_Adapters;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -16,8 +16,6 @@ import java.util.Locale;
 
 import Mercury.Android.Mercury_Model.Entitys.Entity_05_call;
 import Mercury.Android.Mercury_View.Dialogs.Dialog_Feed_01_Profile_Image;
-import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Call;
-import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Video_Call;
 import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Voice_Call;
 import Mercury.Android.R;
 

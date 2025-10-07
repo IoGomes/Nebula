@@ -1,4 +1,4 @@
-package Mercury.Android.Mercury_View.RecyclerView;
+package Mercury.Android.Mercury_View.RV_Adapters;
 
 import android.content.Intent;
 import android.text.Editable;

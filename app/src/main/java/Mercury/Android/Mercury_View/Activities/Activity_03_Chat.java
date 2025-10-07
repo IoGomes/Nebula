@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import Mercury.Android.Mercury_Model.Entitys.Entity_03_Message;
-import Mercury.Android.Mercury_View.RecyclerView.RV_Chat_01_Msg_Adapter;
+import Mercury.Android.Mercury_View.RV_Adapters.RV_Chat_01_Msg_Adapter;
 import Mercury.Android.Mercury_View.Utils.NavBar_Inserts;
 import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Video_Call;
 import Mercury.Android.Mercury_ViewModel.Controllers.Controller_Voice_Call;

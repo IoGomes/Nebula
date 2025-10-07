@@ -1,4 +1,4 @@
-package Mercury.Android.Mercury_View.RecyclerView;
+package Mercury.Android.Mercury_View.RV_Adapters;
 
 import android.text.Html;
 import android.view.LayoutInflater;

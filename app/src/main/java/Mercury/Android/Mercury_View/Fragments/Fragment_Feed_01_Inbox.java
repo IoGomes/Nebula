@@ -19,7 +19,7 @@ import java.util.List;
 import Mercury.Android.Mercury_Model.Entitys.Entity_02_Chat_Session;
 import Mercury.Android.Mercury_View.Activities.Activity_03_Chat;
 import Mercury.Android.Mercury_View.Dialogs.Dialog_Feed_Choose_Contact;
-import Mercury.Android.Mercury_View.RecyclerView.RV_Feed_01_Chat_Adapter;
+import Mercury.Android.Mercury_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
 import Mercury.Android.databinding.Fragment01FeedInboxBinding;
 
 public class Fragment_Feed_01_Inbox extends Fragment {

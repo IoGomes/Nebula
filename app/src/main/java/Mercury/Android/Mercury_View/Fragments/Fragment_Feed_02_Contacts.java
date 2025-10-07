@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Mercury.Android.Mercury_Model.Entitys.Entity_06_Contact;
-import Mercury.Android.Mercury_View.RecyclerView.RV_Feed_02_Contact_Adapter;
+import Mercury.Android.Mercury_View.RV_Adapters.RV_Feed_02_Contact_Adapter;
 import Mercury.Android.R;
 
 public class Fragment_Feed_02_Contacts extends Fragment {

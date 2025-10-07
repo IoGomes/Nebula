@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import Mercury.Android.Mercury_Model.Entitys.Entity_02_Chat_Session;
-import Mercury.Android.Mercury_View.RecyclerView.RV_Feed_01_Chat_Adapter;
+import Mercury.Android.Mercury_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
 import Mercury.Android.databinding.Fragment06ArchivedBinding;
 
 public class Fragment_Feed_04_Archived extends Fragment {

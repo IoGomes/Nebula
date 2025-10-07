@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import Mercury.Android.Mercury_Model.Entitys.Entity_05_call;
-import Mercury.Android.Mercury_View.RecyclerView.RV_Feed_03_Calls_Adapter;
+import Mercury.Android.Mercury_View.RV_Adapters.RV_Feed_03_Calls_Adapter;
 import Mercury.Android.databinding.Fragment05CallHistoryBinding;
 
 @SuppressWarnings("SpellCheckingInspection")
