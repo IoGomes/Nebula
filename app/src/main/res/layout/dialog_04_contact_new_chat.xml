@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:minHeight="500dp"
     android:padding="08dp"
-    android:background="@drawable/profile_background">
+    android:background="@drawable/bg_profile_background">
 
     <EditText
         android:hint="Pesquise por um contato"

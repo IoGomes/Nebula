@@ -102,23 +102,23 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/video_call_button"
+            android:background="@drawable/bg_video_call_button"
             app:layout_constraintEnd_toStartOf="@+id/imageButton5" />
 
         <ImageButton
-            android:src="@drawable/cancel_call"
+            android:src="@drawable/ic_dismiss_call"
             android:id="@+id/imageButton5"
             android:layout_width="68dp"
             android:layout_height="68dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/canccel_call_button"
+            android:background="@drawable/bg_dismiss_call"
             app:layout_constraintEnd_toStartOf="@+id/imageButton4" />
 
         <ImageButton
             android:id="@+id/imageButton4"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@drawable/video_call_button"
+            android:background="@drawable/bg_video_call_button"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </LinearLayout>

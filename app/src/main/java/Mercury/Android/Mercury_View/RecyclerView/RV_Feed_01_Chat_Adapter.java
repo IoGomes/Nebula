@@ -90,7 +90,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if (chatPosition == selectedPosition) {
-                messageHolder.itemView.setBackgroundResource(R.drawable.shape_chat_selected);
+                messageHolder.itemView.setBackgroundResource(R.drawable.bg_chat_selected);
             } else {
                 messageHolder.itemView.setBackground(null);
             }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/img_chat_screen"
+    android:background="@drawable/img_chat_bg"
     android:orientation="vertical">
 
     <LinearLayout
@@ -106,14 +106,14 @@
             android:layout_height="48dp"
             app:layout_constraintEnd_toStartOf="@+id/send"
             app:layout_constraintStart_toStartOf="parent"
-            android:background="@drawable/normal_textfield">
+            android:background="@drawable/bg_normal_textfield">
 
             <ImageButton
                 android:id="@+id/camera1"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@drawable/keyboard_bg"
-                android:src="@drawable/code"
+                android:background="@drawable/bg_keyboard"
+                android:src="@drawable/ic_code"
                 android:stateListAnimator="@animator/scale_animation"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

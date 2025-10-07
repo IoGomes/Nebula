@@ -31,9 +31,9 @@ public class Activity_00_OnBoard extends AppCompatActivity {
     private int currentIndex = 0;
 
     private final int[] images = {
-            R.drawable.ativo,
-            R.drawable._58__convertido_,
-            R.drawable.ativo_1
+            R.drawable.img_onboard_01,
+            R.drawable.img_onboard_03,
+            R.drawable.img_onboard_02
     };
 
     private final String[] titles = {
@@ -147,19 +147,19 @@ public class Activity_00_OnBoard extends AppCompatActivity {
 
     private void updateStepIndicators() {
 
-        step1.setBackgroundResource(R.drawable.step_inactive);
-        step2.setBackgroundResource(R.drawable.step_inactive);
-        step3.setBackgroundResource(R.drawable.step_inactive);
+        step1.setBackgroundResource(R.drawable.bg_step_inactive);
+        step2.setBackgroundResource(R.drawable.bg_step_inactive);
+        step3.setBackgroundResource(R.drawable.bg_step_inactive);
 
         switch (currentIndex) {
             case 0:
-                step1.setBackgroundResource(R.drawable.step_active);
+                step1.setBackgroundResource(R.drawable.bg_current_category);
                 break;
             case 1:
-                step2.setBackgroundResource(R.drawable.step_active);
+                step2.setBackgroundResource(R.drawable.bg_current_category);
                 break;
             case 2:
-                step3.setBackgroundResource(R.drawable.step_active);
+                step3.setBackgroundResource(R.drawable.bg_current_category);
                 break;
         }
     }
