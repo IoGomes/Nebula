@@ -1,8 +1,5 @@
 import java.net.URI
 
-include(":MercuryBenchmark")
-
-
 pluginManagement {
     repositories {
         google {
@@ -25,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Mercury"
+rootProject.name = "Nebula"
 include(":app")
  

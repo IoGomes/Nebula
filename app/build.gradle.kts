@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "Mercury.Android"
+    namespace = "Nebula.Android"
     compileSdk = 36
 
     defaultConfig {
