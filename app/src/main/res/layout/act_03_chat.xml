@@ -23,6 +23,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
             <ImageButton
+                android:id="@+id/returnButton"
                 android:layout_width="32dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -71,20 +72,20 @@
                 android:layout_height="match_parent">
 
                 <ImageButton
-                    android:id="@+id/video_call"
-                    android:layout_width="52dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_video_call"
-                    android:background="@android:color/transparent" />
-
-                <ImageButton
                     android:id="@+id/voice_call"
                     android:layout_width="52dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_call" />
+
+                <ImageButton
+                    android:id="@+id/video_call"
+                    android:layout_width="52dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_video_call"
+                    android:background="@android:color/transparent" />
 
             </LinearLayout>
 
@@ -133,19 +134,9 @@
                 android:textColor="@color/white"
                 android:textColorHint="#99ffffff"
                 app:layout_constraintBottom_toBottomOf="parent"
-
-                app:layout_constraintEnd_toStartOf="@+id/camera"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/camera1"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/camera"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_camera"
-                android:stateListAnimator="@animator/scale_animation"
-                app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageButton

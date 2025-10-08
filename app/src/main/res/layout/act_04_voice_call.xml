@@ -4,71 +4,66 @@
     android:id="@+id/extern_image"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#000000"
+    android:fitsSystemWindows="true">
 
 
-    <ImageView
+    <FrameLayout
         android:id="@+id/textView4"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:src="@drawable/ic_profile_picture"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.448" />
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:gravity="center"
-        android:text="Conectado"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/textView6" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/circle_loading"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"/>
+
+        <ImageView
+            android:layout_gravity="center"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:src="@drawable/ic_profile_picture"
+            />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/textView6"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="100dp"
         android:gravity="center"
-        android:textSize="20sp"
         android:text="Nome de Contato"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:fontFamily="@font/space_mono_regular"
-        android:gravity="center"
-        android:letterSpacing="0.1"
-        android:text="75 992356921"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <ImageButton
-        android:src="@drawable/ic_return"
-        android:background="@android:color/transparent"
-        android:id="@+id/imageButton7"
+        android:id="@+id/returnButton"
         android:layout_width="32dp"
+        android:layout_margin="16dp"
         android:layout_height="32dp"
-        android:layout_marginTop="40dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_return"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView5"
-        android:background="@drawable/bg_category"
+    <Chronometer
+        android:textSize="16sp"
+        android:id="@+id/cronometro"
+        android:textColor="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="01:12"
-        android:fontFamily="@font/space_mono_regular"
-        android:letterSpacing="0.1"
-        android:textSize="14sp"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/textView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/call_contact_name" />
@@ -78,10 +73,10 @@
         android:id="@+id/call_contact_name"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="12dp"
         android:gravity="center"
         android:text="Chamada de Voz"
-        app:layout_constraintBottom_toTopOf="@+id/textView4"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -91,8 +86,8 @@
         android:layout_width="wrap_content"
         android:layout_height="70dp"
         android:layout_marginBottom="32dp"
-        android:background="@android:color/transparent"
         android:gravity="center"
+        android:background="@drawable/call_deck"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -101,6 +96,17 @@
             android:id="@+id/imageButton6"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:src="@drawable/ic_mic_on"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/bg_video_call_button"
+            app:layout_constraintEnd_toStartOf="@+id/imageButton5" />
+
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_mic_on"
             android:layout_marginEnd="16dp"
             android:background="@drawable/bg_video_call_button"
             app:layout_constraintEnd_toStartOf="@+id/imageButton5" />
@@ -108,18 +114,11 @@
         <ImageButton
             android:src="@drawable/ic_dismiss_call"
             android:id="@+id/imageButton5"
-            android:layout_width="68dp"
-            android:layout_height="68dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/bg_dismiss_call"
             app:layout_constraintEnd_toStartOf="@+id/imageButton4" />
-
-        <ImageButton
-            android:id="@+id/imageButton4"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_video_call_button"
-            app:layout_constraintEnd_toEndOf="parent" />
 
     </LinearLayout>
 

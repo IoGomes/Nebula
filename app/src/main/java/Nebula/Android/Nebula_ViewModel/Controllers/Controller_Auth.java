@@ -16,7 +16,7 @@ import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.concurrent.ExecutorService;
 
-import Nebula.Android.Nebula_Data.UserPreferences;
+import Nebula.Android.Nebula_Data.Preferences.SessionPreferences;
 import Nebula.Android.Nebula_Model.Services.Network_Checker;
 import Nebula.Android.Nebula_Model.Services.Service_Permission;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_01_Login;
@@ -67,7 +67,7 @@ public class Controller_Auth {
 
         loginButton.setText(null);
         loadAnimation.setVisibility(View.VISIBLE);
-        UserPreferences prefsData = new UserPreferences(activity);
+        SessionPreferences prefsData = new SessionPreferences(activity);
         prefsData.setIsLoggedIn(true);
         if (loadAnimation instanceof LottieAnimationView) {
             ((LottieAnimationView) loadAnimation).playAnimation();
@@ -116,7 +116,7 @@ public class Controller_Auth {
         if (register.isEnabled()) {
             signupButton.setText("");
             loadAnimation.setVisibility(View.VISIBLE);
-            UserPreferences prefsData = new UserPreferences(activity);
+            SessionPreferences prefsData = new SessionPreferences(activity);
             prefsData.setIsLoggedIn(true);
             if (loadAnimation instanceof LottieAnimationView) {
                 ((LottieAnimationView) loadAnimation).playAnimation();

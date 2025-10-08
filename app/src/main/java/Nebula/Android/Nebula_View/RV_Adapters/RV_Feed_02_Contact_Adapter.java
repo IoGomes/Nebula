@@ -43,7 +43,7 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             View view = inflater.inflate(R.layout.rv_08_header_search, parent, false);
             return new HeaderViewHolder(view);
         } else if (viewType == TYPE_TITLE) {
-            View view = inflater.inflate(R.layout.rv_05_header_calls_title, parent, false);
+            View view = inflater.inflate(R.layout.rv_07_header_contact_title, parent, false);
             return new TitleViewHolder(view);
         } else {
             View view = inflater.inflate(R.layout.rv_06_item_contact, parent, false);
@@ -60,7 +60,7 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             TitleViewHolder titleHolder = (TitleViewHolder) holder;
             titleHolder.bind();
         } else if (holder instanceof ItemViewHolder) {
-            Entity_06_Contact contact = contactList.get(position - 2); // Adjusted for header and title
+            Entity_06_Contact contact = contactList.get(position - 2);
             ItemViewHolder itemHolder = (ItemViewHolder) holder;
             itemHolder.tvName.setText(contact.getContactName());
             itemHolder.tvNumber.setText(contact.getContactNumber());

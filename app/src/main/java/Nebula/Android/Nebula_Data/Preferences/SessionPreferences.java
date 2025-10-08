@@ -1,16 +1,17 @@
-package Nebula.Android.Nebula_Data;
+package Nebula.Android.Nebula_Data.Preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class UserPreferences {
+public class SessionPreferences {
     private static final String PREF_NAME = "UserPrefs";
     private static final String KEY_LOGGED_IN = "isLoggedIn";
+    private static final String KEY_DID_ONBOARD_TUTORIAL = "isOnboardTutorialDone";
     private static final String KEY_USERNAME = "username";
 
     private SharedPreferences prefs;
 
-    public UserPreferences(Context context) {
+    public SessionPreferences(Context context) {
         prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 

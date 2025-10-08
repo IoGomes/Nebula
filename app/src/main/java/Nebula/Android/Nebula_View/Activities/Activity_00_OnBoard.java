@@ -20,7 +20,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.Objects;
 
-import Nebula.Android.Nebula_Data.UserPreferences;
+import Nebula.Android.Nebula_Data.Preferences.SessionPreferences;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act00OnboardBinding;
@@ -66,7 +66,7 @@ public class Activity_00_OnBoard extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (new UserPreferences(this).isLoggedIn()) {
+        if (new SessionPreferences(this).isLoggedIn()) {
             Intent intent = new Intent(Activity_00_OnBoard.this, Activity_02_Feed.class);
             startActivity(intent);
             finish();
@@ -98,11 +98,10 @@ public class Activity_00_OnBoard extends AppCompatActivity {
     }
 
     private void setupAnimations() {
-        // Avançar
+
         inForwardAnim = AnimationUtils.loadAnimation(this, R.anim.slide_in_right);
         outForwardAnim = AnimationUtils.loadAnimation(this, R.anim.slide_out_left);
 
-        // Voltar
         inBackwardAnim = AnimationUtils.loadAnimation(this, R.anim.slide_in_left);
         outBackwardAnim = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
     }
@@ -234,9 +233,9 @@ public class Activity_00_OnBoard extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (currentIndex > 0) {
-            previousImage(); // animação inversa
+            previousImage();
         } else {
-            super.onBackPressed(); // sai normalmente
+            super.onBackPressed();
         }
     }
 

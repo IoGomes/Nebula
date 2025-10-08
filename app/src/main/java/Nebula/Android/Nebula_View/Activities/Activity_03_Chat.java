@@ -62,6 +62,7 @@ public class Activity_03_Chat extends AppCompatActivity {
         mainHandler = new Handler(Looper.getMainLooper());
 
         bind.getRoot().post(this::initializeHeavyComponents);
+        bind.returnButton.setOnClickListener(v -> finish());
     }
 
     private void setupBasicUI() {
@@ -111,8 +112,6 @@ public class Activity_03_Chat extends AppCompatActivity {
                 bind.messageTextfield.setText("");
             }
         });
-
-        bind.camera.setOnClickListener(v -> showCameraPopup(v));
     }
 
     private void setupTextWatcher() {
@@ -140,44 +139,6 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.rvMessage.scrollToPosition(messageList.size() - 1);
     }
 
-    private void showCameraPopup(View v) {
-        int offsetY = -(int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
-
-        PopupMenu camera1 = new PopupMenu(this, v, Gravity.NO_GRAVITY, 0, offsetY);
-        camera1.getMenuInflater().inflate(R.menu.camera_pop_up, camera1.getMenu());
-
-        executorService.execute(() -> {
-            try {
-                Field mPopup = camera1.getClass().getDeclaredField("mPopup");
-                mPopup.setAccessible(true);
-                Object menuPopupHelper = mPopup.get(camera1);
-
-                if (menuPopupHelper != null) {
-                    Method setBackgroundDrawable = menuPopupHelper.getClass()
-                            .getDeclaredMethod("setBackgroundDrawable", Drawable.class);
-
-                    mainHandler.post(() -> {
-                        try {
-                            setBackgroundDrawable.invoke(menuPopupHelper,
-                                    ContextCompat.getDrawable(this, R.drawable.bg_popup_menu));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        camera1.setOnMenuItemClickListener(item -> {
-            int itemId = item.getItemId();
-            return itemId == 1 || itemId == 2;
-        });
-
-        camera1.show();
-    }
 
     private void setupKeyboardListener() {
         View rootView = findViewById(android.R.id.content);
