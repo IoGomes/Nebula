@@ -2,31 +2,32 @@
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
 
-Nebula Messenger é uma aplicação de mensagens em tempo real, desenvolvida para oferecer comunicação rápida e segura com uma interface simples e moderna.
+Nebula Messenger is a real-time messaging application designed to provide fast and secure communication with a simple, modern interface.
 
-## Visão geral
+## Overview
 
-O projeto é dividido em três partes principais:
-- `client/` — aplicação do usuário (frontend)
-- `server/` — API e lógica de mensagens (backend)
-- `database/` — scripts e estrutura do banco de dados
+The project is organized into three main components:
+- `client/` — user application (frontend)
+- `server/` — messaging API and backend logic
+- `database/` — database structure and scripts
 
-## Funcionalidades
+## Features
 
-- Mensagens em tempo real  
-- Chats individuais e em grupo  
-- Envio de arquivos e mídia  
-- Autenticação e criptografia básica  
-- Tema visual leve em gradiente roxo e rosa
+- Real-time messaging  
+- Individual and group chats  
+- File and media sharing  
+- Authentication and basic encryption  
+- Light gradient-based interface in purple and pink tones
 
-## Tecnologias
+## Technologies
 
 **Frontend:** React / JavaFX / Android  
 **Backend:** Node.js / Java / WebSocket  
-**Banco:** PostgreSQL / MongoDB
+**Database:** PostgreSQL / MongoDB
 
-## Instalação
+## Installation
 
 ```bash
 git clone https://github.com/IoGomes/Nebula.git
 cd Nebula
+
