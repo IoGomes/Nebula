@@ -1,4 +1,4 @@
-![Nebula Logo](https://raw.githubusercontent.com/IoGomes/Nebula/acac123562924ddb2f1b9a7ccbf090a1796d121c/Docs/Ativo%201.svg)
+![Nebula Logo](https://raw.githubusercontent.com/IoGomes/Nebula/master/Docs/Ativo%201.svg)
 
 # Messenger
 
