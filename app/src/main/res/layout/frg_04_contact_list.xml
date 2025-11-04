@@ -7,12 +7,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
+        android:id="@+id/null_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textColor="#909090"
         android:gravity="center"
-        android:visibility="gone"
-        android:text="Lista de Contatos Vazia"/>
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:scrollbars="vertical"
@@ -23,7 +23,7 @@
         android:scrollbarSize="1dp"
         android:clipToPadding="false"
         android:layout_height="0dp"
-        tools:listitem="@layout/rv_06_contact"
+        tools:listitem="@layout/rv_06_item_contact"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

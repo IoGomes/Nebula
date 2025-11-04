@@ -98,7 +98,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_margin="08dp"
-        android:background="@drawable/bg_return"
+        android:background="@drawable/bg_incoming_call"
         android:src="@drawable/ic_return"
         android:stateListAnimator="@animator/scale_animation2"
         android:textAllCaps="false"

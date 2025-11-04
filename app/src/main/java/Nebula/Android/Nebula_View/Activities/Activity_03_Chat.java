@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_03_Message;
+import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_01_Profile_Image;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Chat_01_Msg_Adapter;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Video_Call;
@@ -82,6 +83,8 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.rvMessage.setAdapter(adapter);
         bind.rvMessage.setItemAnimator(null);
         bind.rvMessage.setHasFixedSize(true);
+        bind.profilePhoto.setOnClickListener(v ->
+            new Dialog_Feed_01_Profile_Image(v.getContext()).show());
     }
 
     private void initializeHeavyComponents() {

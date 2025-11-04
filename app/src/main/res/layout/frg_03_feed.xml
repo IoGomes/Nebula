@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <TextView
+        android:id="@+id/null_message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="#909090"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="No Open Chats → Tap + to start a conversation"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"

@@ -1,6 +1,10 @@
 package Nebula.Android.Nebula_View.Fragments;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,28 +42,15 @@ public class Fragment_Feed_03_Calls extends Fragment {
 
         callSessions = new ArrayList<>();
 
-        callSessions.add(new Entity_05_call(
-                "Nome de Contato",
-                dataFicticia,
-                true
-        ));
-        callSessions.add(new Entity_05_call(
-                "Nome de Contato",
-                dataFicticia,
-                true
-        ));callSessions.add(new Entity_05_call(
-                "Nome de Contato",
-                dataFicticia,
-                true
-        ));callSessions.add(new Entity_05_call(
-                "Nome de Contato",
-                dataFicticia,
-                true
-        ));callSessions.add(new Entity_05_call(
-                "Nome de Contato",
-                dataFicticia,
-                true
-        ));
+        if(callSessions.isEmpty()){
+
+            bind.callRecyclerView.setVisibility(GONE);
+            bind.nullMessage.setVisibility(VISIBLE);
+
+        }
+
+        String message = "Empty <b><font color='#FFFFFF'>Call History</font></b> → Make or receive a call to view.";
+        bind.nullMessage.setText(Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY));
 
         bind.callRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

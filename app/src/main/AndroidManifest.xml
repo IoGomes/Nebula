@@ -51,6 +51,10 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
+            android:name=".Nebula_View.Activities.Activity_Web"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <activity
             android:name=".Nebula_View.Activities.Activity_04_Voice_Call" />
 
         <activity

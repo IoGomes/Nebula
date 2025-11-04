@@ -1,9 +1,13 @@
 package Nebula.Android.Nebula_View.RV_Adapters;
 
+import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_06_Contact;
+import Nebula.Android.Nebula_View.Activities.Activity_03_Chat;
+import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_01_Profile_Image;
 import Nebula.Android.R;
 
 public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -21,10 +27,20 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
 
     private List<Entity_06_Contact> contactList;
     private List<Entity_06_Contact> fullList;
+    private OnContactClickListener onContactClickListener;
+    private String currentSearchQuery = "";
+
+    public interface OnContactClickListener {
+        void onContactClick(Entity_06_Contact contact);
+    }
 
     public RV_Feed_02_Contact_Adapter(List<Entity_06_Contact> contactList) {
         this.contactList = contactList;
         this.fullList = new ArrayList<>(contactList);
+    }
+
+    public void setOnContactClickListener(OnContactClickListener listener) {
+        this.onContactClickListener = listener;
     }
 
     @Override
@@ -51,6 +67,12 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+    public void updateData(List<Entity_06_Contact> newContacts) {
+        this.contactList = newContacts;
+        notifyDataSetChanged();
+    }
+
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
@@ -64,6 +86,13 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             ItemViewHolder itemHolder = (ItemViewHolder) holder;
             itemHolder.tvName.setText(contact.getContactName());
             itemHolder.tvNumber.setText(contact.getContactNumber());
+
+            itemHolder.profile.setOnClickListener(v ->
+                    new Dialog_Feed_01_Profile_Image(v.getContext()).show()
+            );
+
+            itemHolder.itemView.setOnClickListener(v ->
+                v.getContext().startActivity(new Intent(v.getContext(), Activity_03_Chat.class)));
         }
     }
 
@@ -100,11 +129,13 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
 
     static class ItemViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvNumber;
+        ImageButton profile;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.contactName);
             tvNumber = itemView.findViewById(R.id.number);
+            profile = itemView.findViewById(R.id.profile_photo);
         }
     }
 }

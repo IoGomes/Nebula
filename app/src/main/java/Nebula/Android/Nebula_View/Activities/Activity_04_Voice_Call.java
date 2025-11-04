@@ -45,9 +45,10 @@ public class Activity_04_Voice_Call extends AppCompatActivity {
 
         bind.cronometro.start();
 
-        // Inicializa vibrator e som
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         startCallTone();
+
+        bind.dismissCall.setOnClickListener(v->finish());
 
         bind.returnButton.setOnClickListener(v -> {
             bind.cronometro.stop();
@@ -93,11 +94,10 @@ public class Activity_04_Voice_Call extends AppCompatActivity {
             toneGenerator.release();
         }
 
-        // Tom mais grave e agradável
         toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 60); // 60% volume
 
-        final int pulseDuration = 1400; // duração do "pulso" (soma de todos os pulsos da animação)
-        final long loopDuration = 3000; // duração total do loop da animação
+        final int pulseDuration = 1400;
+        final long loopDuration = 3000;
 
         toneHandler = new Handler();
         toneRunnable = new Runnable() {
@@ -105,7 +105,6 @@ public class Activity_04_Voice_Call extends AppCompatActivity {
             public void run() {
                 toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE, pulseDuration);
 
-                // Reagendar o próximo pulso após o loop da animação
                 toneHandler.postDelayed(this, loopDuration);
             }
         };

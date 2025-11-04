@@ -78,6 +78,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/notification"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="8dp"
@@ -85,6 +86,7 @@
         android:background="@drawable/ic_notification"
         android:gravity="center"
         android:text="1"
+        android:visibility="visible"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="08sp"

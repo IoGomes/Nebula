@@ -23,7 +23,7 @@ import Nebula.Android.databinding.Act05VideoCallBinding;
 
 public class Activity_05_Video_Call extends AppCompatActivity {
         private Act05VideoCallBinding bind;
-        private PreviewView previewView;
+        private PreviewView frontCameraPreview;
         private ProcessCameraProvider cameraProvider;
 
         @Override
@@ -31,7 +31,16 @@ public class Activity_05_Video_Call extends AppCompatActivity {
 
             setTheme(androidx.appcompat.R.style.Theme_AppCompat);
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.act_05_video_call);
+
+            bind = Act05VideoCallBinding.inflate(getLayoutInflater());
+
+            setContentView(bind.getRoot());
+
+            frontCameraPreview = (PreviewView) findViewById(R.id.previewView);
+
+            bind.returnButton.setOnClickListener(v -> finish());
+
+            bind.dismissCall.setOnClickListener(v-> finish());
 
             Window window = getWindow();
             window.setStatusBarColor(Color.TRANSPARENT);
@@ -40,8 +49,6 @@ public class Activity_05_Video_Call extends AppCompatActivity {
             NavBar_Inserts.adjustPaddingForNavigationBar(rootLayout, this);
 
             Objects.requireNonNull(getSupportActionBar()).hide();
-
-            previewView = (PreviewView) findViewById(R.id.previewView);
 
             startCamera();
         }
@@ -55,7 +62,7 @@ public class Activity_05_Video_Call extends AppCompatActivity {
                 cameraProvider = cameraProviderFuture.get();
 
                 Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(previewView.getSurfaceProvider());
+                preview.setSurfaceProvider(frontCameraPreview.getSurfaceProvider());
 
                 CameraSelector cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA;
 

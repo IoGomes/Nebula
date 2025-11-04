@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="end"
-    android:layout_margin="02dp"
+    android:layout_gravity="top"
+    android:layout_margin="2dp"
     android:background="@drawable/bg_message"
-    android:orientation="horizontal"
-    android:stateListAnimator="@animator/scale_animation"
-    android:interpolator="@android:anim/accelerate_decelerate_interpolator">
+    android:clipToOutline="true"
+    android:elevation="2dp"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:stateListAnimator="@animator/scale_animation">
 
     <LinearLayout
         android:id="@+id/message_glass"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="04dp"
-        android:orientation="horizontal">
+        android:layout_margin="4dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/textMessage"
@@ -23,23 +26,18 @@
             android:layout_height="wrap_content"
             android:breakStrategy="simple"
             android:ellipsize="none"
-            android:maxWidth="280dp"
-            android:paddingStart="08dp"
-            android:paddingTop="02dp"
-            android:paddingEnd="08dp"
-            android:paddingBottom="02dp"
-            android:scrollHorizontally="false"
+            android:maxWidth="240dp"
+            android:paddingStart="8dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="2dp"
             android:text="Mensagem"
             android:textColor="@color/white"
-            android:textSize="16sp">
-            
-        </TextView>
+            android:textSize="16sp" />
 
         <Space
-            android:layout_width="04dp"
-            android:layout_height="match_parent">
-
-        </Space>
+            android:layout_width="4dp"
+            android:layout_height="match_parent" />
 
         <TextView
             android:id="@+id/textDate"
@@ -47,11 +45,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:fontFamily="@font/space_mono_regular"
-            android:paddingEnd="04dp"
+            android:paddingEnd="4dp"
             android:text="19:23"
-            android:textColor="#99ffffff"
+            android:textColor="#99FFFFFF"
             android:textSize="10sp"
             tools:ignore="SmallSp" />
+
+        <ImageView
+            android:id="@+id/iconTick"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginBottom="02dp"
+            android:layout_marginEnd="02dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="2dp"
+            android:src="@drawable/ic_tick" />
 
     </LinearLayout>
 

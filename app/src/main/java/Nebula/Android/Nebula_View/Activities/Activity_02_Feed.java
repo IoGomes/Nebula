@@ -1,5 +1,9 @@
 package Nebula.Android.Nebula_View.Activities;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -18,19 +22,19 @@ import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_01_Inbox;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_02_Contacts;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_03_Calls;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_04_Archived;
+import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act02FeedBinding;
 
-/// @author Ítalo Oliveira Gomes
-
+/// Activity principal do Feed
 @SuppressWarnings("SpellCheckingInspection")
 public class Activity_02_Feed extends AppCompatActivity {
 
-    Fragment fragment01 = new Fragment_Feed_01_Inbox();
-    Fragment fragment02 = new Fragment_Feed_02_Contacts();
-    Fragment fragment03 = new Fragment_Feed_03_Calls();
-    Fragment fragment04 = new Fragment_Feed_04_Archived();
+    private Fragment fragment01 = new Fragment_Feed_01_Inbox();
+    private Fragment fragment02 = new Fragment_Feed_02_Contacts();
+    private Fragment fragment03 = new Fragment_Feed_03_Calls();
+    private Fragment fragment04 = new Fragment_Feed_04_Archived();
 
     private Act02FeedBinding binding;
 
@@ -52,6 +56,23 @@ public class Activity_02_Feed extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         replaceFragment(fragment01);
+
+        binding.git.setOnClickListener(v -> {
+                    Intent intent = new Intent(this, Activity_Web.class);
+                    startActivity(intent);
+                });
+
+        binding.close.setOnClickListener(v -> {
+
+            if (fragment01 instanceof Fragment_Feed_01_Inbox) {
+                Fragment_Feed_01_Inbox inboxFragment = (Fragment_Feed_01_Inbox) fragment01;
+                RV_Feed_01_Chat_Adapter adapter = inboxFragment.getAdapter();
+                if (adapter != null) {
+                    adapter.clearSelection();
+                }
+            }
+            hideOptionsBar();
+        });
 
         changeButtonBg();
     }
@@ -82,6 +103,7 @@ public class Activity_02_Feed extends AppCompatActivity {
                 int imageButtonId = layoutParaBotaoMap.get(v.getId());
                 ImageButton imageButton = findViewById(imageButtonId);
                 selecionarBotao(imageButton);
+                hideOptionsBar();
                 replaceFragment(fragmentMap.get(v.getId()));
             });
         }
@@ -110,6 +132,19 @@ public class Activity_02_Feed extends AppCompatActivity {
                 .replace(R.id.fragmentContainer, fragment)
                 .commit();
     }
+
+
+    public void showOptionsBar() {
+        binding.option.setVisibility(VISIBLE);
+        binding.close.setVisibility(VISIBLE);
+        binding.trash.setVisibility(VISIBLE);
+        binding.git.setVisibility(GONE);
+    }
+
+    public void hideOptionsBar() {
+        binding.option.setVisibility(GONE);
+        binding.close.setVisibility(GONE);
+        binding.trash.setVisibility(GONE);
+        binding.git.setVisibility(VISIBLE);
+    }
 }
-
-

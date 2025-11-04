@@ -51,7 +51,8 @@ dependencies {
     implementation(libs.lottie)
 
     //Retrofit - Bibliotecas para Requisição REST;
-    implementation(libs.retrofit.v2110)
+    implementation(libs.retrofit.v290)
+    implementation(libs.converter.gson.v290)
     implementation(libs.converter.gson)
     implementation(libs.gson)
     implementation(libs.androidx.appcompat.v170)

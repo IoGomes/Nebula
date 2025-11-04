@@ -5,10 +5,11 @@
     android:layout_height="wrap_content"
     android:layout_margin="06dp"
     android:orientation="horizontal"
+    android:foreground="?attr/selectableItemBackground"
     android:padding="04dp">
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/profile_photo"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center"

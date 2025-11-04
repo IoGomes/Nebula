@@ -1,6 +1,10 @@
 package Nebula.Android.Nebula_View.Fragments;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
@@ -33,33 +35,13 @@ public class Fragment_Feed_04_Archived extends Fragment {
 
         chatSessions = new ArrayList<>();
 
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                Arrays.asList("userC", "userD"),
-                List.of(new Date()),
-                "Reunião marcada para amanhã."
-        ));
+        String message = "No <b><font color='#FFFFFF'>Archived Chats</font></b>. <b><font color='#FFFFFF'>Long-press</font></b> inbox chat → Archive chat to view.";
+        bind.nullMessage.setText(Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY));
 
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                Arrays.asList("userC", "userD"),
-                List.of(new Date()),
-                "Reunião marcada para amanhã."
-        ));
-
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                Arrays.asList("userC", "userD"),
-                List.of(new Date()),
-                "Reunião marcada para amanhã."
-        ));
-
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat2",
-                Arrays.asList("userC", "userD"),
-                List.of(new Date()),
-                "Reunião marcada para amanhã."
-        ));
+        if (chatSessions.isEmpty()) {
+            bind.recyclerView.setVisibility(GONE);
+            bind.nullMessage.setVisibility(VISIBLE);
+        }
 
         bind.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

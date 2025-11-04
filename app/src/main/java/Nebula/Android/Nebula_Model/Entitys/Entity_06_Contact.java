@@ -27,4 +27,5 @@ public class Entity_06_Contact {
     public void setContactName(String contactName) {
         this.contactName = contactName;
     }
+
 }

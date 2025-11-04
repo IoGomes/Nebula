@@ -5,6 +5,19 @@ import java.util.List;
 
 public class Entity_02_Chat_Session {
 
+    private int unreadCount;
+    private boolean hasUnread = true;
+    public boolean isFavorite = true;
+
+    public int getUnreadCount() { return unreadCount; }
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+        this.hasUnread = unreadCount > 0;
+    }
+
+    public boolean hasUnread() { return hasUnread; }
+    public void setHasUnread(boolean hasUnread) { this.hasUnread = hasUnread; }
+
     private String chatSessionId;
     private List<String> chatUsersId;
     private String usersNumbers;
@@ -52,4 +65,7 @@ public class Entity_02_Chat_Session {
         this.lastMessage = lastMessage;
     }
 
+    public boolean isFavorite() {
+        return true;
+    }
 }

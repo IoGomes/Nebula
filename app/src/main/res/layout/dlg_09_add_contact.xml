@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:layout_height="330dp"
+    android:background="@drawable/bg_add_chat"
+    android:minWidth="300dp">
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/search_field"
+        android:drawableRight="@drawable/ic_user_name"
+        android:hint="Name:"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColorHint="#404040"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/phone_Number"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:drawableRight="@drawable/ic_user_name"
+        android:layout_margin="12dp"
+        android:background="@drawable/search_field"
+        android:hint="Last Name"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColorHint="#404040"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
+
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/search_field"
+        android:drawableRight="@drawable/ic_phone_edit_textfield"
+        android:hint="Telefone Number"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColorHint="#404040"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_Number" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="0dp"
+        android:layout_height="28dp"
+        android:layout_margin="12dp"
+        android:paddingStart="8dp"
+        android:text="Sync with phone"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText2" />
+
+    <ImageButton
+        android:id="@+id/btn_save"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/bg_send_button"
+        android:src="@drawable/ic_add"
+        app:layout_constraintTop_toBottomOf="@+id/switch1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
