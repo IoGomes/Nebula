@@ -9,7 +9,7 @@ Nebula Messenger is a real-time messaging application designed to provide fast a
 Main Components:
 - `Client/` — Android application (frontend, XML-based layouts, Java)
 - `Server/` — Messaging API and Backend logic
-- `Database/` — Database structure and scripts
+- `Database/` — Database Structure and scripts
 - `Docs/` — Project documentation, design assets, and reference material
 
 ## Features
