@@ -12,7 +12,7 @@
   <p> Main Components: </p>
 </h3>
 
-- `Client/` — Android application (frontend, XML-based layouts, Java)
+- `Client/` — Android application (XML-Based Layouts, Java)
 - `Server/` — Messaging API and Backend Logic
 - `Database/` — Database Structure and scripts
 - `Docs/` — Project Documentation and Reference Material
@@ -22,7 +22,7 @@
 - Real-time Messaging  
 - Real Time Voice and Video Chats
 - Authentication and Basic Encryption
-- Timeline Tracking of GitHub events
+- Timeline Tracking of GitHub Events
 
 ## Technologies
 
