@@ -1,7 +1,5 @@
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Ativo%201ldpi.png?raw=true)
-<h3 style="margin: 0;">
-  Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication.
-</h3>
+<span align="right"><code>Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication.</code></span>
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
 <span align="right"><code>In-App Screenshots</code></span>
