@@ -21,7 +21,7 @@ The project is organized into three main components:
 
 ## Technologies
 
-**Frontend:** React / JavaFX / Android  
+**Frontend:** Android (XML layouts, Java) / Html / Css
 **Backend:** Node.js / Java / WebSocket  
 **Database:** PostgreSQL / MongoDB
 
