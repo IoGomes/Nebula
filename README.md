@@ -1,5 +1,5 @@
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Ativo%201ldpi.png?raw=true)
-<span align="right"><b>Message App</b></span>
+<span align="right"><b> - MESSAGE APP</b></span>
 
 <span align="right">Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication.</span>
 
