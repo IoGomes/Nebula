@@ -14,11 +14,9 @@ Main Components:
 
 ## Features
 
-- Real-time messaging  
-- Individual and group chats  
-- File and media sharing  
-- Authentication and basic encryption  
-- Light gradient-based interface in purple and pink tones
+- Real-time Messaging  
+- Real Time Voice and Video Chats
+- Authentication and Basic Encryption  
 
 ## Technologies
 
