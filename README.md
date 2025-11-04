@@ -16,17 +16,16 @@ Main Components:
 
 - Real-time Messaging  
 - Real Time Voice and Video Chats
-- Authentication and Basic Encryption  
+- Authentication and Basic Encryption
+- Timeline tracking of GitHub events
 
 ## Technologies
 
-**Client:** Android (XML, Java, HTML, CSS)  
-**Server:** Java | JavaScript | WebSocket | WebRTC | REST API  
-**Integrations:** GitHub OAuth | GitHub API | Firebase | Google Cloud  
-**Database:** MySQL | SQLite  
-**Docs:** Markdown
-
-
+- **Client:** Android (XML, Java, HTML, CSS)  
+- **Server:** Java | JavaScript | WebSocket | WebRTC | REST API  
+- **Integrations:** | GitHub API | Firebase 
+- **Database:** MySQL | Google Cloud 
+- **Docs:** Markdown
 
 ## Installation
 
