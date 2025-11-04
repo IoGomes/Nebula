@@ -8,7 +8,9 @@
 
 ## Overview
 
-Main Components:
+<h3 align="justified">
+  <p> Main Components: </p>
+</h3>
 - `Client/` — Android application (frontend, XML-based layouts, Java)
 - `Server/` — Messaging API and Backend logic
 - `Database/` — Database Structure and scripts
