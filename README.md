@@ -1,6 +1,6 @@
 # Nebula Messenger
 
-## Real-time messaging application designed to provide fast and secure communication with a simple, modern interface.
+## <p align="justify"> Real-time messaging for fast and secure communication. </p>
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
 
