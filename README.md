@@ -1,7 +1,4 @@
-![Nebula Banner](https://raw.githubusercontent.com/IoGomes/Nebula/master/Docs/Ativo%201xxxhdpi.png)
-
-# Messenger
-
+![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Ativo%201xxxhdpi.png?raw=true)
 
 <h3 align="justified">
   <p> Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication. </p>
