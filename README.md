@@ -1,8 +1,8 @@
 # Nebula Messenger
 
-<h3 align="justified">
+<h2 align="justified">
   <p> Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication. </p>
-</h3>
+</h2>
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
 
