@@ -2,7 +2,7 @@
 <span align="right"><code><b> - Messenger </b></code></span>
 
 <h2 style="text-align: right; margin: 0;">
-  Real-time Messaging for <b><u>Fast</u></b> and <b><u>Secure</u></b> communication.
+  Real-time Messaging for <b><u>FAST</u></b> and <b><u>SECURE</u></b> communication.
 </h2>
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
