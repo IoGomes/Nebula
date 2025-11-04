@@ -1,12 +1,12 @@
 # Nebula Messenger
 
-![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
-
 Nebula Messenger is a real-time messaging application designed to provide fast and secure communication with a simple, modern interface.
+
+![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
 
 ## Overview
 
-The project is organized into four main components:
+Main Components:
 - `Client/` — Android application (frontend, XML-based layouts, Java)
 - `Server/` — Messaging API and Backend logic
 - `Database/` — Database structure and scripts
