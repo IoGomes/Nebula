@@ -13,16 +13,16 @@
 </h3>
 
 - `Client/` — Android application (frontend, XML-based layouts, Java)
-- `Server/` — Messaging API and Backend logic
+- `Server/` — Messaging API and Backend Logic
 - `Database/` — Database Structure and scripts
-- `Docs/` — Project documentation and reference material
+- `Docs/` — Project Documentation and Reference Material
 
 ## Features
 
 - Real-time Messaging  
 - Real Time Voice and Video Chats
 - Authentication and Basic Encryption
-- Timeline tracking of GitHub events
+- Timeline Tracking of GitHub events
 
 ## Technologies
 
