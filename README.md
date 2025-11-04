@@ -1,6 +1,6 @@
 # Nebula Messenger
 
-## <p align="justify"> Real-time Messaging for <i>Fast</i> and <i>Secure</i> communication. </p>
+<h2 style="border:none; margin:0; padding:0;"> Real-time messaging for <b>fast and secure</b> communication. </h2>
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
 
