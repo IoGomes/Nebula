@@ -6,7 +6,7 @@
 </h2>
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
-<p align="right"><code>In-App Screenshots</code></p>
+<span align="right"><code>In-App Screenshots</code></span>
 
 ## Overview
 
