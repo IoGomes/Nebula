@@ -1,4 +1,14 @@
-![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Ativo%201mdpi.png?raw=true)
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/IoGomes/Nebula/blob/master/Docs/Ativo%201mdpi.png?raw=true" width="50">
+    </td>
+    <td>
+      <h3 style="margin: 0;">- Message App</h3>
+    </td>
+  </tr>
+</table>
+
 <h3 style="margin: 0;">
   Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication.
 </h3>
