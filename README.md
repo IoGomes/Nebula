@@ -21,12 +21,12 @@ Main Components:
 ## Technologies
 
 **Frontend:** Android (XML layouts, Java, Html, Css)  
-**Backend:** JavaScript / Java / WebSocket / WebRTC  
-**Database:** MySQL / Firebase  
-**Documentation:** Markdown files and references on `/docs`
+**Backend:** JavaScript | Java | WebSocket | WebRTC  
+**Database:** MySQL | Firebase | Google Cloud 
+**Documentation:** Markdown files | References
 
 ## Installation
 
-```bash
+```bash 
 git clone https://github.com/IoGomes/Nebula.git
 cd Nebula
