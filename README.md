@@ -20,10 +20,12 @@ Main Components:
 
 ## Technologies
 
-**Frontend:** Android (XML layouts, Java, Html, Css)  
-**Backend:** JavaScript | Java | WebSocket | WebRTC  
-**Database:** MySQL | Firebase | Google Cloud 
-**Documentation:** Markdown files | References
+**Client (Frontend):** Android (XML layouts, Java, HTML, CSS)  
+**Server (Backend):** Java | JavaScript | WebSocket | WebRTC | REST API  
+**Integrations:** GitHub Public API | Firebase | Google Cloud  
+**Database:** MySQL  
+**Documentation:** Markdown | References
+
 
 ## Installation
 
