@@ -1,5 +1,4 @@
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Ativo%201mdpi.png?raw=true)
-
 <h3 align="justified">
   <p> Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication. </p>
 </h3>
