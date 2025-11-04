@@ -1,9 +1,7 @@
 # Nebula Messenger
 
-## Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication.
-
-<h3 align="center">
-  <p>Build context-aware reasoning applications with LangChain’s flexible abstractions and AI-first toolkits.</p>
+<h3 align="justified">
+  <p> Real-time Messaging for <b>Fast</b> and <b>Secure</b> communication. </p>
 </h3>
 
 ![Nebula Banner](https://github.com/IoGomes/Nebula/blob/master/Docs/Purple%20Pink%20Gradient%20Mobile%20Application%20Presentation-1.png?raw=true)
