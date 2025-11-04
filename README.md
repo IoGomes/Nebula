@@ -20,10 +20,10 @@ Main Components:
 
 ## Technologies
 
-**Frontend:** Android (native XML layouts, Kotlin/Java)  
-**Backend:** Node.js / Java / WebSocket  
-**Database:** PostgreSQL / MongoDB  
-**Documentation:** Markdown files and visual assets stored under `/docs`
+**Frontend:** Android (XML layouts, Java, Html, Css)  
+**Backend:** JavaScript / Java / WebSocket / WebRTC  
+**Database:** MySQL / Firebase  
+**Documentation:** Markdown files and references on `/docs`
 
 ## Installation
 
