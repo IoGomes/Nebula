@@ -10,7 +10,7 @@ Main Components:
 - `Client/` — Android application (frontend, XML-based layouts, Java)
 - `Server/` — Messaging API and Backend logic
 - `Database/` — Database Structure and scripts
-- `Docs/` — Project documentation, design assets, and reference material
+- `Docs/` — Project documentation and reference material
 
 ## Features
 
