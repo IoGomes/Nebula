@@ -9,6 +9,11 @@ public class Entity_02_Chat_Session {
     private boolean hasUnread = true;
     public boolean isFavorite = true;
 
+    private String senderName;
+
+    public String getSenderName() { return senderName; }
+    public void setSenderName(String senderName) { this.senderName = senderName; }
+
     public int getUnreadCount() { return unreadCount; }
     public void setUnreadCount(int unreadCount) {
         this.unreadCount = unreadCount;

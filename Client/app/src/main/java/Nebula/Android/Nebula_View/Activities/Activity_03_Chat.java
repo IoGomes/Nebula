@@ -2,25 +2,19 @@ package Nebula.Android.Nebula_View.Activities;
 
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +27,7 @@ import Nebula.Android.Nebula_View.RV_Adapters.RV_Chat_01_Msg_Adapter;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Video_Call;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Voice_Call;
+import Nebula.Android.Nebula_WebSocketChat.Chat.StompChatService;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act03ChatBinding;
 
@@ -46,6 +41,18 @@ public class Activity_03_Chat extends AppCompatActivity {
 
     private ExecutorService executorService;
     private Handler mainHandler;
+
+    // ====== INTEGRAÇÃO WEBSOCKET/STOMP ======
+    private StompChatService chatService;
+    private String username = "User_" + System.currentTimeMillis(); // Pode vir de login/preferences
+    private String chatRoomId = "public"; // ID da sala de chat
+
+    // Configurações do servidor - AJUSTE CONFORME SEU SERVIDOR
+    private static final String SERVER_URL = "ws://192.168.1.110:8080/ws/websocket";
+    private static final String TOPIC_PATTERN = "/topic/chat/%s"; // %s será substituído pelo chatRoomId
+    private static final String SEND_DESTINATION = "/app/chat.send";
+    private static final String JOIN_DESTINATION = "/app/chat.join";
+    private static final String LEAVE_DESTINATION = "/app/chat.leave";
 
     @Override
     protected void onCreate(Bundle savedInstanceBundle) {
@@ -62,7 +69,14 @@ public class Activity_03_Chat extends AppCompatActivity {
         executorService = Executors.newSingleThreadExecutor();
         mainHandler = new Handler(Looper.getMainLooper());
 
-        bind.getRoot().post(this::initializeHeavyComponents);
+        // Inicializa o serviço de chat
+        chatService = new StompChatService();
+
+        bind.getRoot().post(() -> {
+            initializeHeavyComponents();
+            connectToWebSocket(); // Conecta ao servidor
+        });
+
         bind.returnButton.setOnClickListener(v -> finish());
     }
 
@@ -84,7 +98,7 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.rvMessage.setItemAnimator(null);
         bind.rvMessage.setHasFixedSize(true);
         bind.profilePhoto.setOnClickListener(v ->
-            new Dialog_Feed_01_Profile_Image(v.getContext()).show());
+                new Dialog_Feed_01_Profile_Image(v.getContext()).show());
     }
 
     private void initializeHeavyComponents() {
@@ -99,6 +113,79 @@ public class Activity_03_Chat extends AppCompatActivity {
         setupClickListeners();
         setupTextWatcher();
         setupKeyboardListener();
+    }
+
+    // ====== CONEXÃO WEBSOCKET ======
+    private void connectToWebSocket() {
+        showConnectionStatus("Conectando...");
+
+        chatService.connect(SERVER_URL, new StompChatService.ConnectionListener() {
+            @Override
+            public void onConnected() {
+                runOnUiThread(() -> {
+                    showConnectionStatus("Conectado!");
+
+                    // Inscreve-se no tópico do chat
+                    String topic = String.format(TOPIC_PATTERN, chatRoomId);
+                    subscribeToChat(topic);
+
+                    // Notifica entrada no chat
+                    chatService.joinChat(JOIN_DESTINATION, username, chatRoomId);
+                });
+            }
+
+            @Override
+            public void onDisconnected() {
+                runOnUiThread(() -> {
+                    showConnectionStatus("Desconectado");
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    showConnectionStatus("Erro: " + error);
+                    // Tenta reconectar após 3 segundos
+                    mainHandler.postDelayed(() -> {
+                        if (!chatService.isConnected()) {
+                            connectToWebSocket();
+                        }
+                    }, 3000);
+                });
+            }
+        });
+    }
+
+    private void subscribeToChat(String topic) {
+        chatService.subscribe(topic, new StompChatService.MessageListener() {
+            @Override
+            public void onMessageReceived(StompChatService.ChatMessage message) {
+                runOnUiThread(() -> {
+                    // Não adiciona mensagens próprias duplicadas
+                    if (!message.getSender().equals(username)) {
+                        receiveMessage(message);
+                    }
+                });
+            }
+        });
+    }
+
+    private void receiveMessage(StompChatService.ChatMessage stompMessage) {
+        Entity_03_Message newMessage = new Entity_03_Message();
+        newMessage.setMessage(stompMessage.getContent());
+        newMessage.setDateTimeMessage(new Date(stompMessage.getTimestamp()));
+        newMessage.setWasVisualized(false);
+        newMessage.setSenderName(stompMessage.getSender());
+
+        messageList.add(newMessage);
+        adapter.notifyItemInserted(messageList.size() - 1);
+        bind.rvMessage.scrollToPosition(messageList.size() - 1);
+    }
+
+    private void showConnectionStatus(String status) {
+        Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
+        // Opcional: Atualizar UI com indicador de conexão
+        // bind.connectionStatus.setText(status);
     }
 
     private void setupClickListeners() {
@@ -132,6 +219,7 @@ public class Activity_03_Chat extends AppCompatActivity {
 
     private void sendMessage(String text) {
 
+        // Adiciona a mensagem localmente
         Entity_03_Message newMessage = new Entity_03_Message();
         newMessage.setMessage(text);
         newMessage.setDateTimeMessage(new Date());
@@ -140,8 +228,22 @@ public class Activity_03_Chat extends AppCompatActivity {
         messageList.add(newMessage);
         adapter.notifyItemInserted(messageList.size() - 1);
         bind.rvMessage.scrollToPosition(messageList.size() - 1);
-    }
 
+        // Envia via WebSocket se conectado
+        if (chatService.isConnected()) {
+            StompChatService.ChatMessage stompMessage = new StompChatService.ChatMessage(
+                    username,
+                    text,
+                    "CHAT",
+                    chatRoomId
+            );
+
+            chatService.sendMessage(SEND_DESTINATION, stompMessage);
+        } else {
+            Toast.makeText(this, "Não conectado. Tentando reconectar...", Toast.LENGTH_SHORT).show();
+            connectToWebSocket();
+        }
+    }
 
     private void setupKeyboardListener() {
         View rootView = findViewById(android.R.id.content);
@@ -177,8 +279,33 @@ public class Activity_03_Chat extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Desconecta do WebSocket
+        if (chatService != null) {
+            chatService.leaveChat(LEAVE_DESTINATION, username, chatRoomId);
+            chatService.disconnect();
+        }
+
         if (executorService != null && !executorService.isShutdown()) {
             executorService.shutdown();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Opcional: Desconectar quando sair da tela
+        // if (chatService != null) {
+        //     chatService.disconnect();
+        // }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Opcional: Reconectar quando voltar
+        // if (chatService != null && !chatService.isConnected()) {
+        //     connectToWebSocket();
+        // }
     }
 }

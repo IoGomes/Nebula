@@ -7,6 +7,16 @@ public class Entity_03_Message {
     private Date dateTimeMessage;
     private Boolean wasVisualized;
 
+    private String senderName;
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
 
     public Boolean getWasVisualized() {
         return wasVisualized;

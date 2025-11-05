@@ -8,6 +8,7 @@
         android:name="android.hardware.audio.output"
         android:required="true" />
 
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -22,6 +23,8 @@
         android:fullBackupContent="@xml/backup_rules"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:label="Nebula"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -47,6 +50,8 @@
         <activity android:name=".Nebula_View.Activities.Activity_02_Feed" />
 
         <activity
+            android:usesCleartextTraffic="true"
+            android:networkSecurityConfig="@xml/network_security_config"
             android:name=".Nebula_View.Activities.Activity_03_Chat"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
