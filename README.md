@@ -28,7 +28,7 @@
 ## Technologies
 
 - **Client:** Android (XML, Java, HTML, CSS)  
-- **Server:** Java | JavaScript | WebSocket | WebRTC | REST API  
+- **Server:** Java | JavaScript | WebSocket | WebRTC | STOMP | REST API  
 - **Integrations:** | GitHub API | Firebase 
 - **Database:** MySQL | Google Cloud 
 - **Docs:** Markdown
