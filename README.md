@@ -13,9 +13,9 @@
   <p> Main Components: </p>
 </h3>
 
-- `Client/` — Android application
+- `Client/` — Android Application
 - `Server/` — Messaging API and Backend Logic
-- `Database/` — Database Structure and scripts
+- `Database/` — Database Structure and Scripts
 - `Docs/` — Project Documentation and Reference Material
 
 ## Technologies
