@@ -26,18 +26,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5df24a7-9ceb-484e-8621-60ad2bd8f08d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Client/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Client/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Client/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Client/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/Client/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Client/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/app/src/main/java/Nebula/Android/Nebula_Model/Entitys/Entity_02_Chat_Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/app/src/main/java/Nebula/Android/Nebula_Model/Entitys/Entity_02_Chat_Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/app/src/main/java/Nebula/Android/Nebula_Model/Entitys/Entity_03_Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/app/src/main/java/Nebula/Android/Nebula_Model/Entitys/Entity_03_Message.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/app/src/main/java/Nebula/Android/Nebula_View/Activities/Activity_03_Chat.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/app/src/main/java/Nebula/Android/Nebula_View/Activities/Activity_03_Chat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/app/src/main/res/drawable/bg_main_searchfield.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Client/app/src/main/res/drawable/bg_main_searchfield.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-    </list>
+    <list default="true" id="d5df24a7-9ceb-484e-8621-60ad2bd8f08d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
