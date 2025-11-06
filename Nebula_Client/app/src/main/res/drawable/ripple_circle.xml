@@ -1,14 +1,15 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="?attr/colorControlHighlight">
 
-    <!-- Define a máscara (formato do ripple) -->
     <item android:id="@android:id/mask">
         <shape android:shape="oval">
-            <solid android:color="#FFFFFFFF"/> <!-- Cor não importa, só o formato -->
+            <solid android:color="#FFFFFFFF"/>
+            <size
+                android:width="38.78dp"
+                android:height="38.78dp"/>
         </shape>
     </item>
 
-    <!-- Background opcional -->
     <item>
         <shape android:shape="oval">
             <solid android:color="@android:color/transparent"/>

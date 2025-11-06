@@ -1,7 +1,6 @@
 package org.example.nebulachat.Chat;
 
 import lombok.*;
-import org.apache.logging.log4j.message.Message;
 
 
 @Getter
@@ -14,4 +13,6 @@ public class ChatMessage {
     private String content;
     private String sender;
     private MessageType messageType;
+    private String roomId;
+    private long timestamp;
 }

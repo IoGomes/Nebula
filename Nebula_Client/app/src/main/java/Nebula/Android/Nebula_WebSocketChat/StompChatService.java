@@ -1,4 +1,4 @@
-package Nebula.Android.Nebula_WebSocketChat.Chat;
+package Nebula.Android.Nebula_WebSocketChat;
 
 import android.util.Log;
 
