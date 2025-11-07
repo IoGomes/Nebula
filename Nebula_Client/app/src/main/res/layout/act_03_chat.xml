@@ -69,7 +69,10 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/nome_contato"
                 android:layout_width="match_parent"
+                android:singleLine="true"
+                android:ellipsize="end"
                 android:layout_height="wrap_content"
                 android:paddingStart="8dp"
                 android:text="@string/nome_de_contato"

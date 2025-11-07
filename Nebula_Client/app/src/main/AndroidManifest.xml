@@ -8,60 +8,60 @@
         android:name="android.hardware.audio.output"
         android:required="true" />
 
+        <uses-permission android:name="android.permission.CAMERA" />
+        <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+        <uses-permission android:name="android.permission.VIBRATE" />
+        <uses-permission android:name="android.permission.RECORD_AUDIO" />
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+        <application
+            android:allowBackup="true"
+            android:dataExtractionRules="@xml/data_extraction_rules"
+            android:fullBackupContent="@xml/backup_rules"
+            android:hardwareAccelerated="true"
+            android:icon="@mipmap/ic_launcher"
+            android:usesCleartextTraffic="false"
+            android:networkSecurityConfig="@xml/network_security_config"
+            android:label="Nebula"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:largeHeap="true"
+            android:theme="@style/Theme.App.Starting">
 
-    <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="false"
-        android:networkSecurityConfig="@xml/network_security_config"
-        android:label="Nebula"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:largeHeap="true"
-        android:theme="@style/Theme.App.Starting">
+            <meta-data
+                android:name="android.graphics.high_refresh_rate_enabled"
+                android:value="true" />
 
-        <meta-data
-            android:name="android.graphics.high_refresh_rate_enabled"
-            android:value="true" />
+            <activity
+                android:name=".Nebula_View.Activities.Activity_00_OnBoard"
+                android:exported="true"
+                android:hardwareAccelerated="true">
+                <intent-filter>
+                    <action android:name="android.intent.action.MAIN" />
+                    <category android:name="android.intent.category.LAUNCHER" />
+                </intent-filter>
+            </activity>
 
-        <activity
-            android:name=".Nebula_View.Activities.Activity_00_OnBoard"
-            android:exported="true"
-            android:hardwareAccelerated="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            <activity android:name=".Nebula_View.Activities.Activity_01_Auth" />
 
-        <activity android:name=".Nebula_View.Activities.Activity_01_Auth" />
+            <activity android:name=".Nebula_View.Activities.Activity_02_Feed" />
 
-        <activity android:name=".Nebula_View.Activities.Activity_02_Feed" />
+            <activity
+                android:name=".Nebula_View.Activities.Activity_03_Chat"
+                android:windowSoftInputMode="adjustResize|stateHidden" />
 
-        <activity
-            android:name=".Nebula_View.Activities.Activity_03_Chat"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            <activity
+                android:name=".Nebula_View.Activities.Activity_Web"
+                android:windowSoftInputMode="adjustResize|stateHidden" />
 
-        <activity
-            android:name=".Nebula_View.Activities.Activity_Web"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            <activity
+                android:name=".Nebula_View.Activities.Activity_04_Voice_Call" />
 
-        <activity
-            android:name=".Nebula_View.Activities.Activity_04_Voice_Call" />
+            <activity
+                android:name=".Nebula_View.Activities.Activity_05_Video_Call" />
 
-        <activity
-            android:name=".Nebula_View.Activities.Activity_05_Video_Call" />
-
-    </application>
-</manifest>
+        </application>
+    </manifest>

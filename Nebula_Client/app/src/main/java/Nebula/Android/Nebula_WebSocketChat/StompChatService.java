@@ -20,7 +20,6 @@ public class StompChatService {
 
     private boolean connected = false;
 
-    // === INTERFACES DE CALLBACK ===
     public interface ConnectionListener {
         void onConnected();
         void onDisconnected();
@@ -31,7 +30,6 @@ public class StompChatService {
         void onMessageReceived(ChatMessage message);
     }
 
-    // === MODELO DE MENSAGEM ===
     public static class ChatMessage {
         private String sender;
         private String content;

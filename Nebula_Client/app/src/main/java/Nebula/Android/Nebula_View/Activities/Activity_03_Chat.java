@@ -26,7 +26,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
 import Nebula.Android.Nebula_Model.Entitys.Entity_03_Message;
+import Nebula.Android.Nebula_Model.Repository.Chat_Repository;
+import Nebula.Android.Nebula_Model.Repository.Chat_Storage;
+import Nebula.Android.Nebula_Model.Repository.Chat_Storage;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_01_Profile_Image;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Chat_01_Msg_Adapter;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
@@ -51,11 +55,21 @@ public class Activity_03_Chat extends AppCompatActivity {
     private String username = "User_" + System.currentTimeMillis();
     private String chatRoomId = "public";
 
+    private List<Entity_02_Chat_Session> chatSessions;
+
+    // ✅ ADICIONAR - Gerenciador de armazenamento
+    private Chat_Storage chatStorage;
+
     private static final String SERVER_URL = "wss://malinda-poetless-manipulatively.ngrok-free.dev/ws/websocket";
     private static final String TOPIC_PATTERN = "/topic/chat/%s";
     private static final String SEND_DESTINATION = "/app/chat.send";
     private static final String JOIN_DESTINATION = "/app/chat.join";
     private static final String LEAVE_DESTINATION = "/app/chat.leave";
+
+    private int currentChatPosition = 0;
+    private String currentChatId;
+
+    private String currentChatWith;
 
     @Override
     protected void onCreate(Bundle savedInstanceBundle) {
@@ -66,6 +80,19 @@ public class Activity_03_Chat extends AppCompatActivity {
 
         bind = Act03ChatBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
+
+        currentChatPosition = getIntent().getIntExtra("CHAT_POSITION", 0);
+        currentChatId = getIntent().getStringExtra("CHAT_ID");
+
+        currentChatWith = getIntent().getStringExtra("ChatWith");
+        bind.nomeContato.setText(currentChatWith);
+
+        chatStorage = new Chat_Storage(this);
+
+        Log.d("NebulaChat", "==================");
+        Log.d("NebulaChat", "currentChatId: " + currentChatId);
+        Log.d("NebulaChat", "currentChatPosition: " + currentChatPosition);
+        Log.d("NebulaChat", "==================");
 
         setupBasicUI();
 
@@ -79,7 +106,10 @@ public class Activity_03_Chat extends AppCompatActivity {
             connectToWebSocket();
         });
 
-        bind.returnButton.setOnClickListener(v -> finish());
+        bind.returnButton.setOnClickListener(v -> {
+            saveMessagesBeforeExit();
+            finish();
+        });
     }
 
     private void setupBasicUI() {
@@ -91,6 +121,17 @@ public class Activity_03_Chat extends AppCompatActivity {
         }
 
         messageList = new ArrayList<>();
+
+
+        if (currentChatId != null && chatStorage.hasSavedMessages(currentChatId)) {
+            List<Entity_03_Message> savedMessages = chatStorage.loadMessages(currentChatId);
+            messageList.addAll(savedMessages);
+            Log.d("NebulaChat", "📂 Carregadas " + savedMessages.size() + " mensagens");
+        } else {
+            Log.d("NebulaChat", "❌ Nenhuma mensagem salva ou currentChatId é null");
+            Log.d("NebulaChat", "currentChatId: " + currentChatId);
+        }
+
         adapter = new RV_Chat_01_Msg_Adapter(messageList);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -99,6 +140,12 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.rvMessage.setAdapter(adapter);
         bind.rvMessage.setItemAnimator(null);
         bind.rvMessage.setHasFixedSize(true);
+
+        // ✅ ADICIONAR - Rolar para a última mensagem se houver
+        if (!messageList.isEmpty()) {
+            bind.rvMessage.scrollToPosition(messageList.size() - 1);
+        }
+
         bind.profilePhoto.setOnClickListener(v ->
                 new Dialog_Feed_01_Profile_Image(v.getContext()).show());
     }
@@ -136,7 +183,8 @@ public class Activity_03_Chat extends AppCompatActivity {
             @Override
             public void onDisconnected() {
                 runOnUiThread(() -> {
-
+                    // ✅ ADICIONAR - Salvar mensagens quando desconectar
+                    saveMessagesBeforeExit();
                 });
             }
 
@@ -168,21 +216,108 @@ public class Activity_03_Chat extends AppCompatActivity {
         });
     }
 
+    private void sendMessage(String text) {
+        Entity_03_Message newMessage = new Entity_03_Message();
+        newMessage.setMessage(text);
+        newMessage.setDateTimeMessage(new Date());
+        newMessage.setWasVisualized(false);
+        newMessage.setIsSentByMe(true);
+        newMessage.setSenderName(username); // ✅ ADICIONAR
+
+        messageList.add(newMessage);
+        adapter.notifyItemInserted(messageList.size() - 1);
+        bind.rvMessage.scrollToPosition(messageList.size() - 1);
+
+        // ✅ ADICIONAR - Salvar mensagem no storage
+        if (currentChatId != null) {
+            chatStorage.addMessage(currentChatId, newMessage);
+            Log.d("NebulaChat", "💾 Mensagem salva no storage");
+        }
+
+        if (Chat_Repository.getChats() != null && currentChatPosition < Chat_Repository.getChats().size()) {
+            Chat_Repository.getChats().get(currentChatPosition).setLastMessage(text);
+            Log.d("NebulaChat", "✅ LastMessage atualizado na posição: " + currentChatPosition);
+
+            if (Chat_Repository.getFeedAdapter() != null) {
+                int recyclerViewPosition = currentChatPosition + 2;
+                Chat_Repository.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
+                Log.d("NebulaChat", "✅ Adapter notificado na posição: " + recyclerViewPosition);
+            }
+        }
+
+        if (chatService.isConnected()) {
+            StompChatService.ChatMessage stompMessage = new StompChatService.ChatMessage(
+                    username,
+                    text,
+                    "CHAT",
+                    chatRoomId
+            );
+
+            String json = new Gson().toJson(stompMessage);
+            Log.d("NebulaChat", "📤 Enviando mensagem: " + json);
+
+            chatService.sendMessage(SEND_DESTINATION, stompMessage);
+        } else {
+            Log.w("NebulaChat", "⚠️ Não conectado! Tentando reconectar...");
+            Toast.makeText(this, "Não conectado. Tentando reconectar...", Toast.LENGTH_SHORT).show();
+            connectToWebSocket();
+        }
+    }
+
     private void receiveMessage(StompChatService.ChatMessage stompMessage) {
         Entity_03_Message newMessage = new Entity_03_Message();
         newMessage.setMessage(stompMessage.getContent());
         newMessage.setDateTimeMessage(new Date(stompMessage.getTimestamp()));
         newMessage.setWasVisualized(false);
         newMessage.setSenderName(stompMessage.getSender());
+        newMessage.setIsSentByMe(false);
 
         messageList.add(newMessage);
         adapter.notifyItemInserted(messageList.size() - 1);
         bind.rvMessage.scrollToPosition(messageList.size() - 1);
+
+        // ✅ ADICIONAR - Salvar mensagem recebida no storage
+        if (currentChatId != null) {
+            chatStorage.addMessage(currentChatId, newMessage);
+            Log.d("NebulaChat", "💾 Mensagem recebida salva no storage");
+        }
+
+        String lastMessageText = stompMessage.getContent();
+        if (Chat_Repository.getChats() != null && currentChatPosition < Chat_Repository.getChats().size()) {
+            Chat_Repository.getChats().get(currentChatPosition).setLastMessage(lastMessageText);
+            Chat_Repository.getChats().get(currentChatPosition).setHasUnread(true);
+
+            Log.d("NebulaChat", "📥 Mensagem recebida na posição: " + currentChatPosition);
+
+            if (Chat_Repository.getFeedAdapter() != null) {
+                int recyclerViewPosition = currentChatPosition + 2;
+                Chat_Repository.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
+                Log.d("NebulaChat", "✅ Feed atualizado na posição: " + recyclerViewPosition);
+            }
+        }
+    }
+
+    // ✅ ADICIONAR - Método para salvar mensagens antes de sair
+    private void saveMessagesBeforeExit() {
+        if (currentChatId != null && !messageList.isEmpty()) {
+            chatStorage.saveMessages(currentChatId, messageList);
+            Log.d("NebulaChat", "💾 Todas as mensagens salvas: " + messageList.size());
+        }
+    }
+
+    // ✅ ADICIONAR - Método para limpar o histórico do chat (opcional)
+    private void clearChatHistory() {
+        if (currentChatId != null) {
+            messageList.clear();
+            chatStorage.clearMessages(currentChatId);
+            adapter.notifyDataSetChanged();
+            Toast.makeText(this, "Histórico limpo", Toast.LENGTH_SHORT).show();
+            Log.d("NebulaChat", "🗑️ Histórico do chat limpo");
+        }
     }
 
     private void showConnectionStatus(String status) {
         Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
-
     }
 
     private void setupClickListeners() {
@@ -199,6 +334,9 @@ public class Activity_03_Chat extends AppCompatActivity {
                 bind.messageTextfield.setText("");
             }
         });
+
+        // ✅ OPCIONAL - Adicionar botão para limpar histórico (se tiver no XML)
+        // bind.clearHistoryButton.setOnClickListener(v -> clearChatHistory());
     }
 
     private void setupTextWatcher() {
@@ -213,39 +351,6 @@ public class Activity_03_Chat extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
     }
-
-    private void sendMessage(String text) {
-
-        Entity_03_Message newMessage = new Entity_03_Message();
-        newMessage.setMessage(text);
-        newMessage.setDateTimeMessage(new Date());
-        newMessage.setWasVisualized(false);
-
-        messageList.add(newMessage);
-        adapter.notifyItemInserted(messageList.size() - 1);
-        bind.rvMessage.scrollToPosition(messageList.size() - 1);
-
-        if (chatService.isConnected()) {
-
-            StompChatService.ChatMessage stompMessage = new StompChatService.ChatMessage(
-                    username,
-                    text,
-                    "CHAT",
-                    chatRoomId
-            );
-
-            String json = new Gson().toJson(stompMessage);
-            Log.d("NebulaChat", "📤 Enviando mensagem: " + json);
-
-            chatService.sendMessage(SEND_DESTINATION, stompMessage);
-
-        } else {
-            Log.w("NebulaChat", "⚠️ Não conectado! Tentando reconectar...");
-            Toast.makeText(this, "Não conectado. Tentando reconectar...", Toast.LENGTH_SHORT).show();
-            connectToWebSocket();
-        }
-    }
-
 
     private void setupKeyboardListener() {
         View rootView = findViewById(android.R.id.content);
@@ -282,6 +387,9 @@ public class Activity_03_Chat extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        // ✅ ADICIONAR - Salvar mensagens ao destruir
+        saveMessagesBeforeExit();
+
         if (chatService != null) {
             chatService.leaveChat(LEAVE_DESTINATION, username, chatRoomId);
             chatService.disconnect();
@@ -295,10 +403,33 @@ public class Activity_03_Chat extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        // ✅ ADICIONAR - Salvar mensagens ao pausar
+        saveMessagesBeforeExit();
+
+        // ✅ OPCIONAL - Marcar mensagens como visualizadas
+        if (currentChatId != null) {
+            chatStorage.markAllAsRead(currentChatId);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // ✅ ADICIONAR - Marcar mensagens como lidas quando voltar ao chat
+        if (currentChatId != null) {
+            chatStorage.markAllAsRead(currentChatId);
+
+            // Atualizar o status de não lidas no repositório
+            if (Chat_Repository.getChats() != null && currentChatPosition < Chat_Repository.getChats().size()) {
+                Chat_Repository.getChats().get(currentChatPosition).setHasUnread(false);
+
+                if (Chat_Repository.getFeedAdapter() != null) {
+                    int recyclerViewPosition = currentChatPosition + 2;
+                    Chat_Repository.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
+                }
+            }
+        }
     }
 }

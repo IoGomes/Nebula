@@ -42,8 +42,10 @@
         <TextView
             android:id="@+id/contactName"
             android:layout_width="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:layout_height="20dp"
-            android:maxWidth="160dp"
+            android:maxWidth="200dp"
             android:text="Nome de Contato"
             android:textColor="@color/white"
             android:textSize="16sp" />

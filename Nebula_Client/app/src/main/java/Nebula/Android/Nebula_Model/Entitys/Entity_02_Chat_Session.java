@@ -5,62 +5,37 @@ import java.util.List;
 
 public class Entity_02_Chat_Session {
 
-    private int unreadCount;
+    private String chatWith;
     private boolean hasUnread = true;
-    public boolean isFavorite = true;
-
-    private String senderName;
-
-    public String getSenderName() { return senderName; }
-    public void setSenderName(String senderName) { this.senderName = senderName; }
-
-    public int getUnreadCount() { return unreadCount; }
-    public void setUnreadCount(int unreadCount) {
-        this.unreadCount = unreadCount;
-        this.hasUnread = unreadCount > 0;
-    }
-
-    public boolean hasUnread() { return hasUnread; }
-    public void setHasUnread(boolean hasUnread) { this.hasUnread = hasUnread; }
-
     private String chatSessionId;
     private List<String> chatUsersId;
-    private String usersNumbers;
     private List<Date> chatDate;
     private String lastMessage;
 
+    public Entity_02_Chat_Session(){
+
+    }
+
     public Entity_02_Chat_Session(String chatSessionId, List<String> chatUsersId,
-                                  List<Date> chatDate, String lastMessage) {
+                                  List<Date> chatDate, String lastMessage, String chatWith) {
         this.chatSessionId = chatSessionId;
+        this.chatWith = chatWith;
         this.chatUsersId = chatUsersId;
         this.chatDate = chatDate;
         this.lastMessage = lastMessage;
     }
 
-    public String getChatSessionId() {
-        return chatSessionId;
+    public boolean hasUnread() {
+        return hasUnread;
     }
 
-    public void setChatSessionId(String chatSessionId) {
-        this.chatSessionId = chatSessionId;
-    }
-
-    public List<String> getChatUsersId() {
-        return chatUsersId;
-    }
-
-    public void setChatUsersId(List<String> chatUsersId) {
-        this.chatUsersId = chatUsersId;
+    public void setHasUnread(boolean hasUnread) {
+        this.hasUnread = hasUnread;
     }
 
     public List<Date> getChatDate() {
         return chatDate;
     }
-
-    public void setChatDate(List<Date> chatDate) {
-        this.chatDate = chatDate;
-    }
-
 
     public String getLastMessage() {
         return lastMessage;
@@ -72,5 +47,21 @@ public class Entity_02_Chat_Session {
 
     public boolean isFavorite() {
         return true;
+    }
+
+    public String getChatWith() {
+        return chatWith;
+    }
+
+    public void setChatWith(String chatWith) {
+        this.chatWith = chatWith;
+    }
+
+    public String getChatSessionId() {
+        return chatSessionId;
+    }
+
+    public void setChatSessionId(String chatSessionId) {
+        this.chatSessionId = chatSessionId;
     }
 }

@@ -22,6 +22,7 @@ import java.util.List;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
 import Nebula.Android.Nebula_Model.Entitys.Entity_06_Contact;
+import Nebula.Android.Nebula_Model.Repository.Chat_Repository;
 import Nebula.Android.Nebula_View.Activities.Activity_03_Chat;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_06_Choose_Contact;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
@@ -41,179 +42,41 @@ public class Fragment_Feed_01_Inbox extends Fragment {
 
         bind = Frg03FeedBinding.inflate(inflater, container, false);
 
-        chatSessions = new ArrayList<>();
         contacts = new ArrayList<>();
 
-        List<String> users2 = Arrays.asList("userC", "userD");
-        List<Date> date = Arrays.asList(new Date());
+        if (Chat_Repository.getChats().isEmpty()) {
+            List<String> users2 = Arrays.asList("userC", "userD");
+            List<Date> date = Arrays.asList(new Date());
 
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));
-        chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));chatSessions.add(new Entity_02_Chat_Session(
-                "chat",
-                users2,
-                date,
-                "Versão 1.0 -> 03/10/2025"
-        ));
+            Chat_Repository.getChats().add(new Entity_02_Chat_Session(
+                    "chat",
+                    users2,
+                    date,
+                    "Versão 1.3 -> 06/11/2025",
+                    "TDE 2025.2"
+            ));
+
+            Chat_Repository.getChats().add(new Entity_02_Chat_Session(
+                    "chat2",
+                    users2,
+                    date,
+                    "\uD83D\uDC4B Olá! Bem-vindo(a) ao chat do Nebula",
+                    "Nebula Dev Team"
+            ));
+        }
 
         bind.nullMessage.setText(Html.fromHtml("No <font color='#FFFFFF'><b>Open Chats</b></font> → Tap <font color='#FFFFFF'><b>+</b></font> to start a conversation.", Html.FROM_HTML_MODE_LEGACY));
 
-        if(chatSessions.isEmpty()){
-            bind.nullMessage.setVisibility(VISIBLE);
-            bind.recyclerView.setVisibility(GONE);
+        if (Chat_Repository.getChats() == null || Chat_Repository.getChats().isEmpty()) {
+            bind.nullMessage.setVisibility(View.VISIBLE);
+            bind.recyclerView.setVisibility(View.GONE);
+        } else {
+            bind.nullMessage.setVisibility(View.GONE);
+            bind.recyclerView.setVisibility(View.VISIBLE);
         }
 
-        // MUDANÇA AQUI: Atribuir ao campo adapter antes de setar no RecyclerView
-        adapter = new RV_Feed_01_Chat_Adapter(chatSessions);
+        adapter = new RV_Feed_01_Chat_Adapter(Chat_Repository.getChats());
+        Chat_Repository.setFeedAdapter(adapter);
         bind.recyclerView.setAdapter(adapter);
         bind.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -230,4 +93,7 @@ public class Fragment_Feed_01_Inbox extends Fragment {
     public RV_Feed_01_Chat_Adapter getAdapter() {
         return adapter;
     }
+
+
+
 }

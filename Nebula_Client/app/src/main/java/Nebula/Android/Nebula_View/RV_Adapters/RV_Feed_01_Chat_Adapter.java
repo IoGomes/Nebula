@@ -1,7 +1,5 @@
 package Nebula.Android.Nebula_View.RV_Adapters;
 
-// Removido import estático - será acessado via Context
-
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,6 +24,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
+import Nebula.Android.Nebula_Model.Repository.Chat_Repository;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
 import Nebula.Android.Nebula_View.Activities.Activity_03_Chat;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_04_Incoming_Call;
@@ -44,9 +43,8 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     private int selectedCategoryId = R.id.all_category;
     private String currentSearchQuery = "";
 
-    // controle de seleção
     private final Set<Integer> selectedPositions = new HashSet<>();
-    private boolean isSelectionMode = false; // Modo seleção ativado?
+    private boolean isSelectionMode = false;
 
     public RV_Feed_01_Chat_Adapter(List<Entity_02_Chat_Session> chats) {
         this.chats = chats;
@@ -85,38 +83,34 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
             setupSearchEditText(headerHolder.searchEditText);
 
         } else if (holder instanceof CategoryViewHolder) {
-            // nada aqui por enquanto
 
         } else if (holder instanceof ChatViewHolder) {
             ChatViewHolder chatHolder = (ChatViewHolder) holder;
             int chatPosition = position - 2;
 
             if (chatPosition >= 0 && chatPosition < filteredChats.size()) {
-                Entity_02_Chat_Session chatSession = filteredChats.get(chatPosition);
+
+                Entity_02_Chat_Session chatSession = Chat_Repository.getChats().get(chatPosition);
+                filteredChats.set(chatPosition, chatSession);
 
                 bindChatData(chatHolder, chatSession);
 
-                // Define aparência de acordo com seleção
                 if (selectedPositions.contains(chatPosition)) {
                     chatHolder.itemView.setBackgroundResource(R.drawable.bg_selected_chat);
                 } else {
-                    // IMPORTANTE: Resetar para o background padrão quando não estiver selecionado
-                    chatHolder.itemView.setBackgroundResource(0); // ou R.drawable.bg_chat_default se você tiver um drawable padrão
+                    chatHolder.itemView.setBackgroundResource(0);
                 }
 
                 chatHolder.unreadIcon.setVisibility(chatSession.hasUnread() ? View.VISIBLE : View.GONE);
 
-                // Clique longo -> seleciona/deseleciona
                 chatHolder.itemView.setOnLongClickListener(v -> {
                     if (selectedPositions.contains(chatPosition)) {
                         selectedPositions.remove(chatPosition);
-                        // Resetar o background ao desselecionar
                         v.setBackgroundResource(0);
                     } else {
                         selectedPositions.add(chatPosition);
                         v.setBackgroundResource(R.drawable.bg_selected_chat);
                     }
-
 
                     if (v.getContext() instanceof Activity_02_Feed) {
                         ((Activity_02_Feed) v.getContext()).showOptionsBar();
@@ -125,13 +119,16 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                     return true;
                 });
 
-
                 chatHolder.itemView.setOnClickListener(v -> {
                     chatSession.setHasUnread(false);
                     chatHolder.unreadIcon.setVisibility(View.GONE);
-                    v.getContext().startActivity(new Intent(v.getContext(), Activity_03_Chat.class));
-                });
 
+                    Intent intent = new Intent(v.getContext(), Activity_03_Chat.class);
+                    intent.putExtra("CHAT_POSITION", chatPosition);
+                    intent.putExtra("CHAT_ID", chatSession.getChatSessionId());
+                    intent.putExtra("ChatWith", chatSession.getChatWith());
+                    v.getContext().startActivity(intent);
+                });
 
                 chatHolder.profileImage.setOnClickListener(v ->
                         new Dialog_Feed_04_Incoming_Call(v.getContext()).show()
@@ -154,6 +151,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
             List<Date> dates = chatSession.getChatDate();
             Date lastDate = dates.get(dates.size() - 1);
             holder.textDate.setText(dateFormat.format(lastDate));
+            holder.contactName.setText(chatSession.getChatWith());
         } else {
             holder.textDate.setText("--:--");
         }
@@ -214,7 +212,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
-        TextView lastText, textDate, unreadIcon;
+        TextView lastText, textDate, unreadIcon, contactName;
         ImageButton profileImage;
 
         public ChatViewHolder(@NonNull View itemView) {
@@ -223,6 +221,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
             textDate = itemView.findViewById(R.id.textDate);
             profileImage = itemView.findViewById(R.id.imageButton);
             unreadIcon = itemView.findViewById(R.id.notification);
+            contactName = itemView.findViewById(R.id.contactName);
         }
     }
 

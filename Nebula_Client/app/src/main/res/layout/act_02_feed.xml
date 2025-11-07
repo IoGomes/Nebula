@@ -26,18 +26,44 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageButton
-                android:id="@+id/git"
-                android:layout_width="38dp"
+            <FrameLayout
                 android:layout_height="38dp"
-                android:background="@android:color/transparent"
-                android:foreground="@drawable/ripple_circle"
-                android:src="@drawable/ic_git"
-                android:stateListAnimator="@animator/scale_animation2"
-                android:visibility="visible"
+                android:layout_width="38dp"
                 app:layout_constraintBottom_toBottomOf="@id/text"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/text" />
+                android:focusable="false"
+                android:clickable="false"
+                app:layout_constraintTop_toTopOf="@id/text">
+
+                <ImageButton
+                    android:id="@+id/git"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@android:color/transparent"
+                    android:foreground="@drawable/ripple_circle"
+                    android:src="@drawable/ic_git"
+                    android:stateListAnimator="@animator/scale_animation2"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/text" />
+
+                <TextView
+                    android:text="1"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textSize="08sp"
+                    android:layout_margin="06dp"
+                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:minWidth="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/git_notification"
+                    android:layout_gravity="end|bottom">
+
+                </TextView>
+
+            </FrameLayout>
 
             <ImageButton
                 android:id="@+id/trash"
@@ -113,6 +139,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical"
+
             tools:context=".Fragments.Fragment_03_AllChats" />
 
     </LinearLayout>

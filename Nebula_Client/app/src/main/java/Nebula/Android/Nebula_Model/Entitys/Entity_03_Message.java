@@ -6,9 +6,19 @@ public class Entity_03_Message {
     private String message;
     private Date dateTimeMessage;
     private Boolean wasVisualized;
-
     private String senderName;
+    private Boolean isSentByMe; // NOVO CAMPO
 
+    // Getter e Setter para isSentByMe
+    public Boolean isSentByMe() {
+        return isSentByMe;
+    }
+
+    public void setIsSentByMe(Boolean isSentByMe) {
+        this.isSentByMe = isSentByMe;
+    }
+
+    // Getters e Setters existentes
     public String getSenderName() {
         return senderName;
     }
@@ -16,7 +26,6 @@ public class Entity_03_Message {
     public void setSenderName(String senderName) {
         this.senderName = senderName;
     }
-
 
     public Boolean getWasVisualized() {
         return wasVisualized;
