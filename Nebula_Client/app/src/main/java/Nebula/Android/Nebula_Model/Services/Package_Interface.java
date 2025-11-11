@@ -1,4 +1,4 @@
 package Nebula.Android.Nebula_Model.Services;
 
-public class requestResponse {
+public interface Package_Interface {
 }

@@ -1,17 +1,17 @@
 package Nebula.Android.Nebula_Model.UseCases;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_01_User;
-import Nebula.Android.Nebula_Model.Services.AlertDialog;
-import Nebula.Android.Nebula_Model.Services.Network_Checker;
-import Nebula.Android.Nebula_Model.Services.Service_Permission;
+import Nebula.Android.Nebula_Model.Services.Svc_Alert_Dialog;
+import Nebula.Android.Nebula_Model.Services.Svc_Network_Checker;
+import Nebula.Android.Nebula_Model.Services.Svc_Permission;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class UseCase_02_Register {
 
     private Boolean isUseCaseEnabled = false;
     private final Entity_01_User user;
-    private final Service_Permission servicePermission;
-    private final Network_Checker networkChecker;
+    private final Svc_Permission servicePermission;
+    private final Svc_Network_Checker networkChecker;
 
     public UseCase_02_Register(String userName,
                                String userEmail,
@@ -20,8 +20,8 @@ public class UseCase_02_Register {
                                String confirmUserPassword,
                                Boolean isTermsAndConditionsAccepted,
                                Boolean isPrivacyPoliticAccepted,
-                               Network_Checker networkChecker,
-                               Service_Permission servicePermission) {
+                               Svc_Network_Checker networkChecker,
+                               Svc_Permission servicePermission) {
 
 
         this.user = new Entity_01_User(
@@ -50,12 +50,12 @@ public class UseCase_02_Register {
     public boolean hasAllPermissionsAndAccess() {
 
         if (!servicePermission.hasWifiPermission()) {
-            AlertDialog.addMesage("Sem permissão para acessar wifi");
+            Svc_Alert_Dialog.addMesage("Sem permissão para acessar wifi");
             return false;
         }
 
         if (!networkChecker.hasWifiAccess()) {
-            AlertDialog.addMesage("Sem conexão com a internet");
+            Svc_Alert_Dialog.addMesage("Sem conexão com a internet");
             return false;
         }
 

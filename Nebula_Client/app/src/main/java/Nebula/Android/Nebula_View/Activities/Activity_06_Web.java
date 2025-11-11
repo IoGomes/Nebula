@@ -19,7 +19,7 @@ import java.util.Objects;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.R;
 
-public class Activity_Web extends AppCompatActivity {
+public class Activity_06_Web extends AppCompatActivity {
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override
@@ -30,8 +30,6 @@ public class Activity_Web extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-
-
 
         View rootLayout = findViewById(R.id.root);
         NavBar_Inserts.adjustPaddingForNavigationBar(rootLayout, this);
@@ -69,7 +67,6 @@ public class Activity_Web extends AppCompatActivity {
             }
         }
 
-        // Caminho absoluto da fonte copiada
         String fontPath = "file://" + fontFile.getAbsolutePath();
 
         String htmlContent = "<!DOCTYPE html>" +
@@ -510,7 +507,7 @@ public class Activity_Web extends AppCompatActivity {
     public class WebBridge {
         @JavascriptInterface
         public void showToast(String msg) {
-            Toast.makeText(Activity_Web.this, msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(Activity_06_Web.this, msg, Toast.LENGTH_SHORT).show();
         }
     }
 }

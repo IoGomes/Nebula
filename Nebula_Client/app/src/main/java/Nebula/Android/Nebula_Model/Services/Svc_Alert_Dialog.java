@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("SpellCheckingInspection")
-public class AlertDialog {
+public class Svc_Alert_Dialog {
 
     private static List<String> alertMesages = new ArrayList<>();
 
@@ -21,6 +21,6 @@ public class AlertDialog {
     }
 
     public static void setAlertMesages(List<String> alertMesages) {
-        AlertDialog.alertMesages = alertMesages;
+        Svc_Alert_Dialog.alertMesages = alertMesages;
     }
 }
