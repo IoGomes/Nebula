@@ -11,14 +11,14 @@ import java.util.List;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_03_Message;
 
-public class Repo_Chat_Storage {
+public class Chat_Storage {
 
     private static final String PREFS_NAME = "NebulaChatPrefs";
     private static final String KEY_MESSAGES_PREFIX = "messages_";
     private SharedPreferences sharedPreferences;
     private Context context;
 
-    public Repo_Chat_Storage(Context context) {
+    public Chat_Storage(Context context) {
         this.context = context;
         this.sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }

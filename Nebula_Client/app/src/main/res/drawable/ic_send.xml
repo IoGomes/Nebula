@@ -1,21 +1,16 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
 
-    <path
-        android:fillColor="@android:color/transparent"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M17,12C15.8757,13.1243,11.5,16.5,11.5,16.5
-                          M17,12C20,9,20,7,20,4C17,4,15,4,12,7
-                          M17,12L17.4752,14.376C17.8031,16.0153,17.29,17.71,16.1078,18.8922L14.9374,20.0626C14.4676,20.5324,13.6788,20.4219,13.3562,19.8411L11.5,16.5
-                          M12,7L7.5,12.5
-                          M12,7L9.62395,6.52479C7.98465,6.19693,6.28996,6.71004,5.10784,7.89216L3.93743,9.06257C3.46765,9.53235,3.57813,10.3212,4.1589,10.6438L7.5,12.5
-                          M7.5,12.5L11.5,16.5
-                          M15.5,8.50049L14.5,9.50049
-                          M3,21L6.39223,20.3216C7.32708,20.1346,8,19.3138,8,18.3604L8,18C8,16.8954,7.10457,16,6,16L5.63961,16C4.68625,16,3.86542,16.6729,3.67845,17.6078L3,21Z"/>
+    <group
+        android:pivotX="8"
+        android:pivotY="8"
+        android:rotation="45">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M15.5715,1.74491 L14.6732,5.11944 C14.2816,6.59062 13.3453,7.85791 12.0542,8.66455 L4.81869,13.1849 L2.90789,11.2741 L7.42828,4.03863 C8.23492,2.74748 9.50221,1.81125 10.9734,1.41962 L14.3479,0.521322 C14.8816,0.379251 15.4294,0.696729 15.5715,1.23043 C15.6164,1.39899 15.6164,1.57635 15.5715,1.74491 Z M13.1949,2.8979 L11.4879,3.35232 C10.5071,3.6134 9.66223,4.23756 9.12446,5.09832 L6.01104,10.0818 L10.9945,6.96837 C11.8553,6.4306 12.4794,5.58574 12.7405,4.60496 L13.1949,2.8979 Z M6,14 L11,11 L11,12 C11,14.2091 9.20914,16 7,16 L6,16 L6,14 Z M2,10 L0,10 L0,9 C0,6.79086 1.79086,5 4,5 L5,5 L2,10 Z"/>
+    </group>
 </vector>

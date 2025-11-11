@@ -5,11 +5,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 
-public class Svc_Network_Checker implements Svc_Network_Interface {
+public class Network_Checker implements Network_Interface {
 
     private final Context context;
 
-    public Svc_Network_Checker(Context context) {
+    public Network_Checker(Context context) {
         this.context = context;
     }
 

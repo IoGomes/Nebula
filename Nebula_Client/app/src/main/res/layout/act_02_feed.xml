@@ -26,34 +26,44 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageButton
-                android:id="@+id/git"
-                android:elevation="1dp"
-                android:layout_width="38dp"
+            <FrameLayout
                 android:layout_height="38dp"
-                android:background="@color/black"
-                android:foreground="@drawable/ripple_circle"
-                android:src="@drawable/ic_git"
-                android:stateListAnimator="@animator/scale_animation2"
-                android:visibility="visible"
+                android:layout_width="38dp"
                 app:layout_constraintBottom_toBottomOf="@id/text"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/text" />
+                android:focusable="false"
+                android:clickable="false"
+                app:layout_constraintTop_toTopOf="@id/text">
 
-            <TextView
-                android:id="@+id/git_notification"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:background="@drawable/bg_git_notification"
-                android:gravity="center"
-                android:text="1"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/git"
-                app:layout_constraintTop_toTopOf="@id/text" />
+                <ImageButton
+                    android:id="@+id/git"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@android:color/transparent"
+                    android:foreground="@drawable/ripple_circle"
+                    android:src="@drawable/ic_git"
+                    android:stateListAnimator="@animator/scale_animation2"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/text" />
+
+                <TextView
+                    android:text="1"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textSize="08sp"
+                    android:layout_margin="06dp"
+                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:minWidth="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/git_notification"
+                    android:layout_gravity="end|bottom">
+
+                </TextView>
+
+            </FrameLayout>
 
             <ImageButton
                 android:id="@+id/trash"
@@ -69,7 +79,7 @@
                 app:layout_constraintTop_toTopOf="@id/text" />
 
             <ImageButton
-                android:id="@+id/ImageButton_Archived"
+                android:id="@+id/option"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:layout_marginEnd="12dp"
@@ -82,17 +92,6 @@
                 app:layout_constraintEnd_toStartOf="@id/trash"
                 app:layout_constraintTop_toTopOf="@id/text" />
 
-            <TextView
-                android:id="@+id/notify"
-                android:padding="10dp"
-                android:stateListAnimator="@animator/disapear"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/text"
-                app:layout_constraintEnd_toStartOf="@id/git_notification"
-                app:layout_constraintTop_toTopOf="@id/text"/>
-
             <ImageButton
                 android:id="@+id/close"
                 android:layout_width="38dp"
@@ -104,7 +103,18 @@
                 android:stateListAnimator="@animator/scale_animation2"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@id/text"
-                app:layout_constraintEnd_toStartOf="@+id/ImageButton_Archived"
+                app:layout_constraintEnd_toStartOf="@+id/option"
+                app:layout_constraintTop_toTopOf="@id/text" />
+
+            <ImageButton
+                android:id="@+id/teste"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/ic_profile_picture"
+                android:contentDescription="@string/profileimage"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/text"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/text" />
 
             <TextView
@@ -112,9 +122,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="04dp"
                 android:fontFamily="@font/nebula"
                 android:paddingStart="04dp"
+                android:layout_marginBottom="04dp"
                 android:text="NEBULA"
                 android:textColor="@color/white"
                 android:textSize="30sp"

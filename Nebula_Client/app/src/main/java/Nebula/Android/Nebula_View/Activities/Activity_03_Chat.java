@@ -28,8 +28,9 @@ import java.util.concurrent.Executors;
 
 import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
 import Nebula.Android.Nebula_Model.Entitys.Entity_03_Message;
-import Nebula.Android.Nebula_Model.Repository.Repo_Chat;
-import Nebula.Android.Nebula_Model.Repository.Repo_Chat_Storage;
+import Nebula.Android.Nebula_Model.Repository.Chat_Repository;
+import Nebula.Android.Nebula_Model.Repository.Chat_Storage;
+import Nebula.Android.Nebula_Model.Repository.Chat_Storage;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_01_Profile_Image;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Chat_01_Msg_Adapter;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
@@ -57,7 +58,7 @@ public class Activity_03_Chat extends AppCompatActivity {
     private List<Entity_02_Chat_Session> chatSessions;
 
     // ✅ ADICIONAR - Gerenciador de armazenamento
-    private Repo_Chat_Storage chatStorage;
+    private Chat_Storage chatStorage;
 
     private static final String SERVER_URL = "wss://malinda-poetless-manipulatively.ngrok-free.dev/ws/websocket";
     private static final String TOPIC_PATTERN = "/topic/chat/%s";
@@ -86,7 +87,7 @@ public class Activity_03_Chat extends AppCompatActivity {
         currentChatWith = getIntent().getStringExtra("ChatWith");
         bind.nomeContato.setText(currentChatWith);
 
-        chatStorage = new Repo_Chat_Storage(this);
+        chatStorage = new Chat_Storage(this);
 
         Log.d("NebulaChat", "==================");
         Log.d("NebulaChat", "currentChatId: " + currentChatId);
@@ -146,11 +147,7 @@ public class Activity_03_Chat extends AppCompatActivity {
         }
 
         bind.profilePhoto.setOnClickListener(v ->
-                new Dialog_Feed_01_Profile_Image(
-                        v.getContext(),
-                        currentChatWith // passa o identificador do perfil
-                ).show()
-        );
+                new Dialog_Feed_01_Profile_Image(v.getContext()).show());
     }
 
     private void initializeHeavyComponents() {
@@ -237,13 +234,13 @@ public class Activity_03_Chat extends AppCompatActivity {
             Log.d("NebulaChat", "💾 Mensagem salva no storage");
         }
 
-        if (Repo_Chat.getChats() != null && currentChatPosition < Repo_Chat.getChats().size()) {
-            Repo_Chat.getChats().get(currentChatPosition).setLastMessage(text);
+        if (Chat_Repository.getChats() != null && currentChatPosition < Chat_Repository.getChats().size()) {
+            Chat_Repository.getChats().get(currentChatPosition).setLastMessage(text);
             Log.d("NebulaChat", "✅ LastMessage atualizado na posição: " + currentChatPosition);
 
-            if (Repo_Chat.getFeedAdapter() != null) {
+            if (Chat_Repository.getFeedAdapter() != null) {
                 int recyclerViewPosition = currentChatPosition + 2;
-                Repo_Chat.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
+                Chat_Repository.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
                 Log.d("NebulaChat", "✅ Adapter notificado na posição: " + recyclerViewPosition);
             }
         }
@@ -286,15 +283,15 @@ public class Activity_03_Chat extends AppCompatActivity {
         }
 
         String lastMessageText = stompMessage.getContent();
-        if (Repo_Chat.getChats() != null && currentChatPosition < Repo_Chat.getChats().size()) {
-            Repo_Chat.getChats().get(currentChatPosition).setLastMessage(lastMessageText);
-            Repo_Chat.getChats().get(currentChatPosition).setHasUnread(true);
+        if (Chat_Repository.getChats() != null && currentChatPosition < Chat_Repository.getChats().size()) {
+            Chat_Repository.getChats().get(currentChatPosition).setLastMessage(lastMessageText);
+            Chat_Repository.getChats().get(currentChatPosition).setHasUnread(true);
 
             Log.d("NebulaChat", "📥 Mensagem recebida na posição: " + currentChatPosition);
 
-            if (Repo_Chat.getFeedAdapter() != null) {
+            if (Chat_Repository.getFeedAdapter() != null) {
                 int recyclerViewPosition = currentChatPosition + 2;
-                Repo_Chat.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
+                Chat_Repository.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
                 Log.d("NebulaChat", "✅ Feed atualizado na posição: " + recyclerViewPosition);
             }
         }
@@ -425,12 +422,12 @@ public class Activity_03_Chat extends AppCompatActivity {
             chatStorage.markAllAsRead(currentChatId);
 
             // Atualizar o status de não lidas no repositório
-            if (Repo_Chat.getChats() != null && currentChatPosition < Repo_Chat.getChats().size()) {
-                Repo_Chat.getChats().get(currentChatPosition).setHasUnread(false);
+            if (Chat_Repository.getChats() != null && currentChatPosition < Chat_Repository.getChats().size()) {
+                Chat_Repository.getChats().get(currentChatPosition).setHasUnread(false);
 
-                if (Repo_Chat.getFeedAdapter() != null) {
+                if (Chat_Repository.getFeedAdapter() != null) {
                     int recyclerViewPosition = currentChatPosition + 2;
-                    Repo_Chat.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
+                    Chat_Repository.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
                 }
             }
         }

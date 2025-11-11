@@ -6,11 +6,11 @@ import android.content.pm.PackageManager;
 
 import androidx.core.content.ContextCompat;
 
-public class Svc_Permission implements Svc_Permission_Interface {
+public class Service_Permission implements Permission_Interface {
 
     private final Context context;
 
-    public Svc_Permission(Context context) {
+    public Service_Permission(Context context) {
         this.context = context;
     }
 
@@ -37,8 +37,4 @@ public class Svc_Permission implements Svc_Permission_Interface {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED;
     }
-}
-
-public interface Svc_Permission_Interface(){
-
 }

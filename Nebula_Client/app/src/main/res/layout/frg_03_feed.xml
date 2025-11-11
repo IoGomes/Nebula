@@ -21,7 +21,7 @@
         android:paddingBottom="80dp"
         android:clipToPadding="false"
         android:layout_height="0dp"
-        tools:listitem="@layout/rv_01_item_chat"
+        tools:listitem="@layout/rv_01_chat"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

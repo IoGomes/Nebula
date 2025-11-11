@@ -1,6 +1,6 @@
 package Nebula.Android.Nebula_Model.Services;
 
-public class Svc_Login_Request {
+public class LoginRegisterRequest {
 
     public String nome;
     public String email;
@@ -8,13 +8,13 @@ public class Svc_Login_Request {
     public String telefone;
     public String key;
 
-    public Svc_Login_Request(String email, String senha, String key) {
+    public LoginRegisterRequest(String email, String senha, String key) {
         this.email = email;
         this.senha = senha;
         this.key = key;
     }
 
-    public Svc_Login_Request(String nome, String email, String senha, String telefone, String key) {
+    public LoginRegisterRequest(String nome, String email, String senha, String telefone, String key) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;

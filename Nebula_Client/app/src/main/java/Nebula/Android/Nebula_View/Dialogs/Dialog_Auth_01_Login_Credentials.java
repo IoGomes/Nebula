@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import Nebula.Android.Nebula_Model.Services.Svc_Alert_Dialog;
+import Nebula.Android.Nebula_Model.Services.AlertDialog;
 import Nebula.Android.R;
 
 public class Dialog_Auth_01_Login_Credentials extends Dialog {
@@ -28,7 +28,7 @@ public class Dialog_Auth_01_Login_Credentials extends Dialog {
 
             init(context);
             setOnCancelListener(d -> {
-                Svc_Alert_Dialog.clearListMesage();
+                AlertDialog.clearListMesage();
             });
         }
 
@@ -36,7 +36,7 @@ public class Dialog_Auth_01_Login_Credentials extends Dialog {
         ListView listView = findViewById(R.id.list_credential);
 
         List<String> items = new ArrayList<>();
-        String alertMesagesString = Svc_Alert_Dialog.getAlertMesages();
+        String alertMesagesString = Nebula.Android.Nebula_Model.Services.AlertDialog.getAlertMesages();
 
         if (!alertMesagesString.isEmpty()) {
             String[] splitMessages = alertMesagesString.split("\n• ");

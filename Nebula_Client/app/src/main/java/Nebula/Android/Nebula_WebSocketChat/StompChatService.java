@@ -52,6 +52,7 @@ public class StompChatService {
         public long getTimestamp() { return timestamp; }
     }
 
+    // === CONEXÃO ===
     public void connect(String serverUrl, ConnectionListener listener) {
         try {
             if (stompClient != null && connected) {
@@ -103,6 +104,7 @@ public class StompChatService {
         }
     }
 
+    // === ENVIO DE MENSAGEM ===
     public void sendMessage(String destination, ChatMessage message) {
         if (isConnected()) {
             String payload = gson.toJson(message);
@@ -112,6 +114,7 @@ public class StompChatService {
         }
     }
 
+    // === INSCRIÇÃO EM TÓPICOS ===
     public void subscribe(String topic, MessageListener listener) {
         if (stompClient == null) {
             Log.e(TAG, "❌ STOMP client não inicializado");
@@ -130,6 +133,7 @@ public class StompChatService {
                 });
     }
 
+    // === EVENTOS DE ENTRADA/SAÍDA ===
     public void joinChat(String destination, String username, String roomId) {
         if (isConnected()) {
             ChatMessage joinMsg = new ChatMessage(username, username + " entrou no chat", "JOIN", roomId);

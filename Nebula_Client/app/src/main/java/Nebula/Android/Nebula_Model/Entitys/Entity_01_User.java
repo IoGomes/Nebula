@@ -2,7 +2,7 @@ package Nebula.Android.Nebula_Model.Entitys;
 
 import java.util.UUID;
 
-import Nebula.Android.Nebula_Model.Services.Svc_Alert_Dialog;
+import Nebula.Android.Nebula_Model.Services.AlertDialog;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class Entity_01_User {
@@ -50,12 +50,12 @@ public class Entity_01_User {
 
     public void setUserName(String userName) {
         if (userName.isEmpty()) {
-            Svc_Alert_Dialog.addMesage("Campo de Usuario está Vazio");
+            AlertDialog.addMesage("Campo de Usuario está Vazio");
             setUserEnabled(false);
             return;
         }
         if(userName.length()>200 || userName.length()<3){
-            Svc_Alert_Dialog.addMesage(" com Número de caracteres invalido");
+            AlertDialog.addMesage(" com Número de caracteres invalido");
             setUserEnabled(false);
             return;
         }
@@ -69,12 +69,12 @@ public class Entity_01_User {
 
     public void setUserEmail(String userEmail) {
         if (userEmail.isEmpty()) {
-            Svc_Alert_Dialog.addMesage("Campo de Email vazio");
+            AlertDialog.addMesage("Campo de Email vazio");
             setUserEnabled(false);
             return;
         }
         if(userEmail.length()>200 || userEmail.length()<3){
-            Svc_Alert_Dialog.addMesage(" com Número de caracteres invalido");
+            AlertDialog.addMesage(" com Número de caracteres invalido");
             setUserEnabled(false);
             return;
         }
@@ -105,7 +105,7 @@ public class Entity_01_User {
     public void setTermsAndConditionsAceppted(boolean termsAndConditionsAceppted) {
         if(!termsAndConditionsAceppted){
             setUserEnabled(false);
-            Svc_Alert_Dialog.addMesage("É necessario aceitar os termos e condições");
+            AlertDialog.addMesage("É necessario aceitar os termos e condições");
             return;
         }
         isTermsAndConditionsAceppted = termsAndConditionsAceppted;
@@ -118,7 +118,7 @@ public class Entity_01_User {
     public void setPrivacyPoliticAccepted(boolean privacyPoliticAccepted) {
         if(!privacyPoliticAccepted){
             setUserEnabled(false);
-            Svc_Alert_Dialog.addMesage("É necessario aceitar os termos e condições");
+            AlertDialog.addMesage("É necessario aceitar os termos e condições");
             return;
         }
         isPrivacyPoliticAccepted = privacyPoliticAccepted;
@@ -131,7 +131,7 @@ public class Entity_01_User {
     public void setUserPassword(String userPassword) {
 
         if(userPassword.isEmpty()){
-            Svc_Alert_Dialog.addMesage("Campo de Senha está vazia");
+            AlertDialog.addMesage("Campo de Senha está vazia");
             return;
         }
         this.userPassword = userPassword;

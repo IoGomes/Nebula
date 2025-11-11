@@ -88,7 +88,7 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             itemHolder.tvNumber.setText(contact.getContactNumber());
 
             itemHolder.profile.setOnClickListener(v ->
-                    new Dialog_Feed_01_Profile_Image(v.getContext(), contact.getContactName()).show()
+                    new Dialog_Feed_01_Profile_Image(v.getContext()).show()
             );
 
             itemHolder.itemView.setOnClickListener(v ->

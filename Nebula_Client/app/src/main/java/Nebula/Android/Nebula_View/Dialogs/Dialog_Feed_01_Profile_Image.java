@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -23,7 +22,7 @@ public class Dialog_Feed_01_Profile_Image extends Dialog {
     Dlg05ProfileImageBinding bind;
     private Activity activity;
 
-    public Dialog_Feed_01_Profile_Image(@NonNull Context context, String chatWith) {
+    public Dialog_Feed_01_Profile_Image(@NonNull Context context) {
         super(context);
 
         this.activity = getActivityFromContext(context);
@@ -37,8 +36,6 @@ public class Dialog_Feed_01_Profile_Image extends Dialog {
         params.width = WindowManager.LayoutParams.WRAP_CONTENT;
         params.height = WindowManager.LayoutParams.WRAP_CONTENT;
         getWindow().setAttributes(params);
-
-        bind.nomeContato.setText(chatWith);
 
         bind.videoCall.setOnClickListener(v -> {
             new Controller_Video_Call(activity).performVideoCall(activity);

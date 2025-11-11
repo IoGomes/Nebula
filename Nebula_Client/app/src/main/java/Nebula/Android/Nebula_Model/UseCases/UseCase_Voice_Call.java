@@ -1,17 +1,17 @@
 package Nebula.Android.Nebula_Model.UseCases;
 
-import Nebula.Android.Nebula_Model.Services.Svc_Alert_Dialog;
-import Nebula.Android.Nebula_Model.Services.Svc_Network_Checker;
-import Nebula.Android.Nebula_Model.Services.Svc_Permission;
+import Nebula.Android.Nebula_Model.Services.AlertDialog;
+import Nebula.Android.Nebula_Model.Services.Network_Checker;
+import Nebula.Android.Nebula_Model.Services.Service_Permission;
 
 public class UseCase_Voice_Call {
 
     private boolean isEnabled;
-    private final Svc_Permission servicePermission;
-    private final Svc_Network_Checker networkChecker;
+    private final Service_Permission servicePermission;
+    private final Network_Checker networkChecker;
 
     // Construtor
-    public UseCase_Voice_Call(Svc_Permission servicePermission, Svc_Network_Checker networkChecker) {
+    public UseCase_Voice_Call(Service_Permission servicePermission, Network_Checker networkChecker) {
         this.servicePermission = servicePermission;
         this.networkChecker = networkChecker;
         this.isEnabled = false;
@@ -28,17 +28,17 @@ public class UseCase_Voice_Call {
 
     public boolean hasAllPermissionsAndAccess() {
         if (!servicePermission.hasRecordAudioPermission()) {
-            Svc_Alert_Dialog.addMesage("Sem permissão para acessar a câmera");
+            AlertDialog.addMesage("Sem permissão para acessar a câmera");
             return false;
         }
 
         if (!servicePermission.hasWifiPermission()) {
-            Svc_Alert_Dialog.addMesage("Sem permissão para acessar Wi-Fi");
+            AlertDialog.addMesage("Sem permissão para acessar Wi-Fi");
             return false;
         }
 
         if (!networkChecker.hasWifiAccess()) {
-            Svc_Alert_Dialog.addMesage("Sem conexão com a internet");
+            AlertDialog.addMesage("Sem conexão com a internet");
             return false;
         }
 

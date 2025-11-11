@@ -17,8 +17,8 @@ import com.airbnb.lottie.LottieAnimationView;
 import java.util.concurrent.ExecutorService;
 
 import Nebula.Android.Nebula_Data.Preferences.SessionPreferences;
-import Nebula.Android.Nebula_Model.Services.Svc_Network_Checker;
-import Nebula.Android.Nebula_Model.Services.Svc_Permission;
+import Nebula.Android.Nebula_Model.Services.Network_Checker;
+import Nebula.Android.Nebula_Model.Services.Service_Permission;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_01_Login;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_02_Register;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
@@ -109,8 +109,8 @@ public class Controller_Auth {
                 confirmPasswordField.getText().toString(),
                 termosCondicoes.isChecked(),
                 termosPrivacidade.isChecked(),
-                new Svc_Network_Checker(activity),
-                new Svc_Permission(activity)
+                new Network_Checker(activity),
+                new Service_Permission(activity)
         );
 
         if (register.isEnabled()) {
