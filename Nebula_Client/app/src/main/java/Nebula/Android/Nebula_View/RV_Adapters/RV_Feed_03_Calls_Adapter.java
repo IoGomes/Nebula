@@ -64,7 +64,7 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
             callHolder.callTextDate.setText(dateFormat.format(call.getDateTimeCall()));
 
             callHolder.profileImage.setOnClickListener(v -> {
-                new Dialog_Feed_01_Profile_Image(v.getContext()).show();
+                new Dialog_Feed_01_Profile_Image(v.getContext(), call.getNomeDeContato()).show();
             });
 
             callHolder.imageButton.setOnClickListener(v -> {

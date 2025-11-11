@@ -54,7 +54,7 @@
                 android:windowSoftInputMode="adjustResize|stateHidden" />
 
             <activity
-                android:name=".Nebula_View.Activities.Activity_Web"
+                android:name=".Nebula_View.Activities.Activity_06_Web"
                 android:windowSoftInputMode="adjustResize|stateHidden" />
 
             <activity
