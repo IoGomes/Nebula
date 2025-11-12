@@ -1,5 +1,6 @@
 package Nebula.Android.Nebula_Model.Services;
-
+import java.util.Collections;
+import java.util.Comparator;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Date;
@@ -119,37 +120,19 @@ public class Svc_Search_Query {
         return results;
     }
 
-    // Troca as posições dos resultados
-    private static void swap(List<Entity_02_Chat_Session> list, int pos1, int pos2) {
-        Entity_02_Chat_Session temp = list.get(pos1);
-        list.set(pos1, list.get(pos2));
-        list.set(pos2, temp);
-    }
 
-    // Bubble Sort por prioridade (não lida → lida recente → lida antiga)
-    private static void sortResults(List<Entity_02_Chat_Session> chats) {
-
-        chats.removeIf(chat -> chat == null);
-
-        for (int i = 0; i < chats.size() - 1; i++) {
-            for (int j = 0; j < chats.size() - i - 1; j++) {
-                Entity_02_Chat_Session current = chats.get(j);
-                Entity_02_Chat_Session next = chats.get(j + 1);
-
-                if (current == null || next == null) continue;
-
-                // Prioridade 1: Mensagens não lidas
-                if (!current.hasUnread() && next.hasUnread()) {
-                    swap(chats, j, j + 1);
-                }
-                // Prioridade 2: Se ambos tiverem o mesmo status, o mais recente vai primeiro
-                else if (current.hasUnread() == next.hasUnread() &&
-                        getLastMessageTime(current) < getLastMessageTime(next)) {
-                    swap(chats, j, j + 1);
-                }
-            }
+    
+  
+ // Metodo que rdena a lista de chats por prioridade usando Collections.sort (O(n log n)) {Prioridade 1: Mensagens não lidas primeiro ,prioridade 2: Mais recentes primeiro (dentro do mesmo status)}
+private static void sortResults(List<Entity_02_Chat_Session> chats) {
+    chats.removeIf(chat -> chat == null);
+    Collections.sort(chats, (c1, c2) -> {
+        if (c1.hasUnread() != c2.hasUnread()) {
+            return c1.hasUnread() ? -1 : 1;
         }
-    }
+        return Long.compare(getLastMessageTime(c2), getLastMessageTime(c1));
+    });
+}
 
     // Método auxiliar para obter o timestamp da última mensagem
     private static long getLastMessageTime(Entity_02_Chat_Session chat) {
