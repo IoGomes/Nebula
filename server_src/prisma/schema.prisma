@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client { 
-  provider = "prisma-client" 
-  output = "../generated/prisma" 
+  provider = "prisma-client-js" 
+  output = "../generated/client"
 }
 
 datasource db { 
@@ -17,25 +17,32 @@ datasource db {
 model User {
   user_id        Int             @id @default(autoincrement())
   username       String
-  password       String
-  email          String
-  phone_number   String
+  password       String           
+  email          String          @unique
+  phone_number   String          @unique
 
   calls_made     Call_history[]  @relation("CallerRelation")
   calls_received Call_history[]  @relation("ReceiverRelation")
+  refreshToken   RefreshToken[]
 }
 
 model Call_history {
   call_id     Int      @id @default(autoincrement())
-
   caller      User     @relation("CallerRelation", fields: [caller_id], references: [user_id])
   caller_id   Int
-
   receiver    User     @relation("ReceiverRelation", fields: [receiver_id], references: [user_id])
   receiver_id Int
-
   duration    Float
   call_date   DateTime @default(now())
   call_type   String
   call_status String
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  user      User     @relation(fields: [user_id], references: [user_id])
+  user_id   Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
