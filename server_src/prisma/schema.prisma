@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client { 
+  provider = "prisma-client" 
+  output = "../generated/prisma" 
+}
+
+datasource db { 
+  provider = "mysql" 
+  url = env("DATABASE_URL") 
+}
+
+model User {
+  user_id        Int             @id @default(autoincrement())
+  username       String
+  password       String
+  email          String
+  phone_number   String
+
+  calls_made     Call_history[]  @relation("CallerRelation")
+  calls_received Call_history[]  @relation("ReceiverRelation")
+}
+
+model Call_history {
+  call_id     Int      @id @default(autoincrement())
+
+  caller      User     @relation("CallerRelation", fields: [caller_id], references: [user_id])
+  caller_id   Int
+
+  receiver    User     @relation("ReceiverRelation", fields: [receiver_id], references: [user_id])
+  receiver_id Int
+
+  duration    Float
+  call_date   DateTime @default(now())
+  call_type   String
+  call_status String
+}
