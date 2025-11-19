@@ -22,7 +22,7 @@ import Nebula.Android.Nebula_Model.Services.Svc_Permission;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_01_Login;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_02_Register;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
-import Nebula.Android.Nebula_View.Dialogs.Dialog_Auth_01_Login_Credentials;
+import Nebula.Android.Nebula_View.Dialogs.Dialog_Auth_Login_Credentials;
 import Nebula.Android.Nebula_View.Utils.ToastWarning;
 import Nebula.Android.R;
 
@@ -128,7 +128,7 @@ public class Controller_Auth {
             }, 1500);
 
         } else {
-            new Dialog_Auth_01_Login_Credentials(activity).show();
+            new Dialog_Auth_Login_Credentials(activity).show();
             signupButton.setClickable(true);
         }
     }

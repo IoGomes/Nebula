@@ -9,11 +9,31 @@
     <TextView
         android:id="@+id/null_message"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textColor="#909090"
+        android:layout_height="20dp"
         android:gravity="center"
+        android:elevation="1dp"
+        android:text="No Open Chats → Tap + to start a conversation"
+        android:textColor="#909090"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/stars"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_loop="true"
+        android:scaleX="-1"
         android:visibility="gone"
-        android:text="No Open Chats → Tap + to start a conversation"/>
+        app:lottie_rawRes="@raw/stars">
+
+    </com.airbnb.lottie.LottieAnimationView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

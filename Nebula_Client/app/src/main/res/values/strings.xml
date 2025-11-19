@@ -17,6 +17,14 @@
     <string name="conversas">Conversas</string>
     <string name="arquivados">Arquivados</string>
     <string name="signup">signup</string>
+
+
+
+    <!-- Calls History Strings -->
+
+    <string name="callsHeaderTitle">Histórico de Chamadas</string>
+
+
     <string name="earth_view_from_the_moon">Earth view from the moon</string>
     <string name="permanecer_conectado">Permanecer conectado</string>
     <string name="google_login_button">Google login button</string>
@@ -27,7 +35,6 @@
     <string name="logo">TImeSkip</string>
     <string name="pesquisar2">Pesquisar...</string>
     <string name="sticker_icon">Sticker Icon</string>
-    <string name="texto_multicolor_html"><![CDATA[<font color="#FF0000">Texto vermelho</font> e <font color="#0000FF">texto azul</font>]]></string>
     <string name="recentes">Recentes</string>
     <string name="signup_fragment">SignUp</string>
     <string name="lista_de_contatos">Lista de contatos</string>

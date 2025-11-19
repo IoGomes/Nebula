@@ -13,6 +13,6 @@
         android:startColor="#4A148C"
         android:endColor="#EC407A"
         android:type="linear"
-        android:angle="180" />
+        android:angle="135" />
 
 </shape>

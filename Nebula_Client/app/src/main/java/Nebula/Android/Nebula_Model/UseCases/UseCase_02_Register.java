@@ -1,6 +1,6 @@
 package Nebula.Android.Nebula_Model.UseCases;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_01_User;
+import Nebula.Android.Nebula_Model.Entitys.Entity_User;
 import Nebula.Android.Nebula_Model.Services.Svc_Alert_Dialog;
 import Nebula.Android.Nebula_Model.Services.Svc_Network_Checker;
 import Nebula.Android.Nebula_Model.Services.Svc_Permission;
@@ -9,7 +9,7 @@ import Nebula.Android.Nebula_Model.Services.Svc_Permission;
 public class UseCase_02_Register {
 
     private Boolean isUseCaseEnabled = false;
-    private final Entity_01_User user;
+    private final Entity_User user;
     private final Svc_Permission servicePermission;
     private final Svc_Network_Checker networkChecker;
 
@@ -24,7 +24,7 @@ public class UseCase_02_Register {
                                Svc_Permission servicePermission) {
 
 
-        this.user = new Entity_01_User(
+        this.user = new Entity_User(
                 userName,
                 userEmail,
                 userTelefoneNumber,

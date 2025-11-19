@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.List;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
-import Nebula.Android.Nebula_Model.Repository.Repo_Archived_Chats;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Data.Repository.Repo_Archived_Chats;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_04_Archived_Adapter;
 import Nebula.Android.databinding.Frg06ArchivedBinding;
 
@@ -30,7 +30,7 @@ public class Fragment_Feed_04_Archived extends Fragment {
 
         bind = Frg06ArchivedBinding.inflate(inflater, container, false);
 
-        List<Entity_02_Chat_Session> archivedChats = Repo_Archived_Chats.getArchivedChats();
+        List<Entity_Pv_Chat> archivedChats = Repo_Archived_Chats.getArchivedChats();
 
         String message = "No <b><font color='#FFFFFF'>Archived Chats</font></b>.<br>" +
                 "<b><font color='#FFFFFF'>Long-press</font></b> inbox chat → Archive chat to view.";

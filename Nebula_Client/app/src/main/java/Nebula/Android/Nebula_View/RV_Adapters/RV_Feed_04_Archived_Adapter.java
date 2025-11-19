@@ -30,18 +30,18 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
-import Nebula.Android.Nebula_Model.Repository.Repo_Archived_Chats;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Data.Repository.Repo_Archived_Chats;
 import Nebula.Android.Nebula_Model.Services.Svc_Search_Query;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
 import Nebula.Android.Nebula_View.Activities.Activity_03_Chat;
-import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_01_Profile_Image;
+import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_Profile_Image;
 import Nebula.Android.R;
 
 ///@author Ítalo Oliveira Gomes
 public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final List<Entity_02_Chat_Session> archivedChats;
+    private final List<Entity_Pv_Chat> archivedChats;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 
     private static final int VIEW_TYPE_HEADER = 0;
@@ -57,7 +57,7 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    public RV_Feed_04_Archived_Adapter(List<Entity_02_Chat_Session> archivedChats) {
+    public RV_Feed_04_Archived_Adapter(List<Entity_Pv_Chat> archivedChats) {
         this.archivedChats = archivedChats;
     }
 
@@ -118,7 +118,7 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
 
             if (chatPosition >= 0 && chatPosition < Repo_Archived_Chats.getArchivedChats().size()) {
 
-                Entity_02_Chat_Session chatSession = Repo_Archived_Chats.getArchivedChats().get(chatPosition);
+                Entity_Pv_Chat chatSession = Repo_Archived_Chats.getArchivedChats().get(chatPosition);
 
                 bindChatData(chatHolder, chatSession);
 
@@ -129,9 +129,8 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
                 }
 
                 chatHolder.unreadIcon.setVisibility(chatSession.hasUnread() ? View.VISIBLE : View.GONE);
-
                 chatHolder.itemView.setOnLongClickListener(v -> {
-                    // Captura a posição final para evitar problemas com variável mutável
+
                     final int finalPosition = chatPosition;
 
                     if (selectedPositions.contains(finalPosition)) {
@@ -143,7 +142,7 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
                     }
 
                     if (v.getContext() instanceof Activity_02_Feed) {
-                        ((Activity_02_Feed) v.getContext()).showOptionsBar();
+                        ((Activity_02_Feed) v.getContext()).showOptionsBarFragment04();
                     }
                     notifyItemChanged(position);
                     return true;
@@ -162,7 +161,7 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
                 });
 
                 chatHolder.profileImage.setOnClickListener(v -> {
-                    new Dialog_Feed_01_Profile_Image(
+                    new Dialog_Feed_Profile_Image(
                             chatHolder.itemView.getContext(),
                             chatSession.getChatWith()
                     ).show();
@@ -171,16 +170,9 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    public void clearSelection() {
-        selectedPositions.clear();
-        isSelectionMode = false;
-        notifyDataSetChanged();
-    }
-
-    private void bindChatData(ChatViewHolder holder, Entity_02_Chat_Session chatSession) {
+    private void bindChatData(ChatViewHolder holder, Entity_Pv_Chat chatSession) {
         String lastMessage = chatSession.getLastMessage();
 
-        // Se houver busca ativa, destaca o texto encontrado
         if (currentSearchQuery != null && !currentSearchQuery.trim().isEmpty()) {
             String highlightedMessage = Svc_Search_Query.highlightTextHtml(
                     lastMessage != null ? lastMessage : "No messages",
@@ -189,7 +181,6 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
             );
             holder.lastText.setText(Html.fromHtml(highlightedMessage, Html.FROM_HTML_MODE_LEGACY));
 
-            // Também destaca o nome se encontrado
             String highlightedName = Svc_Search_Query.highlightTextHtml(
                     chatSession.getChatWith(),
                     currentSearchQuery,
@@ -236,7 +227,7 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
         // Executa busca e ordenação em background
         executor.execute(() -> {
             // Usa o SVC_Search_Query para fazer a pesquisa com filtros de categoria
-            List<Entity_02_Chat_Session> results = Svc_Search_Query.searchWithCategory(
+            List<Entity_Pv_Chat> results = Svc_Search_Query.searchWithCategory(
                     query,
                     categoryId,
                     R.id.all_category,
@@ -244,7 +235,6 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
                     R.id.favorite
             );
 
-            // Ordena os resultados
             sortResults(results);
 
             mainHandler.post(() -> {
@@ -255,11 +245,11 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
         });
     }
 
-    private void sortResults(List<Entity_02_Chat_Session> chats) {
+    private void sortResults(List<Entity_Pv_Chat> chats) {
         for (int i = 0; i < chats.size() - 1; i++) {
             for (int j = 0; j < chats.size() - i - 1; j++) {
-                Entity_02_Chat_Session current = chats.get(j);
-                Entity_02_Chat_Session next = chats.get(j + 1);
+                Entity_Pv_Chat current = chats.get(j);
+                Entity_Pv_Chat next = chats.get(j + 1);
 
                 // Prioridade 1: Mensagens não lidas
                 if (!current.hasUnread() && next.hasUnread()) {
@@ -274,13 +264,13 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    private void swap(List<Entity_02_Chat_Session> chats, int i, int j) {
-        Entity_02_Chat_Session temp = chats.get(i);
+    private void swap(List<Entity_Pv_Chat> chats, int i, int j) {
+        Entity_Pv_Chat temp = chats.get(i);
         chats.set(i, chats.get(j));
         chats.set(j, temp);
     }
 
-    private long getLastMessageTime(Entity_02_Chat_Session chat) {
+    private long getLastMessageTime(Entity_Pv_Chat chat) {
         if (chat.getChatDate() != null && !chat.getChatDate().isEmpty()) {
             List<Date> dates = chat.getChatDate();
             return dates.get(dates.size() - 1).getTime();
@@ -289,7 +279,7 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     public void removeSelected() {
-        // Ordena as posições em ordem DECRESCENTE para remover de trás pra frente
+
         List<Integer> sorted = new ArrayList<>(selectedPositions);
         Collections.sort(sorted, Collections.reverseOrder());
 

@@ -24,7 +24,7 @@ public class Controller_Video_Call {
         useCaseVideoCall = new UseCase_Video_Call(servicePermission, networkChecker);
     }
 
-    public void performVideoCall(Activity activity) {
+    public void performVideoCall(Activity activity, String contactNumber, String contactName) {
         if (useCaseVideoCall.isEnabled()) {
             Intent intent = new Intent(activity, Activity_05_Video_Call.class);
             activity.startActivity(intent);

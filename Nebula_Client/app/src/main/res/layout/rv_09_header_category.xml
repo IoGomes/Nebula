@@ -42,7 +42,6 @@
             android:textSize="12sp" />
 
         <Button
-            android:drawableEnd="@drawable/ic_locked_feature"
             android:id="@+id/favorite"
             android:layout_width="wrap_content"
             android:layout_height="28dp"
@@ -57,9 +56,8 @@
             android:textSize="12sp" />
 
         <Button
-            android:drawableEnd="@drawable/ic_locked_feature"
             android:id="@+id/groups"
-            android:layout_width="78dp"
+            android:layout_width="wrap_content"
             android:layout_height="28dp"
             android:paddingEnd="08dp"
             android:paddingStart="08dp"

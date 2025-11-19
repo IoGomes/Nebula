@@ -23,13 +23,13 @@
             android:fullBackupContent="@xml/backup_rules"
             android:hardwareAccelerated="true"
             android:icon="@mipmap/ic_launcher"
+            android:theme="@style/Theme.App.Starting"
             android:usesCleartextTraffic="false"
             android:networkSecurityConfig="@xml/network_security_config"
             android:label="Nebula"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:largeHeap="true"
-            android:theme="@style/Theme.App.Starting">
+            android:largeHeap="true">
 
             <meta-data
                 android:name="android.graphics.high_refresh_rate_enabled"

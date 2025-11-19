@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/calls_title"
+    android:id="@+id/callsTitle"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/recentes"
-    android:textColor="@color/white"
-    android:textSize="20sp"
     android:paddingStart="10dp"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp"/>
+    android:paddingTop="20dp"
+    android:gravity="center_vertical"
+    android:paddingEnd="10dp"
+    android:layout_marginBottom="10dp"
+    android:paddingBottom="10dp"
+    android:layout_height="55dp"
+    android:textColor="@color/white"
+    android:text="Histórico de Chamadas"
+    android:textSize="18sp"/>

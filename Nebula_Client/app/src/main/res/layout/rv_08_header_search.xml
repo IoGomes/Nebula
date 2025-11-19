@@ -10,7 +10,7 @@
     android:background="@drawable/bg_main_searchfield"
     android:drawableStart="@drawable/ic_search"
     android:drawablePadding="20dp"
-    android:hint="@string/pesquisar2"
+    android:hint="@string/pesquisar"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:textColorHint="#909090" />

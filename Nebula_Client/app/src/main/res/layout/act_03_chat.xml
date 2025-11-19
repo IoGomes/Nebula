@@ -81,6 +81,7 @@
                 tools:ignore="RtlSymmetry" />
 
             <TextView
+                android:id="@+id/contactNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
@@ -136,7 +137,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_marginEnd="04dp"
-            android:background="@drawable/bg_normal_textfield"
+            android:background="#000"
             app:layout_constraintEnd_toStartOf="@+id/send"
             app:layout_constraintStart_toStartOf="parent">
 

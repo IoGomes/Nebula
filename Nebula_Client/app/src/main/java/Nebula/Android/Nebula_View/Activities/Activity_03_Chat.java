@@ -2,6 +2,7 @@ package Nebula.Android.Nebula_View.Activities;
 
 import static android.view.View.VISIBLE;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.processing.SurfaceProcessorNode;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -23,19 +25,20 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
-import Nebula.Android.Nebula_Model.Entitys.Entity_03_Message;
-import Nebula.Android.Nebula_Model.Repository.Repo_Chat;
-import Nebula.Android.Nebula_Model.Repository.Repo_Chat_Storage;
-import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_01_Profile_Image;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Message;
+import Nebula.Android.Nebula_Data.Repository.Repo_Chat;
+import Nebula.Android.Nebula_Data.Repository.Repo_Chat_Storage;
+import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_Profile_Image;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Chat_01_Msg_Adapter;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Video_Call;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Voice_Call;
-import Nebula.Android.Nebula_WebSocketChat.StompChatService;
+import Nebula.Android.Nebula_Model.Services.StompChatService;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act03ChatBinding;
 
@@ -44,7 +47,7 @@ import Nebula.Android.databinding.Act03ChatBinding;
 public class Activity_03_Chat extends AppCompatActivity {
 
     private RV_Chat_01_Msg_Adapter adapter;
-    private List<Entity_03_Message> messageList;
+    private List<Entity_Message> messageList;
     private Act03ChatBinding bind;
 
     private ExecutorService executorService;
@@ -54,7 +57,7 @@ public class Activity_03_Chat extends AppCompatActivity {
     private String username = "User_" + System.currentTimeMillis();
     private String chatRoomId = "public";
 
-    private List<Entity_02_Chat_Session> chatSessions;
+    private List<Entity_Pv_Chat> chatSessions;
 
     // ✅ ADICIONAR - Gerenciador de armazenamento
     private Repo_Chat_Storage chatStorage;
@@ -67,6 +70,7 @@ public class Activity_03_Chat extends AppCompatActivity {
 
     private int currentChatPosition = 0;
     private String currentChatId;
+    private String currentNumber;
 
     private String currentChatWith;
 
@@ -82,16 +86,14 @@ public class Activity_03_Chat extends AppCompatActivity {
 
         currentChatPosition = getIntent().getIntExtra("CHAT_POSITION", 0);
         currentChatId = getIntent().getStringExtra("CHAT_ID");
+        currentNumber = getIntent().getStringExtra("ContactNumber");
+
+        Log.e("Teste", "Posição: " + currentChatPosition);
 
         currentChatWith = getIntent().getStringExtra("ChatWith");
         bind.nomeContato.setText(currentChatWith);
 
         chatStorage = new Repo_Chat_Storage(this);
-
-        Log.d("NebulaChat", "==================");
-        Log.d("NebulaChat", "currentChatId: " + currentChatId);
-        Log.d("NebulaChat", "currentChatPosition: " + currentChatPosition);
-        Log.d("NebulaChat", "==================");
 
         setupBasicUI();
 
@@ -111,26 +113,21 @@ public class Activity_03_Chat extends AppCompatActivity {
         });
     }
 
+
+    public void putExtraIntent(String currentChatId, String currentNumber, Intent intent){
+
+        intent.putExtra("CURRENT_CHAT_ID", currentChatId);
+        intent.putExtra("CURRENT_NUMBER", currentNumber);
+
+    }
+
     private void setupBasicUI() {
 
         getWindow().setStatusBarColor(Color.TRANSPARENT);
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
 
         messageList = new ArrayList<>();
-
-
-        if (currentChatId != null && chatStorage.hasSavedMessages(currentChatId)) {
-            List<Entity_03_Message> savedMessages = chatStorage.loadMessages(currentChatId);
-            messageList.addAll(savedMessages);
-            Log.d("NebulaChat", "📂 Carregadas " + savedMessages.size() + " mensagens");
-        } else {
-            Log.d("NebulaChat", "❌ Nenhuma mensagem salva ou currentChatId é null");
-            Log.d("NebulaChat", "currentChatId: " + currentChatId);
-        }
-
         adapter = new RV_Chat_01_Msg_Adapter(messageList);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -139,16 +136,16 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.rvMessage.setAdapter(adapter);
         bind.rvMessage.setItemAnimator(null);
         bind.rvMessage.setHasFixedSize(true);
+        bind.contactNumber.setText(currentNumber);
 
-        // ✅ ADICIONAR - Rolar para a última mensagem se houver
         if (!messageList.isEmpty()) {
             bind.rvMessage.scrollToPosition(messageList.size() - 1);
         }
 
         bind.profilePhoto.setOnClickListener(v ->
-                new Dialog_Feed_01_Profile_Image(
+                new Dialog_Feed_Profile_Image(
                         v.getContext(),
-                        currentChatWith // passa o identificador do perfil
+                        currentChatWith
                 ).show()
         );
     }
@@ -220,7 +217,7 @@ public class Activity_03_Chat extends AppCompatActivity {
     }
 
     private void sendMessage(String text) {
-        Entity_03_Message newMessage = new Entity_03_Message();
+        Entity_Message newMessage = new Entity_Message();
         newMessage.setMessage(text);
         newMessage.setDateTimeMessage(new Date());
         newMessage.setWasVisualized(false);
@@ -268,7 +265,7 @@ public class Activity_03_Chat extends AppCompatActivity {
     }
 
     private void receiveMessage(StompChatService.ChatMessage stompMessage) {
-        Entity_03_Message newMessage = new Entity_03_Message();
+        Entity_Message newMessage = new Entity_Message();
         newMessage.setMessage(stompMessage.getContent());
         newMessage.setDateTimeMessage(new Date(stompMessage.getTimestamp()));
         newMessage.setWasVisualized(false);
@@ -279,7 +276,7 @@ public class Activity_03_Chat extends AppCompatActivity {
         adapter.notifyItemInserted(messageList.size() - 1);
         bind.rvMessage.scrollToPosition(messageList.size() - 1);
 
-        // ✅ ADICIONAR - Salvar mensagem recebida no storage
+
         if (currentChatId != null) {
             chatStorage.addMessage(currentChatId, newMessage);
             Log.d("NebulaChat", "💾 Mensagem recebida salva no storage");
@@ -300,22 +297,11 @@ public class Activity_03_Chat extends AppCompatActivity {
         }
     }
 
-    // ✅ ADICIONAR - Método para salvar mensagens antes de sair
+
     private void saveMessagesBeforeExit() {
         if (currentChatId != null && !messageList.isEmpty()) {
             chatStorage.saveMessages(currentChatId, messageList);
             Log.d("NebulaChat", "💾 Todas as mensagens salvas: " + messageList.size());
-        }
-    }
-
-    // ✅ ADICIONAR - Método para limpar o histórico do chat (opcional)
-    private void clearChatHistory() {
-        if (currentChatId != null) {
-            messageList.clear();
-            chatStorage.clearMessages(currentChatId);
-            adapter.notifyDataSetChanged();
-            Toast.makeText(this, "Histórico limpo", Toast.LENGTH_SHORT).show();
-            Log.d("NebulaChat", "🗑️ Histórico do chat limpo");
         }
     }
 
@@ -324,8 +310,7 @@ public class Activity_03_Chat extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        bind.videoCall.setOnClickListener(v ->
-                new Controller_Video_Call(this).performVideoCall(this));
+
 
         bind.voiceCall.setOnClickListener(v ->
                 new Controller_Voice_Call(this).performVoiceCall(this));
@@ -337,9 +322,6 @@ public class Activity_03_Chat extends AppCompatActivity {
                 bind.messageTextfield.setText("");
             }
         });
-
-        // ✅ OPCIONAL - Adicionar botão para limpar histórico (se tiver no XML)
-        // bind.clearHistoryButton.setOnClickListener(v -> clearChatHistory());
     }
 
     private void setupTextWatcher() {

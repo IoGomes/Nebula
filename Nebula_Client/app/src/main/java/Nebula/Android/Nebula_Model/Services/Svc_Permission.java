@@ -38,7 +38,3 @@ public class Svc_Permission implements Svc_Permission_Interface {
                 == PackageManager.PERMISSION_GRANTED;
     }
 }
-
-public interface Svc_Permission_Interface(){
-
-}

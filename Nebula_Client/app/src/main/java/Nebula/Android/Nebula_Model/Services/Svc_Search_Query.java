@@ -1,13 +1,12 @@
 package Nebula.Android.Nebula_Model.Services;
 import java.util.Collections;
-import java.util.Comparator;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
-import Nebula.Android.Nebula_Model.Repository.Repo_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Data.Repository.Repo_Chat;
 
 ///@author Thiago Dantas Carneiro
 public class Svc_Search_Query {
@@ -40,20 +39,20 @@ public class Svc_Search_Query {
     }
 
     // Função principal de pesquisa
-    public static List<Entity_02_Chat_Session> search(String searchText) {
-        List<Entity_02_Chat_Session> allChats = Repo_Chat.getChats();
+    public static List<Entity_Pv_Chat> search(String searchText) {
+        List<Entity_Pv_Chat> allChats = Repo_Chat.getChats();
         return search(allChats, searchText);
     }
 
     // Pesquisa sobrecarregada que aceita lista customizada
-    public static List<Entity_02_Chat_Session> search(List<Entity_02_Chat_Session> chats, String searchText) {
-        List<Entity_02_Chat_Session> results = new ArrayList<>();
+    public static List<Entity_Pv_Chat> search(List<Entity_Pv_Chat> chats, String searchText) {
+        List<Entity_Pv_Chat> results = new ArrayList<>();
         if (chats == null || searchText == null || searchText.trim().isEmpty()) {
             return new ArrayList<>(chats != null ? chats : new ArrayList<>());
         }
         searchText = searchText.trim();
 
-        for (Entity_02_Chat_Session chat : chats) {
+        for (Entity_Pv_Chat chat : chats) {
             // Null check added
             if (chat == null) continue;
 
@@ -74,19 +73,19 @@ public class Svc_Search_Query {
     }
 
     // Executa pesquisa com integração de filtros por categoria
-    public static List<Entity_02_Chat_Session> searchWithCategory(String searchText,
-                                                                  int categoryId,
-                                                                  int allCategoryId,
-                                                                  int notReadId,
-                                                                  int favoriteId) {
-        List<Entity_02_Chat_Session> allChats = new ArrayList<>(Repo_Chat.getChats());
-        List<Entity_02_Chat_Session> results = new ArrayList<>();
+    public static List<Entity_Pv_Chat> searchWithCategory(String searchText,
+                                                          int categoryId,
+                                                          int allCategoryId,
+                                                          int notReadId,
+                                                          int favoriteId) {
+        List<Entity_Pv_Chat> allChats = new ArrayList<>(Repo_Chat.getChats());
+        List<Entity_Pv_Chat> results = new ArrayList<>();
 
         if (allChats == null) {
             return results;
         }
 
-        for (Entity_02_Chat_Session chat : allChats) {
+        for (Entity_Pv_Chat chat : allChats) {
             // Null check added - skip null entries
             if (chat == null) continue;
 
@@ -119,12 +118,9 @@ public class Svc_Search_Query {
         sortResults(results);
         return results;
     }
-
-
-    
   
  // Metodo que rdena a lista de chats por prioridade usando Collections.sort (O(n log n)) {Prioridade 1: Mensagens não lidas primeiro ,prioridade 2: Mais recentes primeiro (dentro do mesmo status)}
-private static void sortResults(List<Entity_02_Chat_Session> chats) {
+private static void sortResults(List<Entity_Pv_Chat> chats) {
     chats.removeIf(chat -> chat == null);
     Collections.sort(chats, (c1, c2) -> {
         if (c1.hasUnread() != c2.hasUnread()) {
@@ -135,7 +131,7 @@ private static void sortResults(List<Entity_02_Chat_Session> chats) {
 }
 
     // Método auxiliar para obter o timestamp da última mensagem
-    private static long getLastMessageTime(Entity_02_Chat_Session chat) {
+    private static long getLastMessageTime(Entity_Pv_Chat chat) {
         if (chat == null) return 0;
 
         List<Date> dates = chat.getChatDate();
@@ -147,21 +143,21 @@ private static void sortResults(List<Entity_02_Chat_Session> chats) {
     }
 
     // Método para pesquisa com filtros adicionais
-    public static List<Entity_02_Chat_Session> searchWithFilter(String searchText, boolean onlyUnread) {
+    public static List<Entity_Pv_Chat> searchWithFilter(String searchText, boolean onlyUnread) {
         return searchWithFilter(Repo_Chat.getChats(), searchText, onlyUnread);
     }
 
     // Sobrecarga do método de pesquisa com filtros
-    public static List<Entity_02_Chat_Session> searchWithFilter(List<Entity_02_Chat_Session> chats,
-                                                                String searchText,
-                                                                boolean onlyUnread) {
+    public static List<Entity_Pv_Chat> searchWithFilter(List<Entity_Pv_Chat> chats,
+                                                        String searchText,
+                                                        boolean onlyUnread) {
         // primeiro pesquisa normal
-        List<Entity_02_Chat_Session> results = search(chats, searchText);
+        List<Entity_Pv_Chat> results = search(chats, searchText);
 
         // se fizer a opção de listar apenas as mensagens não lidas
         if (onlyUnread) {
-            List<Entity_02_Chat_Session> filtered = new ArrayList<>();
-            for (Entity_02_Chat_Session chat : results) {
+            List<Entity_Pv_Chat> filtered = new ArrayList<>();
+            for (Entity_Pv_Chat chat : results) {
                 // Null check added
                 if (chat != null && chat.hasUnread()) {
                     filtered.add(chat);

@@ -3,57 +3,71 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="06dp"
-    android:orientation="horizontal"
     android:foreground="?attr/selectableItemBackground"
-    android:padding="04dp">
+    android:orientation="horizontal">
 
     <ImageButton
         android:id="@+id/profile_photo"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_gravity="center"
-        android:background="@drawable/ic_profile_picture">
-
-    </ImageButton>
+        android:background="@android:color/transparent"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_profile_picture"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="60dp"
-        android:clickable="false"
-        android:focusable="false"
-        android:gravity=""
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profile_photo"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="02dp" />
-
-        <TextView
-            android:id="@+id/contactName"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:maxWidth="160dp"
-            android:text="Nome de Contato"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:clickable="false"
+            android:focusable="false"
+            android:orientation="horizontal">
+
+            <TextView
+                android:gravity="center"
+                android:id="@+id/contactName"
+                android:layout_width="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:layout_height="20dp"
+                android:maxWidth="200dp"
+                android:text="Nome de Contato"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="6dp"
+                android:layout_height="6dp" />
+
+        </LinearLayout>
 
         <Space
             android:layout_width="0dp"
-            android:layout_height="08dp">
-
-        </Space>
+            android:layout_height="08dp" />
 
         <TextView
-            android:text="(75) 991126575"
             android:id="@+id/number"
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
             android:layout_height="20dp"
+            android:ellipsize="end"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="false"
+            android:singleLine="true"
             android:textColor="#808080"
-            android:textSize="14sp" />
+            android:textSize="14.6sp" />
 
     </LinearLayout>
 

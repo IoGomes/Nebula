@@ -17,13 +17,11 @@ import Nebula.Android.R;
 import Nebula.Android.databinding.Frg02RegisterBinding;
 
 /// @author Ítalo Oliveira Gomes
-
 public class Fragment_Auth_02_Register extends Fragment {
 
     Frg02RegisterBinding bind;
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 

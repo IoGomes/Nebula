@@ -4,21 +4,36 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#000000"
+    android:fitsSystemWindows="true">
 
-    <Button
-        android:layout_width="70dp"
+    <TextView
+        android:layout_width="50dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="25dp"
+        android:gravity="end"
+        android:text="SKIP"
+        android:textColor="#808080"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/imageButton3"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </TextView>
+
+    <ImageButton
+        android:id="@+id/imageButton3"
+        android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="11dp"
         android:background="@android:color/transparent"
-        android:text="Skip>>"
+        android:src="@drawable/ic_skip"
         android:textAllCaps="false"
         android:textColor="#505050"
         android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </Button>
+    </ImageButton>
 
     <ImageSwitcher
         android:id="@+id/imageSwitcher"
@@ -98,7 +113,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_margin="08dp"
-        android:background="@drawable/bg_incoming_call"
+        android:background="@drawable/circle_gradient"
         android:src="@drawable/ic_return"
         android:stateListAnimator="@animator/scale_animation2"
         android:textAllCaps="false"

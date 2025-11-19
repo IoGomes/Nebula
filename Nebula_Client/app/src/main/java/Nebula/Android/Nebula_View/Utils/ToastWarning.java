@@ -60,12 +60,4 @@ public class ToastWarning {
     public void showInfo(String text) {
         showToast(0, text);
     }
-
-    public void showWarning(String text) {
-        showToast(1, text);
-    }
-
-    public void showError(String text) {
-        showToast(2, text);
-    }
 }

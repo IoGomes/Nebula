@@ -9,6 +9,7 @@
     android:background="@drawable/bg_confirm_action">
 
     <TextView
+        android:letterSpacing="0.01"
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +22,7 @@
         android:id="@+id/message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Once deleted, this chat cannot be restored. Are you sure you want to continue?"
+        android:text="Once deleted, this chat cannot be restored."
         android:layout_marginTop="12dp"
         android:justificationMode="inter_word"
         android:textSize="15sp" />
@@ -40,6 +41,7 @@
             android:layout_weight="1"
             android:textAllCaps="false"
             android:text="Cancel"
+            android:foreground="@drawable/ripple_square_white"
             android:background="@drawable/bg_searchfield"
             android:textColor="@android:color/white" />
 
@@ -53,8 +55,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Delete"
+            android:foreground="@drawable/ripple_square"
             android:textAllCaps="false"
             android:background="@drawable/bg_square_gradient"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/holo_red_light" />
     </LinearLayout>
 </LinearLayout>

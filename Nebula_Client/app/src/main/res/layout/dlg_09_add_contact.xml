@@ -2,9 +2,22 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="300dp"
-    android:layout_height="330dp"
+    android:layout_height="360dp"
     android:background="@drawable/bg_add_chat"
     android:minWidth="300dp">
+
+    <TextView
+        android:id="@+id/Tittle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Adicionar Contatos"
+        android:padding="16dp"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </TextView>
 
     <EditText
         android:id="@+id/editText"
@@ -19,7 +32,7 @@
         android:textColorHint="#404040"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/Tittle" />
 
     <EditText
         android:id="@+id/phone_Number"
@@ -51,26 +64,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phone_Number" />
 
-    <Switch
-        android:id="@+id/switch1"
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_margin="12dp"
-        android:paddingStart="8dp"
-        android:text="Sync with phone"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText2" />
-
     <ImageButton
         android:id="@+id/btn_save"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="12dp"
-        android:background="@drawable/bg_send_button"
+        android:background="@drawable/bg_square_gradient"
         android:src="@drawable/ic_add"
-        app:layout_constraintTop_toBottomOf="@+id/switch1"
+        app:layout_constraintTop_toBottomOf="@+id/editText2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 

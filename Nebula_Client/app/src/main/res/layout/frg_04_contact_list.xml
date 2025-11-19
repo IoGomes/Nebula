@@ -17,7 +17,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:scrollbars="vertical"
         android:scrollbarStyle="insideOverlay"
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewContact"
         android:layout_width="0dp"
         android:paddingBottom="80dp"
         android:scrollbarSize="1dp"

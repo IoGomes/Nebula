@@ -38,8 +38,11 @@ public class Dialog_Feed_Confirm_Chat_Delection extends Dialog {
 
         btnCancel.setOnClickListener(v -> dismiss());
         btnDelete.setOnClickListener(v -> {
-            listener.onConfirm();
-            dismiss();
+            v.postDelayed(() -> {
+                listener.onConfirm();
+                dismiss();
+
+            }, 140);
         });
 
         // Ajustes visuais do diálogo

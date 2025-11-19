@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_03_Message;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Message;
 import Nebula.Android.R;
 
 public class RV_Chat_01_Msg_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -21,16 +21,16 @@ public class RV_Chat_01_Msg_Adapter extends RecyclerView.Adapter<RecyclerView.Vi
     private static final int VIEW_TYPE_SENT = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
 
-    private final List<Entity_03_Message> messages;
+    private final List<Entity_Message> messages;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-    public RV_Chat_01_Msg_Adapter(List<Entity_03_Message> messages) {
+    public RV_Chat_01_Msg_Adapter(List<Entity_Message> messages) {
         this.messages = messages;
     }
 
     @Override
     public int getItemViewType(int position) {
-        Entity_03_Message message = messages.get(position);
+        Entity_Message message = messages.get(position);
         return (message.isSentByMe() != null && message.isSentByMe())
                 ? VIEW_TYPE_SENT
                 : VIEW_TYPE_RECEIVED;
@@ -54,7 +54,7 @@ public class RV_Chat_01_Msg_Adapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Entity_03_Message message = messages.get(position);
+        Entity_Message message = messages.get(position);
 
         if (holder instanceof SentMessageViewHolder) {
             ((SentMessageViewHolder) holder).bind(message, dateFormat);
@@ -78,7 +78,7 @@ public class RV_Chat_01_Msg_Adapter extends RecyclerView.Adapter<RecyclerView.Vi
             textDate = itemView.findViewById(R.id.textDate);
         }
 
-        public void bind(Entity_03_Message message, SimpleDateFormat dateFormat) {
+        public void bind(Entity_Message message, SimpleDateFormat dateFormat) {
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 textMessage.setText(
@@ -116,7 +116,7 @@ public class RV_Chat_01_Msg_Adapter extends RecyclerView.Adapter<RecyclerView.Vi
             textDate = itemView.findViewById(R.id.textDate);
         }
 
-        public void bind(Entity_03_Message message, SimpleDateFormat dateFormat) {
+        public void bind(Entity_Message message, SimpleDateFormat dateFormat) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 textMessage.setText(
                         Html.fromHtml(message.getMessage(), Html.FROM_HTML_MODE_LEGACY)
