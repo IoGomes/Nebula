@@ -1,0 +1,26 @@
+<!-- res/drawable/gradient_stroke.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Camada de fora: o gradiente -->
+    <item>
+        <shape android:shape="oval">
+            <corners android:radius="120dp"/>
+            <gradient
+                android:startColor="#4A148C"
+                android:endColor="#60EC407A"
+                android:angle="360"/>
+        </shape>
+    </item>
+
+    <!-- Camada de dentro: o preenchimento (cria a borda) -->
+    <item
+        android:left="1dp"
+        android:top="1dp"
+        android:right="1dp"
+        android:bottom="1dp">
+        <shape android:shape="oval">
+            <corners android:radius="120dp"/>
+            <solid android:color="#000"/>
+        </shape>
+    </item>
+</layer-list>

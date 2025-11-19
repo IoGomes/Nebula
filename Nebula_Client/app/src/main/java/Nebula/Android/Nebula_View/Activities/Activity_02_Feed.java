@@ -45,7 +45,6 @@ import Nebula.Android.databinding.Act02FeedBinding;
 
 /// @author Ítalo Oliveira Gomes
 
-
 /// Activity principal do Feed
 @SuppressWarnings("SpellCheckingInspection")
 public class Activity_02_Feed extends AppCompatActivity {
@@ -172,7 +171,6 @@ public class Activity_02_Feed extends AppCompatActivity {
         replaceFragment(fragmentMap.get(R.id.button_inbox));
     }
 
-
     /// Methods to Display and Hide Notify Animations after option selected
     public void notifyAnimation(int count, String singular, String plural) {
 
@@ -199,7 +197,6 @@ public class Activity_02_Feed extends AppCompatActivity {
         bind.notify.setVisibility(View.GONE);
         handler.removeCallbacks(hideNotifyRunnable);
     }
-
 
     /// Methods to close and clean selected items from the OptionsBar
     private void close() {
