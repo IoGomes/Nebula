@@ -1,8 +1,10 @@
 package Nebula.Android.Nebula_View.Activities;
 
 import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,146 +26,118 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_02_Chat_Session;
-import Nebula.Android.Nebula_Model.Repository.Repo_Archived_Chats;
-import Nebula.Android.Nebula_Model.Repository.Repo_Chat;
+import Nebula.Android.Nebula_Data.LocalDb.DatabaseHelper;
+import Nebula.Android.Nebula_Data.Repository.Repo_Archived_Chats;
+import Nebula.Android.Nebula_Data.Repository.Repo_Calls_History;
+import Nebula.Android.Nebula_Data.Repository.Repo_Chat;
+import Nebula.Android.Nebula_Data.Repository.Repo_Contact;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_Confirm_Chat_Delection;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_01_Inbox;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_02_Contacts;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_03_Calls;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_04_Archived;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
-import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
+import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_02_Contact_Adapter;
+import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_03_Calls_Adapter;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act02FeedBinding;
 
 /// @author Ítalo Oliveira Gomes
 
+
 /// Activity principal do Feed
 @SuppressWarnings("SpellCheckingInspection")
 public class Activity_02_Feed extends AppCompatActivity {
 
+    private static final String TAG = "Activity_02_Feed";
+
+    /// Declaração do ViewBinding
+    private Act02FeedBinding bind;
+
+    /// Declaração dos Fragments
     private final Fragment fragment01 = new Fragment_Feed_01_Inbox();
     private final Fragment fragment02 = new Fragment_Feed_02_Contacts();
     private final Fragment fragment03 = new Fragment_Feed_03_Calls();
     private final Fragment fragment04 = new Fragment_Feed_04_Archived();
-    private ImageButton ultimoImageButtonClicado = null;
-    private Act02FeedBinding binding;
-    Handler handler = new Handler(Looper.getMainLooper());
+
+    /// Declarações uteis para performance do código
+    private ImageButton lastClickedButton = null;
+
+    /// Handler e Runnable para Delay
     private Runnable hideNotifyRunnable;
+    Handler handler = new Handler(Looper.getMainLooper());
+    DatabaseHelper dbHelper = new DatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceBundle) {
 
-        setTheme(androidx.appcompat.R.style.Theme_AppCompat);
-
         super.onCreate(savedInstanceBundle);
 
-        binding = Act02FeedBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        /// Configura Elementos iniciais da UI
+        setupUI();
 
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        /// Define o Fragment Inicial
+        bind = Act02FeedBinding.inflate(getLayoutInflater());
+        setContentView(bind.getRoot());
 
-        View rootLayout = findViewById(R.id.root);
-        NavBar_Inserts.adjustPaddingForNavigationBar(rootLayout, this);
-
-        Objects.requireNonNull(getSupportActionBar()).hide();
-
+        /// Configura o Fragment Inicial
         replaceFragment(fragment01);
 
-        binding.git.setOnClickListener(v ->
-                startActivity(new Intent(this, Activity_06_Web.class)));
+        this.deleteDatabase("NebulaLocalDB.db");
+        dbHelper.copyDatabaseIfNeeded();
 
-        binding.trash.setOnClickListener(v -> {
-            new Dialog_Feed_Confirm_Chat_Delection(v.getContext(), () -> {
-                RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
-                if (adapter != null) {
-                    adapter.removeSelected();
-                    int count = adapter.getSelectedPositions().size();
-                    binding.notify.setText(count + (count == 1 ? " Chat Deleted" : " Chats Deleted"));
-                    binding.notify.setVisibility(View.VISIBLE);
-                    binding.notify.startAnimation(
-                            AnimationUtils.loadAnimation(binding.getRoot().getContext(), R.anim.slide_in_right)
-                    );
+        /// Inicializa os Repositórios
+        Repo_Chat.initialize(this);
+        Repo_Contact.initialize(this);
+        Repo_Calls_History.initialize(this);
 
-                    hideNotifyRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            binding.notify.startAnimation(
-                                    AnimationUtils.loadAnimation(binding.getRoot().getContext(), R.anim.slide_out_right)
-                            );
-                            binding.notify.setVisibility(View.GONE);
-                        }
-                    };
-
-                    handler.postDelayed(hideNotifyRunnable, 2000); // esconde depois de 2s
-                    hideOptionsBar();
-                }
-            }).show();
-        });
-
-        binding.ImageButtonArchived.setOnClickListener(v -> {
+        if (dbHelper.getUnreadCount() != 0) {
             RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
-
+            bind.countUnread.setVisibility(View.VISIBLE);
+            bind.countUnread.setText(String.valueOf(dbHelper.getUnreadCount()));
             if (adapter != null) {
-
-                List<Integer> selectedPositions = new ArrayList<>(adapter.getSelectedPositions());
-
-                List<Entity_02_Chat_Session> toArchive = new ArrayList<>();
-                for (int pos : selectedPositions) {
-                    if (pos >= 0 && pos < Repo_Chat.getChats().size()) {
-                        toArchive.add(Repo_Chat.getChats().get(pos));
-                    }
-                }
-
-                Repo_Archived_Chats.addArchivedChat(toArchive);
-
-                adapter.removeSelected();
-
-                int count = adapter.getSelectedPositions().size();
-                binding.notify.setText(count + (count == 1 ? " Chat Archived" : " Chats Archived"));
-
-                binding.notify.setVisibility(View.VISIBLE);
-                binding.notify.startAnimation(
-                        AnimationUtils.loadAnimation(binding.getRoot().getContext(), R.anim.slide_in_right)
-                );
-
-                hideNotifyRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        binding.notify.startAnimation(
-                                AnimationUtils.loadAnimation(binding.getRoot().getContext(), R.anim.slide_out_right)
-                        );
-                        binding.notify.setVisibility(View.GONE);
-                    }
-                };
-
-                handler.postDelayed(hideNotifyRunnable, 2000);
-
-
-                hideOptionsBar();
+                adapter.notifyDataSetChanged();
             }
-        });
+        } else bind.countUnread.setVisibility(View.GONE);
 
 
-
-        binding.close.setOnClickListener(v -> {
-
-            if (fragment01 instanceof Fragment_Feed_01_Inbox) {
-                Fragment_Feed_01_Inbox inboxFragment = (Fragment_Feed_01_Inbox) fragment01;
-                RV_Feed_01_Chat_Adapter adapter = inboxFragment.getAdapter();
-                if (adapter != null) {
-                    adapter.clearSelection();
-                }
-            }
-            hideOptionsBar();
-        });
+        /// Atrelando Botões XML a suas respectivas funções
+        bind.git.setOnClickListener(v -> startGitActivity(this));
+        bind.trash.setOnClickListener(v -> delete(this));
+        bind.favorite.setOnClickListener(v -> favorite());
+        bind.ImageButtonArchived.setOnClickListener(v -> archive());
+        bind.ImageButtonUnarchived.setOnClickListener(v -> unarchive());
+        bind.close.setOnClickListener(v -> close());
+        bind.closeSelectionFromContacts.setOnClickListener(v -> closeSelectionFromFragment02());
 
         changeButtonBg();
     }
 
-    public void changeButtonBg() {
-        int[] botoesIds = {
+    /// Methods to Load UI aspects
+    private void setupUI() {
+        setTheme(androidx.appcompat.R.style.Theme_AppCompat);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        Objects.requireNonNull(getSupportActionBar()).hide();
+    }
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .commit();
+    }
+    private void selectButton(ImageButton imageButton) {
+        if (imageButton != null) {
+
+            if (lastClickedButton != null && lastClickedButton != imageButton) {
+                lastClickedButton.setBackground(null);
+            }
+            imageButton.setBackground(ContextCompat.getDrawable(this, R.drawable.bg_selected_highlight));
+            lastClickedButton = imageButton;
+        }
+    }
+    private void changeButtonBg() {
+        int[] buttonsIds = {
                 R.id.button_inbox,
                 R.id.button_contact,
                 R.id.button_call,
@@ -181,55 +156,226 @@ public class Activity_02_Feed extends AppCompatActivity {
         fragmentMap.put(R.id.button_call, fragment03);
         fragmentMap.put(R.id.button_archived, fragment04);
 
-        for (int id : botoesIds) {
+        for (int id : buttonsIds) {
             LinearLayout btn = findViewById(id);
             btn.setOnClickListener(v -> {
                 int imageButtonId = layoutParaBotaoMap.get(v.getId());
                 ImageButton imageButton = findViewById(imageButtonId);
-                selecionarBotao(imageButton);
+                selectButton(imageButton);
                 hideOptionsBar();
                 replaceFragment(fragmentMap.get(v.getId()));
             });
         }
 
         ImageButton imageButtonInbox = findViewById(layoutParaBotaoMap.get(R.id.button_inbox));
-        selecionarBotao(imageButtonInbox);
+        selectButton(imageButtonInbox);
         replaceFragment(fragmentMap.get(R.id.button_inbox));
     }
 
-    private void selecionarBotao(ImageButton imageButton) {
-        if (imageButton != null) {
 
-            if (ultimoImageButtonClicado != null && ultimoImageButtonClicado != imageButton) {
-                ultimoImageButtonClicado.setBackground(null);
-            }
-            imageButton.setBackground(ContextCompat.getDrawable(this, R.drawable.bg_selected_highlight));
-            ultimoImageButtonClicado = imageButton;
-        }
+    /// Methods to Display and Hide Notify Animations after option selected
+    public void notifyAnimation(int count, String singular, String plural) {
+
+        String text = count + " " + (count == 1 ? singular : plural);
+        bind.notify.setText(text);
+
+        bind.notify.setVisibility(View.VISIBLE);
+        bind.notify.startAnimation(
+                AnimationUtils.loadAnimation(bind.getRoot().getContext(), R.anim.slide_in_right)
+        );
+
+        hideNotifyRunnable = () -> {
+            bind.notify.startAnimation(
+                    AnimationUtils.loadAnimation(bind.getRoot().getContext(), R.anim.slide_out_right)
+            );
+            bind.notify.setVisibility(View.GONE);
+        };
+
+        handler.postDelayed(hideNotifyRunnable, 2000);
+        hideOptionsBar();
     }
-
-    private void replaceFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, fragment)
-                .commit();
-    }
-
-    public void showOptionsBar() {
-        binding.ImageButtonArchived.setVisibility(VISIBLE);
-        binding.close.setVisibility(VISIBLE);
-        binding.trash.setVisibility(VISIBLE);
-        binding.git.setVisibility(GONE);
-        binding.gitNotification.setVisibility(GONE);
-        binding.notify.clearAnimation();
-        binding.notify.setVisibility(View.GONE);
+    public void cancelNotifyAnimation() {
+        bind.notify.clearAnimation();
+        bind.notify.setVisibility(View.GONE);
         handler.removeCallbacks(hideNotifyRunnable);
     }
 
+
+    /// Methods to close and clean selected items from the OptionsBar
+    private void close() {
+        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
+        adapter.clearSelection();
+        hideOptionsBar();
+    }
+    private void closeSelectionFromFragment02() {
+        RV_Feed_02_Contact_Adapter adapter = Repo_Contact.getFeedAdapter();
+        adapter.clearSelection();
+        hideOptionsBar();
+    }
+
+    /// Delete Switch that guide to specific delete Methods Below
+    private void delete(Context context) {
+        new Dialog_Feed_Confirm_Chat_Delection(context, () -> {
+
+            if (context instanceof FragmentActivity) {
+                Fragment currentFragment = ((FragmentActivity) context)
+                        .getSupportFragmentManager()
+                        .findFragmentById(R.id.fragmentContainer);
+
+                switch (currentFragment.getClass().getSimpleName()) {
+                    case "Fragment_Feed_01_Inbox":
+                        deleteFromInbox();
+                        break;
+
+                    case "Fragment_Feed_02_Contacts":
+                        deleteFromContacts();
+                        break;
+
+                    case "Fragment_Feed_03_Calls":
+                        deleteFromCalls();
+                        break;
+                }
+            }
+        }).show();
+    }
+
+    /// Delete implementations
+    private void deleteFromInbox() {
+        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
+        adapter.removeSelected(this);
+        int count = adapter.getSelectedPositions().size();
+        notifyAnimation(count, "Chat Deleted", "Chats Deleted");
+    }
+    private void deleteFromContacts() {
+        RV_Feed_02_Contact_Adapter contactAdapter = Repo_Contact.getFeedAdapter();
+        contactAdapter.removeSelected(this);
+        int count = contactAdapter.getSelectedPositions().size();
+        notifyAnimation(count, "Contact Deleted", "Contacts Deleted");
+    }
+    private void deleteFromCalls() {
+        RV_Feed_03_Calls_Adapter callsAdapter = Repo_Calls_History.getFeedAdapter();
+        callsAdapter.removeSelected();
+        int count = callsAdapter.getSelectedPositions().size();
+        notifyAnimation(count, "Call Deleted", "Calls Deleted");
+    }
+
+    /// Git redirection
+    private void startGitActivity(Context context) {
+        startActivity(new Intent(context, Activity_06_Web.class));
+    }
+
+    /// Methods to display OptionsBar with fragment-specific options
+    public void showOptionsBarFragment01() {
+        hideDefaultOptionBar();
+        bind.ImageButtonArchived.setVisibility(VISIBLE);
+        bind.close.setVisibility(VISIBLE);
+        bind.favorite.setVisibility(VISIBLE);
+        bind.trash.setVisibility(VISIBLE);
+        cancelNotifyAnimation();
+    }
+    public void showOptionsBarFragment02() {
+        hideDefaultOptionBar();
+        bind.trash.setVisibility(VISIBLE);
+        bind.edit.setVisibility(VISIBLE);
+        bind.closeSelectionFromContacts.setVisibility(VISIBLE);
+        cancelNotifyAnimation();
+    }
+    public void showOptionsBarFragment03() {
+        hideDefaultOptionBar();
+        bind.trash.setVisibility(VISIBLE);
+        cancelNotifyAnimation();
+    }
+    public void showOptionsBarFragment04() {
+        hideDefaultOptionBar();
+        bind.ImageButtonUnarchived.setVisibility(VISIBLE);
+        bind.close.setVisibility(VISIBLE);
+        bind.favorite.setVisibility(INVISIBLE);
+        bind.trash.setVisibility(VISIBLE);
+        cancelNotifyAnimation();
+    }
+
+    /// Methods to hide Default OptionsBar
+    public void hideDefaultOptionBar(){
+        bind.git.setVisibility(GONE);
+        bind.gitNotification.setVisibility(GONE);
+    }
     public void hideOptionsBar() {
-        binding.ImageButtonArchived.setVisibility(GONE);
-        binding.close.setVisibility(GONE);
-        binding.trash.setVisibility(GONE);
-        binding.git.setVisibility(VISIBLE);
+        bind.git.setVisibility(VISIBLE);
+
+        bind.favorite.setVisibility(GONE);
+        bind.ImageButtonArchived.setVisibility(GONE);
+        bind.close.setVisibility(GONE);
+        bind.ImageButtonUnarchived.setVisibility(GONE);
+        bind.trash.setVisibility(GONE);
+        bind.closeSelectionFromContacts.setVisibility(GONE);
+        bind.edit.setVisibility(GONE);
+    }
+
+    /// Options Implementations
+    private void favorite() {
+        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
+        adapter.toggleFavoriteForSelected();
+        int count = adapter.getSelectedPositions().size();
+        notifyAnimation(count, "Chat Favorited", "Chats Favorited");
+
+        adapter.clearSelection();
+    }
+    private void archive() {
+
+        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
+
+        if (adapter != null) {
+
+            List<Integer> selectedPositions = new ArrayList<>(adapter.getSelectedPositions());
+
+            List<Entity_Pv_Chat> toArchive = new ArrayList<>();
+            for (int pos : selectedPositions) {
+                if (pos >= 0 && pos < Repo_Chat.getChats().size()) {
+                    toArchive.add(Repo_Chat.getChats().get(pos));
+                }
+            }
+
+            Repo_Archived_Chats.addArchivedChat(toArchive);
+
+            adapter.removeSelected(this);
+
+            int count = adapter.getSelectedPositions().size();
+            notifyAnimation(count, "Chat Archived", "Chats Archived");
+        }
+    }
+    private void unarchive() {
+        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
+        if (adapter != null) {
+            List<Integer> selectedPositions = new ArrayList<>(adapter.getSelectedPositions());
+            List<Entity_Pv_Chat> toUnarchive = new ArrayList<>();
+
+            for (int pos : selectedPositions) {
+                if (pos >= 0 && pos < Repo_Archived_Chats.getArchivedChats().size()) {
+                    toUnarchive.add(Repo_Archived_Chats.getArchivedChats().get(pos));
+                }
+            }
+
+            for (Entity_Pv_Chat chat : toUnarchive) {
+                Repo_Archived_Chats.removeArchivedChat(chat);
+                Repo_Chat.addChat(chat);
+            }
+
+            adapter.removeSelected(this);
+
+            int count = toUnarchive.size();
+            notifyAnimation(count, "Chat Unarchived", "Chats Unarchived");
+        }
+    }
+
+    /// Updates NavBar Badges
+    public void updateUnreadCount() {
+        int unreadCount = dbHelper.getUnreadCount();
+
+        if (unreadCount != 0) {
+            bind.countUnread.setVisibility(View.VISIBLE);
+            bind.countUnread.setText(String.valueOf(unreadCount));
+        } else {
+            bind.countUnread.setVisibility(View.GONE);
+        }
     }
 }
