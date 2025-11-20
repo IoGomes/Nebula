@@ -189,7 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.e(TAG, "passou pelo DBHelper");
 
         SQLiteDatabase db = openDatabase();
-        db.delete("VoiceCallTable", "CallId = ?", new String[]{chatSessionId});
+        db.delete("VideoCallTable", "id = ?", new String[]{chatSessionId});
         db.close();
 
         List<Entity_Call> calls = Repo_Calls_History.getCalls();
@@ -449,35 +449,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "Diego Ribeiro", "Eduarda Mendes", "Felipe Barbosa"
         };
 
-        // Horários variados (últimos 7 dias)
         long currentTime = System.currentTimeMillis();
         long oneDay = 24 * 60 * 60 * 1000L;
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
         for (int i = 0; i < 30; i++) {
             ContentValues values = new ContentValues();
 
             String contato = contatos[i % contatos.length];
-
             long randomOffset = (long) (Math.random() * 7 * oneDay);
             Date callDate = new Date(currentTime - randomOffset);
-
             boolean isReceived = (i % 3 != 0);
 
             values.put("nomeDeContato", contato);
             values.put("dateTimeCall", dateFormat.format(callDate));
             values.put("received", isReceived ? 1 : 0);
 
-            long result = db.insert("VideoCallTable", null, values);
-            if (result != -1) {
-                Log.i(TAG, "📞 Chamada inserida: " + contato +
+            long newId = db.insert("VideoCallTable", null, values); // ID gerado aqui
+
+            if (newId != -1) {
+                Log.i(TAG, "📞 Chamada inserida (ID: " + newId + "): " + contato +
                         (isReceived ? " (recebida)" : " (realizada)"));
             }
         }
 
         Log.i(TAG, "✅ 30 chamadas de exemplo inseridas!");
     }
+
 
     public void copyDatabaseIfNeeded() {
         File dbFile = new File(getDatabasePath());

@@ -106,21 +106,21 @@
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/self_container"
-        android:layout_width="130dp"
-        android:layout_height="200dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        app:cardCornerRadius="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+    android:id="@+id/self_container"
+    android:layout_width="130dp"
+    android:layout_height="200dp"
+    android:layout_marginEnd="32dp"
+    android:layout_marginBottom="32dp"
+    app:cardCornerRadius="12dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.camera.view.PreviewView
-            android:id="@+id/previewView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:background="#33FF0000" />
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:background="#33FF0000" />
 
-        /></androidx.cardview.widget.CardView>
+    /></androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

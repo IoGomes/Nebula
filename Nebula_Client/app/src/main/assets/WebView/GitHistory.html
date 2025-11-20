@@ -40,26 +40,55 @@
           font-size: 32px;
           font-weight: 700;
         }
-        .profile-icon {
+        .profile-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          position: relative;
+        }
+       .profile-icon {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #EC407A, #a371f7);
+          background:#30363d;
           display: flex;
           align-items: center;
           justify-content: center;
-          cursor: pointer;
           transition: transform 0.2s, box-shadow 0.2s;
           flex-shrink: 0;
+          border: 2px solid  #EC407A;
         }
         .profile-icon:hover {
-          transform: scale(1.1);
+          transform: scale(1.05);
           box-shadow: 0 0 15px rgba(236, 64, 122, 0.5);
         }
         .profile-icon svg {
-          width: 24px;
-          height: 24px;
-          fill: #fff;
+          width: 28px;
+          height: 28px;
+          fill:  #8b949e;
+        }
+        .connection-status {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          border: 2px solid #000;
+          transition: background-color 0.3s;
+        }
+        .connection-status.connected {
+          background-color: #7ee787;
+        }
+        .connection-status.disconnected {
+          background-color: #f85149;
+        }
+        .username {
+          color: #8b949e;
+          font-size: 13px;
+          font-weight: 500;
         }
         .filters-wrapper {
           overflow-x: auto;
@@ -108,6 +137,7 @@
         .timeline {
           position: relative;
           padding-left: 40px;
+          min-height: 200px;
         }
         .timeline::before {
           content: '';
@@ -118,6 +148,17 @@
           width: 2px;
           background: #30363d;
         }
+        .empty-state {
+          text-align: center;
+          padding: 60px 20px;
+          color: #8b949e;
+        }
+        .empty-state svg {
+          width: 64px;
+          height: 64px;
+          margin-bottom: 16px;
+          opacity: 0.3;
+        }
         .update-item {
           position: relative;
           background-color: #000;
@@ -126,6 +167,21 @@
           padding: 20px;
           margin-bottom: 20px;
           transition: all 0.3s;
+          animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .update-item.new {
+          border-color: #7ee787;
+          box-shadow: 0 0 15px rgba(126, 231, 135, 0.3);
         }
         .update-item::before {
           content: '';
@@ -158,7 +214,7 @@
           font-weight: 600;
           text-transform: uppercase;
         }
-        .badge.commit {
+        .badge.push, .badge.commit {
           background-color: rgba(126, 231, 135, 0.15);
           color: #7ee787;
         }
@@ -166,13 +222,41 @@
           background-color: rgba(163, 113, 247, 0.15);
           color: #a371f7;
         }
-        .badge.pull-request {
+        .badge.pull_request, .badge.pull-request {
           background-color: rgba(88, 166, 255, 0.15);
           color: #58a6ff;
         }
-        .badge.issue {
+        .badge.issues, .badge.issue {
           background-color: rgba(248, 81, 73, 0.15);
           color: #f85149;
+        }
+        .badge.release {
+          background-color: rgba(88, 166, 255, 0.15);
+          color: #58a6ff;
+        }
+        .badge.create {
+          background-color: rgba(126, 231, 135, 0.15);
+          color: #7ee787;
+        }
+        .badge.delete {
+          background-color: rgba(248, 81, 73, 0.15);
+          color: #f85149;
+        }
+        .badge.fork {
+          background-color: rgba(163, 113, 247, 0.15);
+          color: #a371f7;
+        }
+        .badge.star, .badge.watch {
+          background-color: rgba(242, 201, 76, 0.15);
+          color: #f2c94c;
+        }
+        .badge.issue_comment {
+          background-color: rgba(88, 166, 255, 0.15);
+          color: #58a6ff;
+        }
+        .badge.pull_request_review {
+          background-color: rgba(163, 113, 247, 0.15);
+          color: #a371f7;
         }
         .update-title {
           font-size: 18px;
@@ -234,193 +318,330 @@
         .files-changed {
           color: #58a6ff;
         }
+        .repo-name {
+          color: #58a6ff;
+          font-weight: 500;
+        }
     </style>
 </head>
 <body>
 <div class='container'>
     <header>
         <h1>GitHub Dashboard</h1>
-        <div class='profile-icon'>
-            <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-                <path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/>
-            </svg>
+        <div class='profile-section'>
+            <div class='profile-icon'>
+                <div class='connection-status disconnected' id='connectionStatus'></div>
+                <svg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'>
+                    <path fill-rule='evenodd' d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/>
+                </svg>
+            </div>
+            <span class='username' id='username'>Conectando...</span>
         </div>
     </header>
     <div class='filters-wrapper'>
-        <div class='filters'>
-            <button class='filter-btn active' onclick="filterUpdates('all')">Todos</button>
-            <button class='filter-btn' onclick="filterUpdates('commit')">Commits</button>
-            <button class='filter-btn' onclick="filterUpdates('merge')">Merges</button>
-            <button class='filter-btn' onclick="filterUpdates('pull-request')">Pull Requests</button>
-            <button class='filter-btn' onclick="filterUpdates('issue')">Issues</button>
+        <div class='filters' id='filters'>
+            <button class='filter-btn active' data-filter='all'>Todos</button>
+            <button class='filter-btn' data-filter='push'>Push</button>
+            <button class='filter-btn' data-filter='commit'>Commits</button>
+            <button class='filter-btn' data-filter='pull_request'>Pull Requests</button>
+            <button class='filter-btn' data-filter='issues'>Issues</button>
+            <button class='filter-btn' data-filter='release'>Releases</button>
+            <button class='filter-btn' data-filter='create'>Create</button>
+            <button class='filter-btn' data-filter='delete'>Delete</button>
+            <button class='filter-btn' data-filter='fork'>Forks</button>
+            <button class='filter-btn' data-filter='star'>Stars</button>
+            <button class='filter-btn' data-filter='issue_comment'>Comentários</button>
         </div>
     </div>
-    <div class='timeline'>
-        <div class='update-item merge' data-type='merge'>
-            <div class='update-header'>
-                <span class='badge merge'>Merge</span>
-                <h3 class='update-title'>Merge pull request #42 em main</h3>
-            </div>
-            <div class='update-meta'>
-          <span class='meta-item'>
-            <span class='avatar'></span>
-            <strong>João Silva</strong>
-          </span>
-                <span class='meta-item'>Hoje às 14:32</span>
-                <span class='meta-item'>feature/nova-funcionalidade → main</span>
-            </div>
-            <p class='update-description'>
-                Implementada nova funcionalidade de autenticação com OAuth2
-            </p>
-            <div class='stats'>
-                <span class='stat-item files-changed'>8 arquivos alterados</span>
-                <span class='stat-item additions'>+342</span>
-                <span class='stat-item deletions'>-127</span>
-            </div>
-        </div>
-        <div class='update-item commit' data-type='commit'>
-            <div class='update-header'>
-                <span class='badge commit'>Commit</span>
-                <h3 class='update-title'>fix: validação de formulário corrigida</h3>
-            </div>
-            <div class='update-meta'>
-          <span class='meta-item'>
-            <span class='avatar'></span>
-            <strong>Maria Santos</strong>
-          </span>
-                <span class='meta-item'>Hoje às 13:15</span>
-                <span class='meta-item'><span class='code-ref'>a7f3c2d</span></span>
-            </div>
-            <p class='update-description'>
-                Adicionada validação para campos obrigatórios e mensagens de erro melhoradas
-            </p>
-            <div class='stats'>
-                <span class='stat-item files-changed'>3 arquivos alterados</span>
-                <span class='stat-item additions'>+45</span>
-                <span class='stat-item deletions'>-12</span>
-            </div>
-        </div>
-        <div class='update-item pull-request' data-type='pull-request'>
-            <div class='update-header'>
-                <span class='badge pull-request'>Pull Request</span>
-                <h3 class='update-title'>PR #45: Refatoração do módulo de pagamentos</h3>
-            </div>
-            <div class='update-meta'>
-          <span class='meta-item'>
-            <span class='avatar'></span>
-            <strong>Pedro Costa</strong>
-          </span>
-                <span class='meta-item'>Hoje às 11:48</span>
-                <span class='meta-item'>Aguardando revisão</span>
-            </div>
-            <p class='update-description'>
-                Refatoração completa do sistema de pagamentos para melhorar performance e manutenibilidade
-            </p>
-            <div class='stats'>
-                <span class='stat-item files-changed'>15 arquivos alterados</span>
-                <span class='stat-item additions'>+589</span>
-                <span class='stat-item deletions'>-423</span>
-            </div>
-        </div>
-        <div class='update-item commit' data-type='commit'>
-            <div class='update-header'>
-                <span class='badge commit'>Commit</span>
-                <h3 class='update-title'>chore: atualização de dependências</h3>
-            </div>
-            <div class='update-meta'>
-          <span class='meta-item'>
-            <span class='avatar'></span>
-            <strong>Ana Oliveira</strong>
-          </span>
-                <span class='meta-item'>Ontem às 16:23</span>
-                <span class='meta-item'><span class='code-ref'>b9e5f1a</span></span>
-            </div>
-            <p class='update-description'>
-                Atualizado React para versão 18.3 e outras dependências críticas
-            </p>
-            <div class='stats'>
-                <span class='stat-item files-changed'>2 arquivos alterados</span>
-                <span class='stat-item additions'>+8</span>
-                <span class='stat-item deletions'>-8</span>
-            </div>
-        </div>
-        <div class='update-item issue' data-type='issue'>
-            <div class='update-header'>
-                <span class='badge issue'>Issue</span>
-                <h3 class='update-title'>Issue #78: Erro ao carregar imagens grandes</h3>
-            </div>
-            <div class='update-meta'>
-          <span class='meta-item'>
-            <span class='avatar'></span>
-            <strong>Carlos Ferreira</strong>
-          </span>
-                <span class='meta-item'>Ontem às 14:10</span>
-                <span class='meta-item'>bug, prioridade alta</span>
-            </div>
-            <p class='update-description'>
-                Aplicação trava ao tentar carregar imagens com mais de 5MB. Necessário implementar lazy loading.
-            </p>
-        </div>
-        <div class='update-item merge' data-type='merge'>
-            <div class='update-header'>
-                <span class='badge merge'>Merge</span>
-                <h3 class='update-title'>Merge pull request #40 em main</h3>
-            </div>
-            <div class='update-meta'>
-          <span class='meta-item'>
-            <span class='avatar'></span>
-            <strong>Lucas Mendes</strong>
-          </span>
-                <span class='meta-item'>Ontem às 10:05</span>
-                <span class='meta-item'>hotfix/security-patch → main</span>
-            </div>
-            <p class='update-description'>
-                Correção de vulnerabilidade de segurança identificada no sistema de autenticação
-            </p>
-            <div class='stats'>
-                <span class='stat-item files-changed'>4 arquivos alterados</span>
-                <span class='stat-item additions'>+67</span>
-                <span class='stat-item deletions'>-23</span>
-            </div>
-        </div>
-        <div class='update-item commit' data-type='commit'>
-            <div class='update-header'>
-                <span class='badge commit'>Commit</span>
-                <h3 class='update-title'>test: adicionados testes unitários para API</h3>
-            </div>
-            <div class='update-meta'>
-          <span class='meta-item'>
-            <span class='avatar'></span>
-            <strong>Juliana Rocha</strong>
-          </span>
-                <span class='meta-item'>2 dias atrás às 15:42</span>
-                <span class='meta-item'><span class='code-ref'>c3d8a9f</span></span>
-            </div>
-            <p class='update-description'>
-                Implementados testes para todos os endpoints da API de usuários, cobertura aumentada para 85%
-            </p>
-            <div class='stats'>
-                <span class='stat-item files-changed'>6 arquivos alterados</span>
-                <span class='stat-item additions'>+234</span>
-                <span class='stat-item deletions'>-5</span>
-            </div>
+    <div class='timeline' id='timeline'>
+        <div class='empty-state'>
+            <svg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg' fill='currentColor'>
+                <path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/>
+            </svg>
+            <p>Aguardando notificações do GitHub...</p>
         </div>
     </div>
 </div>
+
+<!-- Socket.IO Client -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 <script>
-    function filterUpdates(type) {
-      const items = document.querySelectorAll('.update-item');
-      const buttons = document.querySelectorAll('.filter-btn');
-      buttons.forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      items.forEach(item => {
-        if (type === 'all' || item.dataset.type === type) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
+// Configuração do Socket.IO
+const SOCKET_URL = 'http://localhost:3000'; // Altere para a URL do seu backend
+let socket;
+let currentFilter = 'all';
+let notifications = [];
+
+// Conecta ao servidor Socket.IO
+function connectSocket() {
+    // Pega o token do usuário (você pode passar via query params, localStorage, etc)
+    const userToken = getUserToken();
+    
+    socket = io(SOCKET_URL, {
+        auth: {
+            token: userToken
+        },
+        transports: ['websocket', 'polling']
+    });
+
+    socket.on('connect', () => {
+        console.log('✅ Conectado ao servidor Socket.IO');
+        updateConnectionStatus(true);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('❌ Desconectado do servidor Socket.IO');
+        updateConnectionStatus(false);
+    });
+
+    // Recebe informações do usuário
+    socket.on('user:info', (userData) => {
+        console.log('👤 Dados do usuário:', userData);
+        document.getElementById('username').textContent = `@${userData.username}`;
+    });
+
+    // Recebe notificações do GitHub via webhook
+    socket.on('github:notification', (data) => {
+        console.log('📬 Nova notificação recebida:', data);
+        addNotification(data);
+    });
+
+    // Recebe histórico de notificações ao conectar
+    socket.on('github:history', (history) => {
+        console.log('📜 Histórico recebido:', history.length, 'notificações');
+        notifications = history;
+        renderNotifications();
+    });
+
+    socket.on('error', (error) => {
+        console.error('❌ Erro no Socket.IO:', error);
+    });
+}
+
+// Pega o token do usuário (adapte conforme sua implementação)
+function getUserToken() {
+    // Opção 1: Pegar da URL (ex: ?token=xxx)
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+    if (tokenFromUrl) return tokenFromUrl;
+
+    // Opção 2: Pegar do localStorage
+    const tokenFromStorage = localStorage.getItem('github_token');
+    if (tokenFromStorage) return tokenFromStorage;
+
+    // Opção 3: Pegar de um cookie
+    // const tokenFromCookie = getCookie('github_token');
+    
+    return null;
+}
+
+// Atualiza o status da conexão
+function updateConnectionStatus(connected) {
+    const statusEl = document.getElementById('connectionStatus');
+    const usernameEl = document.getElementById('username');
+    
+    if (connected) {
+        statusEl.classList.remove('disconnected');
+        statusEl.classList.add('connected');
+    } else {
+        statusEl.classList.remove('connected');
+        statusEl.classList.add('disconnected');
+        usernameEl.textContent = 'Desconectado';
     }
+}
+
+// Adiciona uma nova notificação
+function addNotification(data) {
+    const notification = formatNotification(data);
+    notifications.unshift(notification);
+    
+    // Limita o número de notificações em memória
+    if (notifications.length > 100) {
+        notifications = notifications.slice(0, 100);
+    }
+    
+    renderNotifications();
+}
+
+// Formata a notificação do GitHub para o formato da UI
+function formatNotification(data) {
+    const event = data.event || data.type;
+    const payload = data.payload || {};
+    
+    let title = '';
+    let description = '';
+    let author = '';
+    let stats = null;
+
+    switch(event) {
+        case 'push':
+            const commits = payload.commits || [];
+            title = `Push para ${payload.ref?.replace('refs/heads/', '') || 'branch'}`;
+            description = commits.map(c => c.message).join(', ') || 'Commits enviados';
+            author = payload.pusher?.name || payload.sender?.login || 'Usuário';
+            stats = {
+                files: payload.size || commits.length,
+                additions: payload.additions || 0,
+                deletions: payload.deletions || 0
+            };
+            break;
+            
+        case 'pull_request':
+            const pr = payload.pull_request || {};
+            title = `PR #${pr.number}: ${pr.title}`;
+            description = pr.body || 'Pull request aberto';
+            author = pr.user?.login || payload.sender?.login;
+            stats = {
+                files: pr.changed_files,
+                additions: pr.additions,
+                deletions: pr.deletions
+            };
+            break;
+            
+        case 'issues':
+            const issue = payload.issue || {};
+            title = `Issue #${issue.number}: ${issue.title}`;
+            description = issue.body || 'Nova issue criada';
+            author = issue.user?.login || payload.sender?.login;
+            break;
+            
+        case 'release':
+            const release = payload.release || {};
+            title = `Release ${release.tag_name} publicada`;
+            description = release.body || release.name || 'Nova versão lançada';
+            author = release.author?.login || payload.sender?.login;
+            break;
+            
+        case 'issue_comment':
+            const comment = payload.comment || {};
+            title = `Comentário em Issue #${payload.issue?.number}`;
+            description = comment.body || 'Novo comentário';
+            author = comment.user?.login || payload.sender?.login;
+            break;
+            
+        default:
+            title = `${event} detectado`;
+            description = JSON.stringify(payload).substring(0, 100);
+            author = payload.sender?.login || 'GitHub';
+    }
+
+    return {
+        id: Date.now() + Math.random(),
+        type: event,
+        badge: formatBadge(event),
+        badgeClass: event.replace('_', '-'),
+        title,
+        description,
+        author,
+        time: formatTime(data.created_at || new Date()),
+        repo: data.repository?.name || payload.repository?.name || 'repositório',
+        stats,
+        isNew: true
+    };
+}
+
+// Formata o badge do evento
+function formatBadge(event) {
+    const badges = {
+        'push': 'Push',
+        'pull_request': 'Pull Request',
+        'issues': 'Issue',
+        'issue_comment': 'Comentário',
+        'release': 'Release',
+        'create': 'Create',
+        'delete': 'Delete',
+        'fork': 'Fork',
+        'star': 'Star',
+        'watch': 'Watch',
+        'pull_request_review': 'Review'
+    };
+    return badges[event] || event.toUpperCase();
+}
+
+// Formata o tempo relativo
+function formatTime(date) {
+    const now = new Date();
+    const time = new Date(date);
+    const diff = Math.floor((now - time) / 1000);
+
+    if (diff < 60) return 'Agora';
+    if (diff < 3600) return `Há ${Math.floor(diff / 60)} minutos`;
+    if (diff < 86400) return `Há ${Math.floor(diff / 3600)} horas`;
+    return `Há ${Math.floor(diff / 86400)} dias`;
+}
+
+// Renderiza as notificações na timeline
+function renderNotifications() {
+    const timeline = document.getElementById('timeline');
+    const filtered = notifications.filter(n => 
+        currentFilter === 'all' || n.type === currentFilter
+    );
+
+    if (filtered.length === 0) {
+        timeline.innerHTML = `
+            <div class='empty-state'>
+                <svg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg' fill='currentColor'>
+                    <path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/>
+                </svg>
+                <p>Nenhuma notificação encontrada</p>
+            </div>
+        `;
+        return;
+    }
+
+    timeline.innerHTML = filtered.map(n => `
+        <div class='update-item ${n.badgeClass} ${n.isNew ? 'new' : ''}' data-type='${n.type}'>
+            <div class='update-header'>
+                <span class='badge ${n.badgeClass}'>${n.badge}</span>
+                <h3 class='update-title'>${n.title}</h3>
+            </div>
+            <div class='update-meta'>
+                <span class='meta-item'>
+                    <span class='avatar'></span>
+                    <strong>${n.author}</strong>
+                </span>
+                <span class='meta-item'>${n.time}</span>
+                <span class='meta-item repo-name'>${n.repo}</span>
+            </div>
+            <p class='update-description'>${n.description}</p>
+            ${n.stats ? `
+                <div class='stats'>
+                    <span class='stat-item files-changed'>${n.stats.files} arquivos</span>
+                    <span class='stat-item additions'>+${n.stats.additions}</span>
+                    <span class='stat-item deletions'>-${n.stats.deletions}</span>
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+
+    // Remove a classe "new" após 3 segundos
+    setTimeout(() => {
+        notifications.forEach(n => n.isNew = false);
+    }, 3000);
+}
+
+// Gerencia os filtros
+document.getElementById('filters').addEventListener('click', (e) => {
+    if (e.target.classList.contains('filter-btn')) {
+        // Remove active de todos
+        document.querySelectorAll('.filter-btn').forEach(btn => 
+            btn.classList.remove('active')
+        );
+        
+        // Adiciona active no clicado
+        e.target.classList.add('active');
+        
+        // Atualiza o filtro
+        currentFilter = e.target.dataset.filter;
+        renderNotifications();
+    }
+});
+
+// Inicializa quando a página carregar
+window.addEventListener('DOMContentLoaded', () => {
+    connectSocket();
+});
 </script>
 </body>
 </html>

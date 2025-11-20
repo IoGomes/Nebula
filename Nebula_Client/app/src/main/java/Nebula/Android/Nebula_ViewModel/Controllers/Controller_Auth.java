@@ -44,15 +44,9 @@ public class Controller_Auth {
 
     }
 
-    public void performGitLogin(Context context) {
-        new ToastWarning(context)
-                .showInfo("Google Sign-in is still under development.");
-    }
-
     public void performLogin(
             Activity activity,
             Button loginButton,
-            ImageButton googleButton,
             EditText emailField,
             EditText passwordField,
             View loadAnimation,
@@ -60,7 +54,6 @@ public class Controller_Auth {
             Handler mainHandler
     ) {
         loginButton.setClickable(false);
-        googleButton.setClickable(false);
 
         final String email = emailField.getText().toString();
         final String password = passwordField.getText().toString();
@@ -81,7 +74,6 @@ public class Controller_Auth {
                 activity.startActivity(new Intent(activity, Activity_02_Feed.class));
                 activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 loginButton.setClickable(true);
-                googleButton.setClickable(true);
 
             }, 1500));
         });
@@ -92,7 +84,6 @@ public class Controller_Auth {
             Button signupButton,
             EditText userNameField,
             EditText userEmailField,
-            EditText userTelefoneField,
             EditText userPasswordField,
             EditText confirmPasswordField,
             SwitchCompat termosCondicoes,
@@ -104,7 +95,6 @@ public class Controller_Auth {
         UseCase_02_Register register = new UseCase_02_Register(
                 userNameField.getText().toString(),
                 userEmailField.getText().toString(),
-                userTelefoneField.getText().toString(),
                 userPasswordField.getText().toString(),
                 confirmPasswordField.getText().toString(),
                 termosCondicoes.isChecked(),

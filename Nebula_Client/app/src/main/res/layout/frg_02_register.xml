@@ -37,27 +37,11 @@
         android:textColor="@color/white"
         android:textColorHint="#909090"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/user_telefone_textfield"
+        app:layout_constraintBottom_toTopOf="@+id/user_password_textfield"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/user_telefone_textfield"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/bg_edit_textfield"
-        android:drawableRight="@drawable/ic_phone_edit_textfield"
-        android:hint="Telefone Number"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textColor="@color/white"
-        android:textColorHint="#909090"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/user_password_textfield"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="Autofill,RtlSymmetry,TextFields" />
+
 
     <EditText
         android:id="@+id/user_password_textfield"
@@ -219,30 +203,16 @@
         app:layout_constraintStart_toEndOf="@+id/signup_button"
         app:layout_constraintTop_toBottomOf="@+id/loginButton" />
 
-    <LinearLayout
-        android:id="@+id/google"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="04dp"
-        android:gravity="center"
+    <Button
+        android:id="@id/google"
+        android:layout_width="180dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/ic_github_auth"
+        android:text="Sign up with GitHub"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageButton
-            android:id="@+id/googleLogin"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="32dp"
-            android:background="@drawable/ic_google_auth"
-            android:contentDescription="@string/google_login_button" />
-
-        <ImageButton
-            android:id="@+id/git_auth"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@drawable/ic_github_auth" />
-
-    </LinearLayout>
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

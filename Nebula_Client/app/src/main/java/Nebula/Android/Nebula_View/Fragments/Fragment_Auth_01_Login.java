@@ -2,6 +2,7 @@ package Nebula.Android.Nebula_View.Fragments;
 
 import static android.view.View.INVISIBLE;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import Nebula.Android.Nebula_View.Activities.git_login_activity;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Auth;
 import Nebula.Android.databinding.Frg01LoginBinding;
 
@@ -40,7 +42,6 @@ public class Fragment_Auth_01_Login extends Fragment {
                 Controller_Auth.getInstance().performLogin(
                         requireActivity(),
                         bind.login,
-                        bind.googleLogin,
                         bind.emailTextfield,
                         bind.userPasswordTextfield,
                         bind.loadAnimation,
@@ -49,9 +50,10 @@ public class Fragment_Auth_01_Login extends Fragment {
                 )
         );
 
-        bind.googleLogin.setOnClickListener(v -> new Controller_Auth().performGoogleLogin(requireContext()));
-
-        bind.gitAuth.setOnClickListener(v -> new Controller_Auth().performGitLogin(requireContext()));
+        bind.google.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), git_login_activity.class);
+                    startActivity(intent);
+                });
 
         return bind.getRoot();
     }
@@ -63,14 +65,4 @@ public class Fragment_Auth_01_Login extends Fragment {
         executor.shutdownNow();
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (bind != null) {
-            bind.googleLogin.setClickable(true);
-            bind.login.setText("Login");
-            bind.loadAnimation.cancelAnimation();
-            bind.loadAnimation.setVisibility(INVISIBLE);
-        }
-    }
 }

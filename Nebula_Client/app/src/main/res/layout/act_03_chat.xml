@@ -123,11 +123,10 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="04dp"
         android:layout_margin="04dp"
-        android:background="@drawable/bg_normal_textfield"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -137,26 +136,16 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_marginEnd="04dp"
-            android:background="#000"
-            app:layout_constraintEnd_toStartOf="@+id/send"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/send"
             app:layout_constraintStart_toStartOf="parent">
 
-            <ImageButton
-                android:id="@+id/camera1"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_code"
-                android:stateListAnimator="@animator/scale_animation"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/messageTextfield"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@android:color/transparent"
+                android:background="@drawable/bg_edit_mesage"
                 android:hint="@string/type"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
@@ -168,21 +157,24 @@
                 android:textColorHint="#99ffffff"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/camera1"
+
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageButton
+            app:layout_constraintHorizontal_weight="1"
             android:id="@+id/send"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/bg_login_button"
-            android:padding="04dp"
+
             android:src="@drawable/ic_send"
             android:stateListAnimator="@animator/scale_animation"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -195,6 +187,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/blurview"
-        tools:listitem="@layout/rv_03_msg_received"></androidx.recyclerview.widget.RecyclerView>
+        tools:listitem="@layout/rv_03_msg_received" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

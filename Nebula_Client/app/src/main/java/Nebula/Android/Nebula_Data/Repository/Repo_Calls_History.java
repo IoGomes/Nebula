@@ -14,8 +14,6 @@ import java.util.Locale;
 
 import Nebula.Android.Nebula_Data.LocalDb.DatabaseHelper;
 import Nebula.Android.Nebula_Model.Entitys.Entity_Call;
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
-import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_03_Calls_Adapter;
 
 public class Repo_Calls_History {
@@ -27,6 +25,7 @@ public class Repo_Calls_History {
     private static final String COL_CONTACT_NAME = "nomeDeContato";
     private static final String COL_DATE_TIME = "dateTimeCall";
     private static final String COL_RECEIVED = "received";
+
     private static List<Entity_Call> calls = new ArrayList<>();
 
     private static final SimpleDateFormat dateFormat =

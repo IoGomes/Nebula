@@ -15,7 +15,6 @@ public class UseCase_02_Register {
 
     public UseCase_02_Register(String userName,
                                String userEmail,
-                               String userTelefoneNumber,
                                String userPassword,
                                String confirmUserPassword,
                                Boolean isTermsAndConditionsAccepted,
@@ -27,7 +26,6 @@ public class UseCase_02_Register {
         this.user = new Entity_User(
                 userName,
                 userEmail,
-                userTelefoneNumber,
                 userPassword,
                 confirmUserPassword,
                 isTermsAndConditionsAccepted,

@@ -57,6 +57,21 @@
                 android:name=".Nebula_View.Activities.Activity_06_Web"
                 android:windowSoftInputMode="adjustResize|stateHidden" />
 
+            <activity android:name=".Nebula_View.Activities.git_login_activity"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="android.intent.action.VIEW" />
+
+                    <category android:name="android.intent.category.DEFAULT" />
+                    <category android:name="android.intent.category.BROWSABLE" />
+
+                    <data
+                        android:scheme="myapp"
+                        android:host="auth"
+                        android:path="/github" />
+                </intent-filter>
+            </activity>
+
             <activity
                 android:name=".Nebula_View.Activities.Activity_04_Voice_Call" />
 

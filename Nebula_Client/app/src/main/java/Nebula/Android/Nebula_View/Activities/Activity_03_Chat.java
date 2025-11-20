@@ -59,7 +59,6 @@ public class Activity_03_Chat extends AppCompatActivity {
 
     private List<Entity_Pv_Chat> chatSessions;
 
-    // ✅ ADICIONAR - Gerenciador de armazenamento
     private Repo_Chat_Storage chatStorage;
 
     private static final String SERVER_URL = "wss://malinda-poetless-manipulatively.ngrok-free.dev/ws/websocket";
@@ -222,13 +221,12 @@ public class Activity_03_Chat extends AppCompatActivity {
         newMessage.setDateTimeMessage(new Date());
         newMessage.setWasVisualized(false);
         newMessage.setIsSentByMe(true);
-        newMessage.setSenderName(username); // ✅ ADICIONAR
+        newMessage.setSenderName(username);
 
         messageList.add(newMessage);
         adapter.notifyItemInserted(messageList.size() - 1);
         bind.rvMessage.scrollToPosition(messageList.size() - 1);
 
-        // ✅ ADICIONAR - Salvar mensagem no storage
         if (currentChatId != null) {
             chatStorage.addMessage(currentChatId, newMessage);
             Log.d("NebulaChat", "💾 Mensagem salva no storage");

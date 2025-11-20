@@ -4,11 +4,15 @@ import static android.view.View.GONE;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -81,6 +86,14 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        Drawable selectedBg = ContextCompat.getDrawable(
+                parent.getContext(),
+                R.drawable.bg_selected_chat
+        );
+
+        Drawable normalBg = new ColorDrawable(Color.TRANSPARENT);
+
 
         switch (viewType) {
             case VIEW_TYPE_HEADER:
@@ -186,12 +199,14 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private void toggleSelection(int position, View view) {
+
         if (selectedPositions.contains(position)) {
             selectedPositions.remove(position);
             view.setBackgroundResource(0);
         } else {
             selectedPositions.add(position);
             view.setBackgroundResource(R.drawable.bg_selected_chat);
+            view.setForeground(null);
         }
 
         if (view.getContext() instanceof Activity_02_Feed) {

@@ -24,10 +24,8 @@ import Nebula.Android.databinding.Frg04ContactListBinding;
 /// @author Ítalo Oliveira Gomes
 public class Fragment_Feed_02_Contacts extends Fragment {
 
-    // ViewBinding do Fragment
     private Frg04ContactListBinding bind;
 
-    // Obtem o Adapter para utilizar no Fragment
     public RV_Feed_02_Contact_Adapter getAdapter() {
         return adapter;
     }

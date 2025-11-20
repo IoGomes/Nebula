@@ -29,8 +29,8 @@
         android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:letterSpacing="0.2"
         android:gravity="end"
+        android:letterSpacing="0.2"
         android:paddingEnd="20dp"
         android:text="By Orbit Labs"
         android:textColor="#959595"
@@ -75,10 +75,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/confirm"
         android:layout_width="match_parent"
-        android:paddingStart="5dp"
-        android:paddingEnd="10dp"
         android:layout_height="wrap_content"
         android:layout_marginVertical="16dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="10dp"
         app:layout_constraintBottom_toTopOf="@+id/login_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -166,7 +166,7 @@
         android:id="@+id/orLogin"
         android:layout_width="120dp"
         android:layout_height="22dp"
-        android:layout_marginVertical="10dp"
+        android:layout_marginVertical="8dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:text="Or Login with"
@@ -184,31 +184,17 @@
         app:layout_constraintEnd_toStartOf="@+id/orLogin"
         app:layout_constraintTop_toBottomOf="@+id/login_button" />
 
-    <LinearLayout
-        android:id="@+id/google"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="04dp"
-        android:gravity="center"
+    <Button
+        android:id="@id/google"
+        android:layout_width="180dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/ic_github_auth"
+        android:text="Sign in with GitHub"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageButton
-            android:id="@+id/googleLogin"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="32dp"
-            android:background="@drawable/ic_google_auth"
-            android:contentDescription="@string/google_login_button" />
-
-        <ImageButton
-            android:id="@+id/git_auth"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@drawable/ic_github_auth" />
-
-    </LinearLayout>
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

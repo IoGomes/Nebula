@@ -20,7 +20,6 @@ public class Entity_User {
     public Entity_User(
             String userName,
             String userEmail,
-            String userTelefoneNumber,
             String userPassword,
             String confirmUserPassword,
             Boolean isTermsAndConditionsAceppted,

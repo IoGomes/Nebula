@@ -2,6 +2,7 @@ package Nebula.Android.Nebula_View.Fragments;
 
 import static android.view.View.GONE;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -12,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import Nebula.Android.Nebula_View.Activities.Fragment_Github_Preloader;
+import Nebula.Android.Nebula_View.Activities.git_login_activity;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Auth;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Frg02RegisterBinding;
@@ -25,10 +28,21 @@ public class Fragment_Auth_02_Register extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+
+        getParentFragmentManager()
+                .beginTransaction()
+                .add(new Fragment_Github_Preloader(), "github_preloader")
+                .commit();
+
         bind = Frg02RegisterBinding.inflate(inflater, container, false);
 
         String htmlTermsAndConditions = "I agree with the <u>Terms and Conditions</u>";
         String htmlPrivacyPolicy = "I agree with the <u>Privacy Policy</u>";
+
+        bind.google.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), git_login_activity.class);
+            startActivity(intent);
+        } );
 
         bind.termsAndConditions.setText(Html.fromHtml(htmlTermsAndConditions, Html.FROM_HTML_MODE_LEGACY));
         bind.privacyPolicy.setText(Html.fromHtml(htmlPrivacyPolicy, Html.FROM_HTML_MODE_LEGACY));
@@ -39,7 +53,6 @@ public class Fragment_Auth_02_Register extends Fragment {
                         bind.signupButton,
                         bind.userNameTextfield,
                         bind.userEmailTextfield,
-                        bind.userTelefoneTextfield,
                         bind.userPasswordTextfield,
                         bind.confirmUserPasswordTextfield,
                         bind.termosECondicoes,
@@ -48,11 +61,8 @@ public class Fragment_Auth_02_Register extends Fragment {
                 )
         );
 
-        bind.googleLogin.setOnClickListener(v ->
+        bind.google.setOnClickListener(v ->
                 new Controller_Auth().performGoogleLogin(requireContext()));
-
-        bind.gitAuth.setOnClickListener(view ->
-                new Controller_Auth().performGitLogin(requireContext()));
 
         return bind.getRoot();
     }
@@ -67,7 +77,6 @@ public class Fragment_Auth_02_Register extends Fragment {
         bind.signupButton.setClickable(true);
         bind.userNameTextfield.setText("");
         bind.userEmailTextfield.setText("");
-        bind.userTelefoneTextfield.setText("");
         bind.userPasswordTextfield.setText("");
         bind.confirmUserPasswordTextfield.setText("");
         bind.termosECondicoes.setChecked(false);

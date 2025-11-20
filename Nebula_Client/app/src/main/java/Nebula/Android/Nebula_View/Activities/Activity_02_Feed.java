@@ -273,7 +273,6 @@ public class Activity_02_Feed extends AppCompatActivity {
     public void showOptionsBarFragment02() {
         hideDefaultOptionBar();
         bind.trash.setVisibility(VISIBLE);
-        bind.edit.setVisibility(VISIBLE);
         bind.closeSelectionFromContacts.setVisibility(VISIBLE);
         cancelNotifyAnimation();
     }
@@ -305,7 +304,6 @@ public class Activity_02_Feed extends AppCompatActivity {
         bind.ImageButtonUnarchived.setVisibility(GONE);
         bind.trash.setVisibility(GONE);
         bind.closeSelectionFromContacts.setVisibility(GONE);
-        bind.edit.setVisibility(GONE);
     }
 
     /// Options Implementations

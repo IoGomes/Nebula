@@ -172,7 +172,7 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
 
             if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
                 itemHolder.itemView.setOnLongClickListener(v -> {
-                    // ⭐ IMPORTANTE: Usar holder.getAdapterPosition() para evitar posição desatualizada
+
                     int currentPosition = holder.getAdapterPosition();
                     if (currentPosition == RecyclerView.NO_POSITION) return true;
 
@@ -194,6 +194,24 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
                     return true;
                 });
             }
+        }
+    }
+
+    private void toggleSelection(int position, View view) {
+        if (selectedPositions.contains(position)) {
+            selectedPositions.remove(position);
+            view.setBackgroundResource(0);
+        } else {
+            selectedPositions.add(position);
+            view.setBackgroundResource(R.drawable.bg_selected_chat);
+        }
+
+        if (view.getContext() instanceof Activity_02_Feed) {
+
+            Activity_02_Feed feed = (Activity_02_Feed) view.getContext();
+
+            if (selectedPositions.isEmpty()) feed.hideOptionsBar();
+            else feed.showOptionsBarFragment03();
         }
     }
 
