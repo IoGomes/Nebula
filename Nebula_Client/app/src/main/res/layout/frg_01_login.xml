@@ -110,6 +110,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/esqueceu_a_senha"
+            android:clickable="true"
+            android:focusable="true"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -130,6 +132,7 @@
 
         <Button
             android:id="@+id/login"
+            android:foreground="@drawable/ripple_square_gray"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/bg_login_button"
@@ -188,7 +191,8 @@
         android:id="@id/google"
         android:layout_width="180dp"
         android:layout_height="48dp"
-        android:background="@android:color/transparent"
+        android:foreground="@drawable/ripple_square_gray"
+        android:background="@drawable/git_bg"
         android:drawableLeft="@drawable/ic_github_auth"
         android:text="Sign in with GitHub"
         android:textAllCaps="false"

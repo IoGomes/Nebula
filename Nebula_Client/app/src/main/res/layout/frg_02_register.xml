@@ -37,6 +37,25 @@
         android:textColor="@color/white"
         android:textColorHint="#909090"
         android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/user_phone_textfield"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+
+    <EditText
+        android:id="@+id/user_phone_textfield"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_edit_textfield"
+        android:drawableEnd="@drawable/ic_email"
+        android:hint="Phone Number"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/white"
+        android:textColorHint="#909090"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/user_password_textfield"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

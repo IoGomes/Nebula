@@ -54,10 +54,13 @@
                 android:windowSoftInputMode="adjustResize|stateHidden" />
 
             <activity
-                android:name=".Nebula_View.Activities.Activity_06_Web"
+                android:name=".Nebula_View.Activities.Activity_06_Git_WebHook"
                 android:windowSoftInputMode="adjustResize|stateHidden" />
 
-            <activity android:name=".Nebula_View.Activities.git_login_activity"
+
+            <activity android:name=".Nebula_View.Activities.Activity_LandingPage" />
+
+            <activity android:name=".Nebula_View.Activities.Activity_GitAuth"
                 android:exported="true">
                 <intent-filter>
                     <action android:name="android.intent.action.VIEW" />

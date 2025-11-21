@@ -8,6 +8,27 @@
     android:background="#000000"
     android:fitsSystemWindows="true">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/back_container"
+        android:layout_width="130dp"
+        android:layout_height="200dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="parent">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/back_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:background="#33FF0000" />
+
+    </androidx.cardview.widget.CardView>
+
+
     <ImageButton
         android:id="@+id/returnButton"
         android:src="@drawable/ic_return"
@@ -116,11 +137,11 @@
     app:layout_constraintEnd_toEndOf="parent">
 
     <androidx.camera.view.PreviewView
-        android:id="@+id/previewView"
+        android:id="@+id/front_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:background="#33FF0000" />
 
-    /></androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

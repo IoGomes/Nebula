@@ -2,15 +2,19 @@ package Nebula.Android.Nebula_View.RV_Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -71,8 +75,8 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
 
     private void bindContactData(ItemViewHolder holder, Entity_Contact contacts) {
 
-        String name = contacts.getContactName() != null ? contacts.getContactName() : "Sem nome";
-        String number = contacts.getContactNumber() != null ? contacts.getContactNumber() : "Sem número";
+        String name = contacts.getContactName();
+        String number = contacts.getContactNumber();
 
         if (currentSearchQuery == null || currentSearchQuery.trim().isEmpty()) {
             holder.tvName.setText(name);
@@ -95,8 +99,14 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
                 "#EC407A"
         );
 
-        holder.tvName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
-        holder.tvNumber.setText(Html.fromHtml(highlightedNumber, Html.FROM_HTML_MODE_LEGACY));
+        new Thread(() -> {
+
+            new Handler(Looper.getMainLooper()).post(() -> {
+                holder.tvName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
+                holder.tvNumber.setText(Html.fromHtml(highlightedNumber, Html.FROM_HTML_MODE_LEGACY));
+            });
+
+        }).start();
     }
 
     @NonNull
@@ -173,45 +183,68 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
                 itemHolder.itemView.setOnLongClickListener(v -> {
 
-                    int currentPosition = holder.getAdapterPosition();
-                    if (currentPosition == RecyclerView.NO_POSITION) return true;
+                    int pos = holder.getAdapterPosition();
+                    if (pos == RecyclerView.NO_POSITION) return true;
 
-                    if (selectedPositions.contains(currentPosition)) {
-                        selectedPositions.remove(currentPosition);
-                        v.setBackgroundResource(0);
-                    } else {
-                        selectedPositions.add(currentPosition);
-                        v.setBackgroundResource(R.drawable.bg_selected_chat);
-                    }
-
-                    if (v.getContext() instanceof Activity_02_Feed) {
-                        Activity_02_Feed feed = (Activity_02_Feed) v.getContext();
-
-                        if (selectedPositions.isEmpty()) feed.hideOptionsBar();
-                        else feed.showOptionsBarFragment02();
-
-                    }
+                    toggleSelection(pos, v);
                     return true;
+                });
+                itemHolder.itemView.setOnClickListener(v -> {
+
+                    if (selectedPositions.isEmpty()) {
+                        return;
+                    }
+
+                    int pos = holder.getAdapterPosition();
+                    if (pos == RecyclerView.NO_POSITION) return;
+
+                    toggleSelection(pos, v);
                 });
             }
         }
     }
 
-    private void toggleSelection(int position, View view) {
+    private void toggleSelection(int position, View itemView) {
+
         if (selectedPositions.contains(position)) {
+
             selectedPositions.remove(position);
-            view.setBackgroundResource(0);
+            itemView.setBackgroundResource(0);
+
+            if (selectedPositions.size() < 1) {
+                TypedValue outValue = new TypedValue();
+                itemView.getContext().getTheme().resolveAttribute(
+                        android.R.attr.selectableItemBackground, outValue, true
+                );
+                itemView.setForeground(ContextCompat.getDrawable(
+                        itemView.getContext(),
+                        outValue.resourceId
+                ));
+            }
+
         } else {
             selectedPositions.add(position);
-            view.setBackgroundResource(R.drawable.bg_selected_chat);
+            new Thread(() -> {
+
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    itemView.setBackgroundResource(R.drawable.bg_selected_chat);
+                    itemView.setForeground(null);
+                });
+
+            }).start();
         }
 
-        if (view.getContext() instanceof Activity_02_Feed) {
+        if (itemView.getContext() instanceof Activity_02_Feed) {
+            Activity_02_Feed feed = (Activity_02_Feed) itemView.getContext();
 
-            Activity_02_Feed feed = (Activity_02_Feed) view.getContext();
+            new Thread(() -> {
 
-            if (selectedPositions.isEmpty()) feed.hideOptionsBar();
-            else feed.showOptionsBarFragment03();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (selectedPositions.isEmpty()) feed.hideOptionsBar();
+                    else feed.showOptionsBarFragment02();
+                });
+
+            }).start();
         }
     }
 
@@ -300,25 +333,84 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             super(itemView);
             this.adapter = adapter;
             etSearch = itemView.findViewById(R.id.searchGlass);
+            setupSearch();
         }
 
-        public void bind() {
+        private void setupSearch() {
+            // Listener para clicar no drawableEnd (botão de limpar)
+            etSearch.setOnTouchListener((v, event) -> {
+                final int DRAWABLE_RIGHT = 2;
+
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    Drawable drawableEnd = etSearch.getCompoundDrawables()[DRAWABLE_RIGHT];
+
+                    if (drawableEnd != null && etSearch.getText().length() > 0) {
+                        // Área clicável do drawable (com margem de tolerância)
+                        int drawableWidth = drawableEnd.getIntrinsicWidth();
+                        int touchAreaWidth = drawableWidth + etSearch.getPaddingEnd();
+
+                        // Verifica se o toque foi na área do drawable (lado direito)
+                        if (event.getX() >= (etSearch.getWidth() - touchAreaWidth)) {
+                            etSearch.setText("");
+                            etSearch.clearFocus();
+
+                            // Esconde o teclado
+                            InputMethodManager imm = (InputMethodManager) v.getContext()
+                                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+                            if (imm != null) {
+                                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                            }
+
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            });
+
+            // TextWatcher para filtrar o adapter e mostrar/ocultar o botão de limpar
             etSearch.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    adapter.filter(s.toString());
+                    // Filtra a lista
+                    if (adapter != null) {
+                        adapter.filter(s.toString());
+                    }
+
+                    // Atualiza o drawable do botão limpar
+                    updateClearButton(s);
                 }
 
                 @Override
-                public void afterTextChanged(Editable s) {
-                }
+                public void afterTextChanged(Editable s) { }
             });
+
+            // Inicializa sem o botão de limpar
+            updateClearButton("");
+        }
+
+        private void updateClearButton(CharSequence text) {
+            boolean hasText = text != null && text.length() > 0;
+            Drawable searchIcon = etSearch.getContext().getDrawable(R.drawable.ic_search);
+            Drawable clearIcon = hasText ? etSearch.getContext().getDrawable(R.drawable.ic_close) : null;
+
+            // Define os drawables
+            etSearch.setCompoundDrawablesWithIntrinsicBounds(
+                    searchIcon,  // drawableStart
+                    null,        // drawableTop
+                    clearIcon,   // drawableEnd
+                    null         // drawableBottom
+            );
+        }
+
+        public void bind() {
+            // Método bind vazio - adicione lógica se necessário
         }
     }
+
 
     static class TitleViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle;

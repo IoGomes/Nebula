@@ -3,6 +3,7 @@ package Nebula.Android.Nebula_ViewModel.Controllers;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import Nebula.Android.Nebula_ViewModel.Services.Service_Online;
 
 import androidx.core.app.ActivityCompat;
 
@@ -11,6 +12,7 @@ import Nebula.Android.Nebula_Model.Services.Svc_Permission;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_Video_Call;
 import Nebula.Android.Nebula_View.Activities.Activity_05_Video_Call;
 import Nebula.Android.R;
+import io.socket.client.Socket;
 
 public class Controller_Video_Call {
 
@@ -24,8 +26,18 @@ public class Controller_Video_Call {
         useCaseVideoCall = new UseCase_Video_Call(servicePermission, networkChecker);
     }
 
-    public void performVideoCall(Activity activity, String contactNumber, String contactName) {
+    public void performVideoCall(Activity activity, String username) {
         if (useCaseVideoCall.isEnabled()) {
+
+            Socket socket = Service_Online.getSocket();
+            if (socket == null || !socket.connected()) {
+                Activity_05_Video_Call.sharedSocket = Service_Online.getSocket();
+                return;
+            }
+
+            Activity_05_Video_Call.sharedSocket = Service_Online.getSocket();
+            Activity_05_Video_Call.sharedUserName = username;
+
             Intent intent = new Intent(activity, Activity_05_Video_Call.class);
             activity.startActivity(intent);
             activity.overridePendingTransition(
@@ -43,4 +55,4 @@ public class Controller_Video_Call {
             );
         }
     }
-    }
+}

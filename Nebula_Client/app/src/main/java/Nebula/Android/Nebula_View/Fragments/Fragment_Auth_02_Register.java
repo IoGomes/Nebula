@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import Nebula.Android.Nebula_View.Activities.Fragment_Github_Preloader;
-import Nebula.Android.Nebula_View.Activities.git_login_activity;
+import Nebula.Android.Nebula_View.Activities.Activity_GitAuth;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Auth;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Frg02RegisterBinding;
@@ -40,7 +40,7 @@ public class Fragment_Auth_02_Register extends Fragment {
         String htmlPrivacyPolicy = "I agree with the <u>Privacy Policy</u>";
 
         bind.google.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), git_login_activity.class);
+            Intent intent = new Intent(getActivity(), Activity_GitAuth.class);
             startActivity(intent);
         } );
 
@@ -48,11 +48,12 @@ public class Fragment_Auth_02_Register extends Fragment {
         bind.privacyPolicy.setText(Html.fromHtml(htmlPrivacyPolicy, Html.FROM_HTML_MODE_LEGACY));
 
         bind.signupButton.setOnClickListener(v ->
-                Controller_Auth.getInstance().performRegister(
+                Controller_Auth.getInstance().handleRegister(
                         requireActivity(),
                         bind.signupButton,
                         bind.userNameTextfield,
                         bind.userEmailTextfield,
+                        bind.userPhoneTextfield,
                         bind.userPasswordTextfield,
                         bind.confirmUserPasswordTextfield,
                         bind.termosECondicoes,
@@ -60,9 +61,6 @@ public class Fragment_Auth_02_Register extends Fragment {
                         bind.loadAnimation
                 )
         );
-
-        bind.google.setOnClickListener(v ->
-                new Controller_Auth().performGoogleLogin(requireContext()));
 
         return bind.getRoot();
     }

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    android:orientation="horizontal">
 
     <ImageButton
         android:id="@+id/call_profile_image"
@@ -60,21 +60,12 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <View
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:background="@drawable/ic_received_call" />
-
-            <Space
-                android:layout_width="04dp"
-                android:layout_height="0dp" />
-
             <TextView
                 android:id="@+id/call_text_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingTop="2dp"
                 android:fontFamily="@font/space_mono_regular"
-                android:paddingTop="04dp"
                 android:textColor="#808080"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -84,13 +75,13 @@
     <ImageButton
         android:id="@+id/call"
         android:layout_width="32dp"
-        android:layout_marginEnd="12dp"
         android:layout_height="32dp"
+        android:layout_marginEnd="12dp"
+        android:background="@android:color/transparent"
+        android:foreground="@drawable/ripple_circle"
+        android:src="@drawable/ic_phone_edit_textfield"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:foreground="@drawable/ripple_circle"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_phone_edit_textfield"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

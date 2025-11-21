@@ -8,8 +8,21 @@ public class SessionPreferences {
     private static final String KEY_LOGGED_IN = "isLoggedIn";
     private static final String KEY_DID_ONBOARD_TUTORIAL = "isOnboardTutorialDone";
     private static final String KEY_USERNAME = "username";
+    private static final String KEY_ID = "keyId";
 
     private SharedPreferences prefs;
+
+    public void generateQrCode(){
+
+    }
+
+    public void setKeyId(String id) {
+        prefs.edit().putString(KEY_ID, id).apply();
+    }
+
+    public String getKeyId(){
+        return prefs.getString(KEY_ID, null);
+    }
 
     public SessionPreferences(Context context) {
         prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);

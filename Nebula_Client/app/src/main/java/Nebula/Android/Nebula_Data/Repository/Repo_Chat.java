@@ -5,6 +5,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import Nebula.Android.Nebula_Data.LocalDb.DatabaseHelper;
 import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
@@ -24,8 +26,13 @@ public class Repo_Chat {
 
     public static void initialize(Context context) {
         if (context == null) return;
+
         dbHelper = new DatabaseHelper(context);
-        chats = dbHelper.getAllChatSessions();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            chats = dbHelper.getAllChatSessions();
+        });
+        executor.shutdown();
     }
 
     public static void removeChat(int index) {

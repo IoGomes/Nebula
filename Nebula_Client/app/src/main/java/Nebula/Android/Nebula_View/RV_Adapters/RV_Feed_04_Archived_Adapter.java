@@ -53,7 +53,6 @@ public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerVi
     private String currentSearchQuery = "";
 
     private final Set<Integer> selectedPositions = new HashSet<>();
-    private boolean isSelectionMode = false;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 

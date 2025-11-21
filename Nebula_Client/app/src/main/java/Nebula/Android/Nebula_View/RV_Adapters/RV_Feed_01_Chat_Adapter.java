@@ -4,9 +4,6 @@ import static android.view.View.GONE;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -23,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -86,14 +82,6 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
-        Drawable selectedBg = ContextCompat.getDrawable(
-                parent.getContext(),
-                R.drawable.bg_selected_chat
-        );
-
-        Drawable normalBg = new ColorDrawable(Color.TRANSPARENT);
-
 
         switch (viewType) {
             case VIEW_TYPE_HEADER:
@@ -158,6 +146,12 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         ));
     }
 
+    private void setupFooter(FooterViewHolder footerHolder, String text) {
+
+        footerHolder.textView.setText(Html.fromHtml(text
+        ));
+    }
+
     private void setupCategory(CategoryViewHolder categoryViewHolder) {
         categoryViewHolder.notRead.setText("Não Lidas 5");
         categoryViewHolder.allCategory.setText("Todas");
@@ -182,15 +176,17 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     private void setupChatClickListeners(ChatViewHolder chatHolder, Entity_Pv_Chat chatSession, int chatPosition, int adapterPosition) {
 
         chatHolder.itemView.setOnLongClickListener(v -> {
-            toggleSelection(adapterPosition, v);
-            notifyItemChanged(adapterPosition);
+
+            int pos = adapterPosition;
+            if (pos == RecyclerView.NO_POSITION) return true;
+
+            toggleSelection(pos, v);
             return true;
         });
 
         chatHolder.itemView.setOnClickListener(v -> {
             if (!selectedPositions.isEmpty()) {
                 toggleSelection(adapterPosition, v);
-                notifyItemChanged(adapterPosition);
             } else openChat(v.getContext(), chatHolder, chatSession, chatPosition);
         });
 
@@ -198,19 +194,32 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                 new Dialog_Feed_Profile_Image(chatHolder.itemView.getContext(), chatSession.getChatWith()).show());
     }
 
-    private void toggleSelection(int position, View view) {
+    private void toggleSelection(int position, View itemView) {
 
         if (selectedPositions.contains(position)) {
+
             selectedPositions.remove(position);
-            view.setBackgroundResource(0);
+            itemView.setBackgroundResource(0);
+
+            if (selectedPositions.size() < 1) {
+                TypedValue outValue = new TypedValue();
+                itemView.getContext().getTheme().resolveAttribute(
+                        android.R.attr.selectableItemBackground, outValue, true
+                );
+                itemView.setForeground(ContextCompat.getDrawable(
+                        itemView.getContext(),
+                        outValue.resourceId
+                ));
+            }
+
         } else {
             selectedPositions.add(position);
-            view.setBackgroundResource(R.drawable.bg_selected_chat);
-            view.setForeground(null);
+            itemView.setBackgroundResource(R.drawable.bg_selected_chat);
+            itemView.setForeground(null);
         }
 
-        if (view.getContext() instanceof Activity_02_Feed) {
-            Activity_02_Feed feed = (Activity_02_Feed) view.getContext();
+        if (itemView.getContext() instanceof Activity_02_Feed) {
+            Activity_02_Feed feed = (Activity_02_Feed) itemView.getContext();
             if (selectedPositions.isEmpty()) {
                 feed.hideOptionsBar();
             } else {
@@ -218,6 +227,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
     }
+
 
     private void openChat(Context context, ChatViewHolder chatHolder, Entity_Pv_Chat chatSession, int position) {
 
@@ -251,18 +261,17 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         String lastMessage = chatSession.getLastMessage();
         String chatWith = chatSession.getChatWith();
 
-        if (currentSearchQuery != null && !currentSearchQuery.trim().isEmpty()) {
-
-            String highlightedMessage = Svc_Search_Query.highlightTextHtml(lastMessage, currentSearchQuery, "#EC407A");
-            String highlightedName = Svc_Search_Query.highlightTextHtml(chatWith, currentSearchQuery, "#EC407A");
-
-            holder.lastText.setText(Html.fromHtml(highlightedMessage, Html.FROM_HTML_MODE_LEGACY));
-            holder.contactName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
-
-        } else {
+        if (currentSearchQuery == null || currentSearchQuery.trim().isEmpty()) {
             holder.lastText.setText(lastMessage);
             holder.contactName.setText(chatWith);
+            return;
         }
+
+        String highlightedMessage = Svc_Search_Query.highlightTextHtml(lastMessage, currentSearchQuery.trim(), "#EC407A");
+        String highlightedName = Svc_Search_Query.highlightTextHtml(chatWith, currentSearchQuery.trim(), "#EC407A");
+
+        holder.lastText.setText(Html.fromHtml(highlightedMessage, Html.FROM_HTML_MODE_LEGACY));
+        holder.contactName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
 
         if (chatSession.getChatDate() != null && !chatSession.getChatDate().isEmpty()) {
             List<Date> dates = chatSession.getChatDate();
@@ -346,7 +355,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         for (Integer adapterPosition : selectedPositions) {
-            // Converter para posição do chat
+
             int chatPosition = adapterPosition - 2;
 
             if (chatPosition >= 0 && chatPosition < displayedChats.size()) {
@@ -396,6 +405,9 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                     adapter.selectedCategoryId = button.getId();
                     atualizarAparencia(buttons, adapter.selectedCategoryId);
                     adapter.applyFilters();
+                    if (adapter.displayedChats.isEmpty()) {
+
+                    }
                 });
             }
         }
@@ -412,7 +424,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
         TextView lastText, textDate, unreadIcon, contactName;
         ImageButton profileImage;
-        View favorite;
+        View favorite, selected;
 
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -422,6 +434,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
             unreadIcon = itemView.findViewById(R.id.notification);
             contactName = itemView.findViewById(R.id.contactName);
             favorite = itemView.findViewById(R.id.favorite);
+            selected = itemView.findViewById(R.id.selected);
         }
     }
 

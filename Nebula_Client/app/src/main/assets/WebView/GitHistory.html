@@ -1,370 +1,62 @@
 <!DOCTYPE html>
-<html lang='pt-BR'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>GitHub Updates Dashboard</title>
-    <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          -webkit-tap-highlight-color: transparent;
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
-        body {
-          background-color: #000;
-          color: #c9d1d9;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-          padding: 20px 10px;
-          line-height: 1.6;
-        }
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-        header {
-          padding: 30px 0 15px 0;
-          margin-bottom: 15px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 20px;
-        }
-        h1 {
-          color: #fff;
-          font-size: 32px;
-          font-weight: 700;
-        }
-        .profile-section {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-          position: relative;
-        }
-       .profile-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          background:#30363d;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: transform 0.2s, box-shadow 0.2s;
-          flex-shrink: 0;
-          border: 2px solid  #EC407A;
-        }
-        .profile-icon:hover {
-          transform: scale(1.05);
-          box-shadow: 0 0 15px rgba(236, 64, 122, 0.5);
-        }
-        .profile-icon svg {
-          width: 28px;
-          height: 28px;
-          fill:  #8b949e;
-        }
-        .connection-status {
-          position: absolute;
-          top: -2px;
-          right: -2px;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 2px solid #000;
-          transition: background-color 0.3s;
-        }
-        .connection-status.connected {
-          background-color: #7ee787;
-        }
-        .connection-status.disconnected {
-          background-color: #f85149;
-        }
-        .username {
-          color: #8b949e;
-          font-size: 13px;
-          font-weight: 500;
-        }
-        .filters-wrapper {
-          overflow-x: auto;
-          margin-bottom: 30px;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        .filters-wrapper::-webkit-scrollbar {
-          display: none;
-        }
-        .filters {
-          display: flex;
-          gap: 6px;
-          width: max-content;
-        }
-        .filter-btn {
-          background-color: transparent;
-          color: #808080;
-          border: 1px solid #30363d;
-          padding: 0 16px;
-          height: 28px;
-          border-radius: 24px;
-          cursor: pointer;
-          font-size: 12px;
-          transition: all 0.2s;
-          white-space: nowrap;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          -webkit-tap-highlight-color: transparent;
-          outline: none;
-        }
-        .filter-btn:hover {
-          border-color: #EC407A;
-        }
-        .filter-btn:focus {
-          outline: none;
-        }
-        .filter-btn.active {
-          background-color: #EC407A;
-          color: #F7B2CA;
-          border-color: #EC407A;
-        }
-        .timeline {
-          position: relative;
-          padding-left: 40px;
-          min-height: 200px;
-        }
-        .timeline::before {
-          content: '';
-          position: absolute;
-          left: 15px;
-          top: 0;
-          bottom: 0;
-          width: 2px;
-          background: #30363d;
-        }
-        .empty-state {
-          text-align: center;
-          padding: 60px 20px;
-          color: #8b949e;
-        }
-        .empty-state svg {
-          width: 64px;
-          height: 64px;
-          margin-bottom: 16px;
-          opacity: 0.3;
-        }
-        .update-item {
-          position: relative;
-          background-color: #000;
-          border: 1px solid #30363d;
-          border-radius: 6px;
-          padding: 20px;
-          margin-bottom: 20px;
-          transition: all 0.3s;
-          animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .update-item.new {
-          border-color: #7ee787;
-          box-shadow: 0 0 15px rgba(126, 231, 135, 0.3);
-        }
-        .update-item::before {
-          content: '';
-          position: absolute;
-          left: -33px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background-color: #c9d1d9;
-          border: 2px solid #000;
-          z-index: 1;
-        }
-        .update-item:hover {
-          border-color: #EC407A;
-          box-shadow: 0 0 10px rgba(236, 64, 122, 0.3);
-        }
-        .update-header {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 12px;
-          flex-wrap: wrap;
-        }
-        .badge {
-          padding: 4px 8px;
-          border-radius: 12px;
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-        .badge.push, .badge.commit {
-          background-color: rgba(126, 231, 135, 0.15);
-          color: #7ee787;
-        }
-        .badge.merge {
-          background-color: rgba(163, 113, 247, 0.15);
-          color: #a371f7;
-        }
-        .badge.pull_request, .badge.pull-request {
-          background-color: rgba(88, 166, 255, 0.15);
-          color: #58a6ff;
-        }
-        .badge.issues, .badge.issue {
-          background-color: rgba(248, 81, 73, 0.15);
-          color: #f85149;
-        }
-        .badge.release {
-          background-color: rgba(88, 166, 255, 0.15);
-          color: #58a6ff;
-        }
-        .badge.create {
-          background-color: rgba(126, 231, 135, 0.15);
-          color: #7ee787;
-        }
-        .badge.delete {
-          background-color: rgba(248, 81, 73, 0.15);
-          color: #f85149;
-        }
-        .badge.fork {
-          background-color: rgba(163, 113, 247, 0.15);
-          color: #a371f7;
-        }
-        .badge.star, .badge.watch {
-          background-color: rgba(242, 201, 76, 0.15);
-          color: #f2c94c;
-        }
-        .badge.issue_comment {
-          background-color: rgba(88, 166, 255, 0.15);
-          color: #58a6ff;
-        }
-        .badge.pull_request_review {
-          background-color: rgba(163, 113, 247, 0.15);
-          color: #a371f7;
-        }
-        .update-title {
-          font-size: 18px;
-          font-weight: 600;
-          color: #c9d1d9;
-          flex: 1;
-        }
-        .update-meta {
-          display: flex;
-          gap: 20px;
-          font-size: 14px;
-          color: #8b949e;
-          margin-bottom: 12px;
-          flex-wrap: wrap;
-        }
-        .meta-item {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .avatar {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #58a6ff, #a371f7);
-          flex-shrink: 0;
-        }
-        .update-description {
-          color: #8b949e;
-          font-size: 14px;
-          line-height: 1.6;
-          margin-bottom: 12px;
-        }
-        .code-ref {
-          background-color: #21262d;
-          padding: 2px 6px;
-          border-radius: 3px;
-          font-family: 'Courier New', monospace;
-          font-size: 13px;
-          color: #79c0ff;
-        }
-        .stats {
-          display: flex;
-          gap: 15px;
-          font-size: 13px;
-          color: #8b949e;
-        }
-        .stat-item {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-        }
-        .additions {
-          color: #7ee787;
-        }
-        .deletions {
-          color: #f85149;
-        }
-        .files-changed {
-          color: #58a6ff;
-        }
-        .repo-name {
-          color: #58a6ff;
-          font-weight: 500;
-        }
-    </style>
-</head>
-<body>
-<div class='container'>
-    <header>
-        <h1>GitHub Dashboard</h1>
-        <div class='profile-section'>
-            <div class='profile-icon'>
-                <div class='connection-status disconnected' id='connectionStatus'></div>
-                <svg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'>
-                    <path fill-rule='evenodd' d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/>
-                </svg>
-            </div>
-            <span class='username' id='username'>Conectando...</span>
-        </div>
-    </header>
-    <div class='filters-wrapper'>
-        <div class='filters' id='filters'>
-            <button class='filter-btn active' data-filter='all'>Todos</button>
-            <button class='filter-btn' data-filter='push'>Push</button>
-            <button class='filter-btn' data-filter='commit'>Commits</button>
-            <button class='filter-btn' data-filter='pull_request'>Pull Requests</button>
-            <button class='filter-btn' data-filter='issues'>Issues</button>
-            <button class='filter-btn' data-filter='release'>Releases</button>
-            <button class='filter-btn' data-filter='create'>Create</button>
-            <button class='filter-btn' data-filter='delete'>Delete</button>
-            <button class='filter-btn' data-filter='fork'>Forks</button>
-            <button class='filter-btn' data-filter='star'>Stars</button>
-            <button class='filter-btn' data-filter='issue_comment'>Comentários</button>
-        </div>
-    </div>
-    <div class='timeline' id='timeline'>
-        <div class='empty-state'>
-            <svg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg' fill='currentColor'>
-                <path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/>
-            </svg>
-            <p>Aguardando notificações do GitHub...</p>
-        </div>
-    </div>
-</div>
+<html>
 
-<!-- Socket.IO Client -->
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title></title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel='stylesheet' type='text/css' media='screen' href='styles.css'>
+</head>
+
+<body>
+    <div class="container row">
+        <div class="buttons col-4">
+            <button id="share" class="btn btn-primary d-block mb-1">Share my mic and camera</button>
+            <button id="show-video" class="btn btn-secondary d-block mb-1">Show My Video</button>
+            <button id="stop-video" class="btn btn-secondary d-block mb-1">Stop My Video</button>
+            <div class="mb-1">
+                <button id="change-size" class="btn btn-secondary mb-1">Change screen size</button>
+                <input type="text" id="vid-width" value="1280" />
+                <input type="text" id="vid-height" value="720" />
+            </div>
+            <div class="mb-1">
+                <button id="start-record" class="btn btn-secondary mb-1">Start recording</button>
+                <button id="stop-record" class="btn btn-secondary mb-1">Stop Recording</button>
+                <button id="play-record" class="btn btn-secondary mb-1">Play Recording</button>
+            </div>
+            <button id="share-screen" class="btn btn-secondary d-block mb-1">Share Screen</button>
+            <div>
+                <label>Select audio input: </label>
+                <select id="audio-input"></select>
+            </div>
+            <div>
+                <label>Select audio output: </label>
+                <select id="audio-output"></select>
+            </div>
+            <div>
+                <label>Select video input: </label>
+                <select id="video-input"></select>
+            </div>
+
+
+
+        </div>
+        <div class="videos col-8">
+            <div>
+                <h3>My feed</h3>
+                <video id="my-video" class="video" autoplay playsinline></video>
+            </div>
+            <div>
+                <h3>Their feed</h3>
+                <video id="other-video" class="video" autoplay playsinline></video>
+            </div>
+        </div>
+    </div>
+
+    <script>
 
 <script>
   document.querySelector("#username").innerHTML = navigator
@@ -374,275 +66,240 @@ let socket;
 let currentFilter = 'all';
 let notifications = [];
 
-// Conecta ao servidor Socket.IO
-function connectSocket() {
-    // Pega o token do usuário (você pode passar via query params, localStorage, etc)
-    const userToken = getUserToken();
-    
-    socket = io(SOCKET_URL, {
-        auth: {
-            token: userToken
-        },
-        transports: ['websocket', 'polling']
-    });
+        let stream = null;
+        let mediaStream = null;
+        const constraints = {
+            audio: true,
+            video: true
+        }
+        const getMicAndCamera = async (e) => {
 
-    socket.on('connect', () => {
-        console.log('✅ Conectado ao servidor Socket.IO');
-        updateConnectionStatus(true);
-    });
+            try {
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log(stream)
+                changeButtons([
+                    'green', 'blue', 'blue', 'grey', 'grey', 'grey', 'grey', 'grey'
+                ])
+            } catch {
+                console.log("Usuário negou o acesso aos dispositivos");
+            }
+        }
 
-    socket.on('disconnect', () => {
-        console.log('❌ Desconectado do servidor Socket.IO');
-        updateConnectionStatus(false);
-    });
+        const showMyFeed = (e) => {
+            videoEl.srcObject = stream;
+            changeButtons([
+                'blue', 'grey', 'grey', 'blue', 'grey', 'grey', 'grey', 'grey'
+            ])
+        }
 
-    // Recebe informações do usuário
-    socket.on('user:info', (userData) => {
-        console.log('👤 Dados do usuário:', userData);
-        document.getElementById('username').textContent = `@${userData.username}`;
-    });
+        const stopMyFeed = (e) => {
+            const tracks = stream.getTracks();
+            tracks.forEach(track => {
+                track.stop()
+            });
+        }
 
-    // Recebe notificações do GitHub via webhook
-    socket.on('github:notification', (data) => {
-        console.log('📬 Nova notificação recebida:', data);
-        addNotification(data);
-    });
+        document.querySelector("#share").addEventListener('click', e => getMicAndCamera(e))
+        document.querySelector("#show-video").addEventListener('click', e => showMyFeed(e))
+        document.querySelector("#stop-video").addEventListener('click', e => stopMyFeed(e))
+        document.querySelector("#start-record").addEventListener('click', e => startRecording(e))
+        document.querySelector("#stop-record").addEventListener('click', e => stopRecording(e))
+        document.querySelector("#play-record").addEventListener('click', e => playRecording(e))
+        document.querySelector("#share-screen").addEventListener('click', e => shareScreen(e))
 
-    // Recebe histórico de notificações ao conectar
-    socket.on('github:history', (history) => {
-        console.log('📜 Histórico recebido:', history.length, 'notificações');
-        notifications = history;
-        renderNotifications();
-    });
+        document.querySelector("#audio-input").addEventListener('change', e => changeAudioInput(e))
+        document.querySelector("#video-input").addEventListener('change', e => changeVideo(e))
+        document.querySelector("#audio-output").addEventListener('change', e => changeAudioOutput(e))
 
-    socket.on('error', (error) => {
-        console.error('❌ Erro no Socket.IO:', error);
-    });
-}
 
-// Pega o token do usuário (adapte conforme sua implementação)
-function getUserToken() {
-    // Opção 1: Pegar da URL (ex: ?token=xxx)
-    const urlParams = new URLSearchParams(window.location.search);
-    const tokenFromUrl = urlParams.get('token');
-    if (tokenFromUrl) return tokenFromUrl;
+        //green = btn-success
+        //blue = btn-primary
+        //grey = btn-secondary
+        //red = btn-danger
 
-    // Opção 2: Pegar do localStorage
-    const tokenFromStorage = localStorage.getItem('github_token');
-    if (tokenFromStorage) return tokenFromStorage;
+        const buttonsById = [
+            'share', 'show-video', 'stop-video', 'change-size', 'start-record',
+            'stop-record', 'play-record', 'share-screen'
+        ]
 
-    // Opção 3: Pegar de um cookie
-    // const tokenFromCookie = getCookie('github_token');
-    
-    return null;
-}
+        //buttonEls will be an array of dom elements in order of buttonsById
+        const buttonEls = buttonsById.map(buttonId => document.getElementById(buttonId));
 
-// Atualiza o status da conexão
-function updateConnectionStatus(connected) {
-    const statusEl = document.getElementById('connectionStatus');
-    const usernameEl = document.getElementById('username');
-    
-    if (connected) {
-        statusEl.classList.remove('disconnected');
-        statusEl.classList.add('connected');
-    } else {
-        statusEl.classList.remove('connected');
-        statusEl.classList.add('disconnected');
-        usernameEl.textContent = 'Desconectado';
-    }
-}
+        const changeButtons = (colorsArray) => {
+            colorsArray.forEach((color, i) => {
+                buttonEls[i].classList.remove('btn-success');
+                buttonEls[i].classList.remove('btn-primary');
+                buttonEls[i].classList.remove('btn-secondary');
+                buttonEls[i].classList.remove('btn-danger');
+                if (color === "green") {
+                    buttonEls[i].classList.add('btn-success');
+                } else if (color === "blue") {
+                    buttonEls[i].classList.add('btn-primary');
+                } else if (color === "grey") {
+                    buttonEls[i].classList.add('btn-secondary');
+                } else if (color === "red") {
+                    buttonEls[i].classList.add('btn-danger');
+                }
+            })
+        }
 
-// Adiciona uma nova notificação
-function addNotification(data) {
-    const notification = formatNotification(data);
-    notifications.unshift(notification);
-    
-    // Limita o número de notificações em memória
-    if (notifications.length > 100) {
-        notifications = notifications.slice(0, 100);
-    }
-    
-    renderNotifications();
-}
+        const supportedConstraints = navigator.mediaDevices.getSupportedConstraints()
 
-// Formata a notificação do GitHub para o formato da UI
-function formatNotification(data) {
-    const event = data.event || data.type;
-    const payload = data.payload || {};
-    
-    let title = '';
-    let description = '';
-    let author = '';
-    let stats = null;
+        const changeVideoSize = () => {
+            stream.getVideoTracks().forEach(track => {
 
-    switch(event) {
-        case 'push':
-            const commits = payload.commits || [];
-            title = `Push para ${payload.ref?.replace('refs/heads/', '') || 'branch'}`;
-            description = commits.map(c => c.message).join(', ') || 'Commits enviados';
-            author = payload.pusher?.name || payload.sender?.login || 'Usuário';
-            stats = {
-                files: payload.size || commits.length,
-                additions: payload.additions || 0,
-                deletions: payload.deletions || 0
-            };
-            break;
-            
-        case 'pull_request':
-            const pr = payload.pull_request || {};
-            title = `PR #${pr.number}: ${pr.title}`;
-            description = pr.body || 'Pull request aberto';
-            author = pr.user?.login || payload.sender?.login;
-            stats = {
-                files: pr.changed_files,
-                additions: pr.additions,
-                deletions: pr.deletions
-            };
-            break;
-            
-        case 'issues':
-            const issue = payload.issue || {};
-            title = `Issue #${issue.number}: ${issue.title}`;
-            description = issue.body || 'Nova issue criada';
-            author = issue.user?.login || payload.sender?.login;
-            break;
-            
-        case 'release':
-            const release = payload.release || {};
-            title = `Release ${release.tag_name} publicada`;
-            description = release.body || release.name || 'Nova versão lançada';
-            author = release.author?.login || payload.sender?.login;
-            break;
-            
-        case 'issue_comment':
-            const comment = payload.comment || {};
-            title = `Comentário em Issue #${payload.issue?.number}`;
-            description = comment.body || 'Novo comentário';
-            author = comment.user?.login || payload.sender?.login;
-            break;
-            
-        default:
-            title = `${event} detectado`;
-            description = JSON.stringify(payload).substring(0, 100);
-            author = payload.sender?.login || 'GitHub';
-    }
+                const capabilities = track.getCapabilities()
+                const height = document.querySelector("#vid-height").value
+                const width = document.querySelector("#vid-width").value
 
-    return {
-        id: Date.now() + Math.random(),
-        type: event,
-        badge: formatBadge(event),
-        badgeClass: event.replace('_', '-'),
-        title,
-        description,
-        author,
-        time: formatTime(data.created_at || new Date()),
-        repo: data.repository?.name || payload.repository?.name || 'repositório',
-        stats,
-        isNew: true
-    };
-}
+                const vConstraints = {
+                    height: { exact: height < capabilities.height.max ? height : capabilities.height.max },
+                    width: { exact: width < capabilities.width.max ? width : capabilities.width.max },
+                }
 
-// Formata o badge do evento
-function formatBadge(event) {
-    const badges = {
-        'push': 'Push',
-        'pull_request': 'Pull Request',
-        'issues': 'Issue',
-        'issue_comment': 'Comentário',
-        'release': 'Release',
-        'create': 'Create',
-        'delete': 'Delete',
-        'fork': 'Fork',
-        'star': 'Star',
-        'watch': 'Watch',
-        'pull_request_review': 'Review'
-    };
-    return badges[event] || event.toUpperCase();
-}
+                track.applyConstraints(vConstraints)
+            })
+        }
 
-// Formata o tempo relativo
-function formatTime(date) {
-    const now = new Date();
-    const time = new Date(date);
-    const diff = Math.floor((now - time) / 1000);
+        document.querySelector('#change-size').addEventListener('click', (e) => changeVideoSize(e));
 
-    if (diff < 60) return 'Agora';
-    if (diff < 3600) return `Há ${Math.floor(diff / 60)} minutos`;
-    if (diff < 86400) return `Há ${Math.floor(diff / 3600)} horas`;
-    return `Há ${Math.floor(diff / 86400)} dias`;
-}
+        let mediaRecorder;
+        let recordedBlobs;
 
-// Renderiza as notificações na timeline
-function renderNotifications() {
-    const timeline = document.getElementById('timeline');
-    const filtered = notifications.filter(n => 
-        currentFilter === 'all' || n.type === currentFilter
-    );
+        const startRecording = () => {
+            if (!stream) {
+                alert("No current feed");
+                return
+            }
+            console.log("Start recording")
+            recordedBlobs = [];
+            mediaRecorder = new MediaRecorder(stream)
+            mediaRecorder.ondataavailable = e => {
 
-    if (filtered.length === 0) {
-        timeline.innerHTML = `
-            <div class='empty-state'>
-                <svg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg' fill='currentColor'>
-                    <path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/>
-                </svg>
-                <p>Nenhuma notificação encontrada</p>
-            </div>
-        `;
-        return;
-    }
+                console.log("Data is available for the media recorder!")
+                recordedBlobs.push(e.data)
+            }
+            mediaRecorder.start();
+            changeButtons([
+                'green', 'green', 'blue', 'blue', 'green', 'blue', 'grey', 'blue'
+            ])
+        }
 
-    timeline.innerHTML = filtered.map(n => `
-        <div class='update-item ${n.badgeClass} ${n.isNew ? 'new' : ''}' data-type='${n.type}'>
-            <div class='update-header'>
-                <span class='badge ${n.badgeClass}'>${n.badge}</span>
-                <h3 class='update-title'>${n.title}</h3>
-            </div>
-            <div class='update-meta'>
-                <span class='meta-item'>
-                    <span class='avatar'></span>
-                    <strong>${n.author}</strong>
-                </span>
-                <span class='meta-item'>${n.time}</span>
-                <span class='meta-item repo-name'>${n.repo}</span>
-            </div>
-            <p class='update-description'>${n.description}</p>
-            ${n.stats ? `
-                <div class='stats'>
-                    <span class='stat-item files-changed'>${n.stats.files} arquivos</span>
-                    <span class='stat-item additions'>+${n.stats.additions}</span>
-                    <span class='stat-item deletions'>-${n.stats.deletions}</span>
-                </div>
-            ` : ''}
-        </div>
-    `).join('');
 
-    // Remove a classe "new" após 3 segundos
-    setTimeout(() => {
-        notifications.forEach(n => n.isNew = false);
-    }, 3000);
-}
+        const stopRecording = () => {
+            if (!mediaRecorder) {
+                alert("Please record before stopping!")
+                return
+            }
+            console.log("stop recording")
+            mediaRecorder.stop()
+            changeButtons([
+                'green', 'green', 'blue', 'blue', 'green', 'green', 'blue', 'blue'
+            ])
 
-// Gerencia os filtros
-document.getElementById('filters').addEventListener('click', (e) => {
-    if (e.target.classList.contains('filter-btn')) {
-        // Remove active de todos
-        document.querySelectorAll('.filter-btn').forEach(btn => 
-            btn.classList.remove('active')
-        );
-        
-        // Adiciona active no clicado
-        e.target.classList.add('active');
-        
-        // Atualiza o filtro
-        currentFilter = e.target.dataset.filter;
-        renderNotifications();
-    }
-});
+        }
 
-// Inicializa quando a página carregar
-window.addEventListener('DOMContentLoaded', () => {
-    connectSocket();
-});
-</script>
+        const playRecording = () => {
+            console.log("play recording")
+            if (!recordedBlobs) {
+                alert("No Recording saved")
+                return
+            }
+            const superBuffer = new Blob(recordedBlobs)
+            const recordedVideoEl = document.querySelector('#other-video');
+            recordedVideoEl.src = window.URL.createObjectURL(superBuffer);
+            recordedVideoEl.controls = true;
+            recordedVideoEl.play();
+            changeButtons([
+                'green', 'green', 'blue', 'blue', 'green', 'green', 'green', 'blue'
+            ])
+        }
+
+        const shareScreen = async () => {
+
+            const options = {
+                video: true,
+                audio: false,
+                surfaceSwitching: 'include'
+            }
+            try {
+                mediaStream = await navigator.mediaDevices.getDisplayMedia(options);
+                videoEl.srcObject = mediaStream;
+            } catch (err) {
+                console.log(err);
+            }
+            changeButtons([
+                'green', 'green', 'blue', 'blue', 'green', 'green', 'green', 'green'
+            ])
+        }
+
+        const audioInputEl = document.querySelector("#audio-input");
+        const audioOutputEl = document.querySelector("#audio-output");
+        const videoInputEl = document.querySelector("#video-input");
+
+
+        const getDevices = async () => {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                console.log(devices);
+                devices.forEach(d => {
+                    const option = document.createElement('option');
+                    option.value = d.deviceId
+                    option.text = d.label
+                    if (d.kind === "audioinput") audioInputEl.appendChild(option)
+                    if (d.kind === "audiooutput") audioOutputEl.appendChild(option)
+                    if (d.kind === "videoinput") videoInputEl.appendChild(option)
+                })
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        const changeAudioInput = async (e) => {
+            const deviceId = e.target.value;
+            const newConstraints = {
+                audio: { deviceId: { exact: deviceId } },
+                video: true,
+            }
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia(newConstraints);
+                const tracks = stream.getAudioTracks();
+                console.log(tracks)
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        const changeAudioOutput = async (e) => {
+            await videoEl.setSinkId(e.target.value)
+            console.log("Change audio device")
+        }
+
+        const changeVideo = async (e) => {
+            const deviceId = e.target.value;
+            const newConstraints = {
+                audio: true,
+                video: { deviceId: { exact: deviceId } }
+            }
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia(newConstraints);
+                const tracks = stream.getVideoTracks();
+                console.log(tracks)
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        getDevices();
+    </script>
+    <!-- <script src='scripts.js'></script>
+    <script src='changeButton.js'></script> -->
+    <!-- <script src='changeVideoSize.js'></script> -->
+    <!-- <script src='screenRecorder.js'></script> -->
+    <!-- <script src="shareScreen.js"></script> -->
+    <!-- <script src="inputOutput.js"></script> -->
 </body>
+
 </html>

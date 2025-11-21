@@ -71,6 +71,8 @@ public class Activity_02_Feed extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceBundle) {
 
+        TimingUtils.start("onCreate");
+
         super.onCreate(savedInstanceBundle);
 
         /// Configura Elementos iniciais da UI
@@ -88,8 +90,29 @@ public class Activity_02_Feed extends AppCompatActivity {
 
         /// Inicializa os Repositórios
         Repo_Chat.initialize(this);
+
+        TimingUtils.stop("onCreate");
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+
         Repo_Contact.initialize(this);
         Repo_Calls_History.initialize(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /// Atrelando Botões XML a suas respectivas funções
+        bind.git.setOnClickListener(v -> startGitActivity(this));
+        bind.trash.setOnClickListener(v -> delete(this));
+        bind.favorite.setOnClickListener(v -> favorite());
+        bind.ImageButtonArchived.setOnClickListener(v -> archive());
+        bind.ImageButtonUnarchived.setOnClickListener(v -> unarchive());
+        bind.close.setOnClickListener(v -> close(this));
 
         if (dbHelper.getUnreadCount() != 0) {
             RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
@@ -99,16 +122,6 @@ public class Activity_02_Feed extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         } else bind.countUnread.setVisibility(View.GONE);
-
-
-        /// Atrelando Botões XML a suas respectivas funções
-        bind.git.setOnClickListener(v -> startGitActivity(this));
-        bind.trash.setOnClickListener(v -> delete(this));
-        bind.favorite.setOnClickListener(v -> favorite());
-        bind.ImageButtonArchived.setOnClickListener(v -> archive());
-        bind.ImageButtonUnarchived.setOnClickListener(v -> unarchive());
-        bind.close.setOnClickListener(v -> close());
-        bind.closeSelectionFromContacts.setOnClickListener(v -> closeSelectionFromFragment02());
 
         changeButtonBg();
     }
@@ -155,14 +168,33 @@ public class Activity_02_Feed extends AppCompatActivity {
         fragmentMap.put(R.id.button_call, fragment03);
         fragmentMap.put(R.id.button_archived, fragment04);
 
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+
         for (int id : buttonsIds) {
             LinearLayout btn = findViewById(id);
             btn.setOnClickListener(v -> {
-                int imageButtonId = layoutParaBotaoMap.get(v.getId());
-                ImageButton imageButton = findViewById(imageButtonId);
-                selectButton(imageButton);
-                hideOptionsBar();
-                replaceFragment(fragmentMap.get(v.getId()));
+
+                v.setEnabled(false);
+
+                int viewId = v.getId();
+                Integer imageButtonId = layoutParaBotaoMap.get(viewId);
+                Fragment targetFragment = fragmentMap.get(viewId);
+
+                if (imageButtonId == null || targetFragment == null) {
+                    v.setEnabled(true);
+                    return;
+                }
+
+                new Thread(() -> {
+
+                    mainHandler.post(() -> {
+                        ImageButton imageButton = findViewById(imageButtonId);
+                        selectButton(imageButton);
+                        hideOptionsBar();
+                        replaceFragment(targetFragment);
+                        mainHandler.postDelayed(() -> v.setEnabled(true), 300);
+                    });
+                }).start();
             });
         }
 
@@ -199,13 +231,23 @@ public class Activity_02_Feed extends AppCompatActivity {
     }
 
     /// Methods to close and clean selected items from the OptionsBar
-    private void close() {
+    private void closeFromFragment01() {
         RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
         adapter.clearSelection();
         hideOptionsBar();
     }
-    private void closeSelectionFromFragment02() {
+    private void closeFromFragment02() {
         RV_Feed_02_Contact_Adapter adapter = Repo_Contact.getFeedAdapter();
+        adapter.clearSelection();
+        hideOptionsBar();
+    }
+    private void closeFromFragment03() {
+        RV_Feed_03_Calls_Adapter adapter = Repo_Calls_History.getFeedAdapter();
+        adapter.clearSelection();
+        hideOptionsBar();
+    }
+    private void closeFromFragment04() {
+        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
         adapter.clearSelection();
         hideOptionsBar();
     }
@@ -221,35 +263,57 @@ public class Activity_02_Feed extends AppCompatActivity {
 
                 switch (currentFragment.getClass().getSimpleName()) {
                     case "Fragment_Feed_01_Inbox":
-                        deleteFromInbox();
+                        deleteFromFragment01();
                         break;
 
                     case "Fragment_Feed_02_Contacts":
-                        deleteFromContacts();
+                        deleteFromFragment02();
                         break;
 
                     case "Fragment_Feed_03_Calls":
-                        deleteFromCalls();
+                        deleteFromFragment03();
                         break;
                 }
             }
         }).show();
     }
+    private void close(Context context) {
+
+            if (context instanceof FragmentActivity) {
+                Fragment currentFragment = ((FragmentActivity) context)
+                        .getSupportFragmentManager()
+                        .findFragmentById(R.id.fragmentContainer);
+
+                switch (currentFragment.getClass().getSimpleName()) {
+                    case "Fragment_Feed_01_Inbox":
+                        closeFromFragment01();
+                        break;
+
+                    case "Fragment_Feed_02_Contacts":
+                        closeFromFragment02();
+                        break;
+
+                    case "Fragment_Feed_03_Calls":
+                        closeFromFragment03();
+                        break;
+                }
+            }
+    }
 
     /// Delete implementations
-    private void deleteFromInbox() {
+    private void deleteFromFragment01() {
         RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
         adapter.removeSelected(this);
         int count = adapter.getSelectedPositions().size();
         notifyAnimation(count, "Chat Deleted", "Chats Deleted");
     }
-    private void deleteFromContacts() {
+    private void deleteFromFragment02() {
         RV_Feed_02_Contact_Adapter contactAdapter = Repo_Contact.getFeedAdapter();
         contactAdapter.removeSelected(this);
         int count = contactAdapter.getSelectedPositions().size();
         notifyAnimation(count, "Contact Deleted", "Contacts Deleted");
     }
-    private void deleteFromCalls() {
+    private void deleteFromFragment03() {
         RV_Feed_03_Calls_Adapter callsAdapter = Repo_Calls_History.getFeedAdapter();
         callsAdapter.removeSelected();
         int count = callsAdapter.getSelectedPositions().size();
@@ -258,7 +322,7 @@ public class Activity_02_Feed extends AppCompatActivity {
 
     /// Git redirection
     private void startGitActivity(Context context) {
-        startActivity(new Intent(context, Activity_06_Web.class));
+        startActivity(new Intent(context, Activity_06_Git_WebHook.class));
     }
 
     /// Methods to display OptionsBar with fragment-specific options
@@ -273,12 +337,13 @@ public class Activity_02_Feed extends AppCompatActivity {
     public void showOptionsBarFragment02() {
         hideDefaultOptionBar();
         bind.trash.setVisibility(VISIBLE);
-        bind.closeSelectionFromContacts.setVisibility(VISIBLE);
+        bind.close.setVisibility(VISIBLE);
         cancelNotifyAnimation();
     }
     public void showOptionsBarFragment03() {
         hideDefaultOptionBar();
         bind.trash.setVisibility(VISIBLE);
+        bind.close.setVisibility(VISIBLE);
         cancelNotifyAnimation();
     }
     public void showOptionsBarFragment04() {
@@ -303,7 +368,6 @@ public class Activity_02_Feed extends AppCompatActivity {
         bind.close.setVisibility(GONE);
         bind.ImageButtonUnarchived.setVisibility(GONE);
         bind.trash.setVisibility(GONE);
-        bind.closeSelectionFromContacts.setVisibility(GONE);
     }
 
     /// Options Implementations

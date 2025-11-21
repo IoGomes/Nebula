@@ -64,32 +64,43 @@ public class Activity_00_OnBoard extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        TimingUtils.start("onCreate");
         super.onCreate(savedInstanceState);
 
         if (new SessionPreferences(this).isLoggedIn()) {
-            Intent intent = new Intent(Activity_00_OnBoard.this, Activity_02_Feed.class);
-            startActivity(intent);
+            startActivity(new Intent(Activity_00_OnBoard.this, Activity_02_Feed.class));
             finish();
+            TimingUtils.stop("onCreate");
+            return;
         }
-
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
+
+        TimingUtils.stop("onCreate");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        TimingUtils.start("onStart");
 
         binding = Act00OnboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         View rootLayout = findViewById(R.id.root);
         NavBar_Inserts.adjustPaddingForNavigationBar(rootLayout, this);
-
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        setupStepIndicators();
         setupAnimations();
-        setupImageSwitcher();
         setupButtons();
-        updateButtonStates();
-        updateStepIndicators();
+        setupImageSwitcher();
+        setupStepIndicators();
+
+        TimingUtils.stop("onStart");
     }
+
+
 
     private void setupStepIndicators() {
         step1 = binding.step1;
@@ -175,10 +186,8 @@ public class Activity_00_OnBoard extends AppCompatActivity {
         binding.previousButton.setEnabled(currentIndex > 0);
         binding.nextButton.setEnabled(true);
 
-        // Atualiza título e descrição dinamicamente
         binding.title.setText(titles[currentIndex]);
         binding.text.setText(Html.fromHtml((descriptions[currentIndex])));
-
 
         if (currentIndex == images.length - 1) {
             binding.nextButton.setText("Permissions");

@@ -1,5 +1,6 @@
 package Nebula.Android.Nebula_View.Activities;
 
+import static android.app.PendingIntent.getActivity;
 import static android.view.View.VISIBLE;
 
 import android.content.Intent;
@@ -39,6 +40,7 @@ import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Video_Call;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Voice_Call;
 import Nebula.Android.Nebula_Model.Services.StompChatService;
+import Nebula.Android.Nebula_ViewModel.Services.Service_Online;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act03ChatBinding;
 
@@ -100,6 +102,11 @@ public class Activity_03_Chat extends AppCompatActivity {
         mainHandler = new Handler(Looper.getMainLooper());
 
         chatService = new StompChatService();
+
+        bind.videoCall.setOnClickListener(v -> {
+            new Controller_Video_Call(this).performVideoCall(this, username);
+        });
+
 
         bind.getRoot().post(() -> {
             initializeHeavyComponents();

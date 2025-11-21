@@ -7,13 +7,14 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:elevation="1dp"
         android:id="@+id/null_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:padding="16dp"
         android:textColor="#909090"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/stars"
@@ -26,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_loop="true"
         android:scaleX="-1"
-        android:visibility="gone"
+        android:visibility="visible"
         app:lottie_rawRes="@raw/stars">
 
     </com.airbnb.lottie.LottieAnimationView>

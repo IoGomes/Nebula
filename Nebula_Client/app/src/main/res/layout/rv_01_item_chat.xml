@@ -1,49 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    >
 
-
-    <View
-        android:id="@+id/bgSelected"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/bg_selected_chat"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <ImageButton
-        android:foreground="@drawable/ripple_profile"
-        android:id="@+id/imageButton"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:background="@android:color/transparent"
-        android:clickable="true"
-        android:elevation="0dp"
-        android:focusable="true"
-        android:padding="10dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_profile_picture"
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:foreground="@drawable/ripple_profile"
+            android:id="@+id/imageButton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:focusable="true"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_profile_picture" />
+
+        <View
+            android:id="@+id/selected"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_gravity="end|bottom"
+            android:background="@drawable/ic_tick"
+            android:layout_margin="12dp"
+            android:stateListAnimator="@animator/scale_animation"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/layoutTexts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
+        android:clickable="false"
+        android:focusable="false"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/imageButton"
+        app:layout_constraintStart_toEndOf="@id/frame"
         app:layout_constraintTop_toTopOf="parent">
 
         <Space
@@ -98,6 +106,7 @@
             android:singleLine="true"
             android:textColor="#808080"
             android:textSize="14.6sp" />
+
     </LinearLayout>
 
     <TextView
