@@ -1,4 +1,4 @@
-import { createUser, findUserByEmail } from "../../services/user.services.js";
+import { createUser, findByUserId, findUserByEmail } from "../../services/user.services.js";
 import bcrypt from "bcrypt";
 
 import {
@@ -78,3 +78,27 @@ export const refreshTokenAPI = async (req, res) => {
     }
 };
 
+export const getUserById = async (req, res) => {
+    try {
+        const id = Number(req.query.id);
+        console.log(id)
+        if (!id) {
+            return res.status(400).json({
+                error: "O parâmetro 'id' é obrigatório. Exemplo: ?id=4"
+            });
+        }
+        
+
+        const userData = await findByUserId(id);
+
+        if (userData.success) {
+            res.status(200).json({userData})
+        } else {
+            res.status(401).json({userData})
+
+        }
+    } catch (err) {
+        res.status(500).json()
+    }
+
+};
