@@ -52,8 +52,6 @@ public class Repo_Calls_History {
         dbHelper = new DatabaseHelper(context);
         Repo_Calls_History repo = new Repo_Calls_History(dbHelper);
         repo.loadCallsToRepository();
-
-        Log.i(TAG, "✅ Repo_Calls_History inicializado com " + calls.size() + " chamadas");
     }
 
     public static List<Entity_Call> getCalls() {
@@ -119,11 +117,6 @@ public class Repo_Calls_History {
         }
     }
 
-    // ==================== MÉTODOS DE BANCO DE DADOS ====================
-
-    /**
-     * Insere uma nova chamada no histórico
-     */
     public long insertCall(Entity_Call call) {
         SQLiteDatabase db = dbHelper.openDatabase();
         ContentValues values = new ContentValues();
@@ -143,9 +136,6 @@ public class Repo_Calls_History {
         return id;
     }
 
-    /**
-     * Busca todas as chamadas do banco
-     */
     public List<Entity_Call> getAllCallsFromDatabase() {
         List<Entity_Call> callsList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.openDatabase();
@@ -169,9 +159,7 @@ public class Repo_Calls_History {
         return callsList;
     }
 
-    /**
-     * Busca chamadas por nome de contato
-     */
+
     public List<Entity_Call> getCallsByContact(String contactName) {
         List<Entity_Call> callsList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.openDatabase();
@@ -203,16 +191,10 @@ public class Repo_Calls_History {
         return getCallsByType(true);
     }
 
-    /**
-     * Busca apenas chamadas realizadas
-     */
     public List<Entity_Call> getMadeCalls() {
         return getCallsByType(false);
     }
 
-    /**
-     * Busca chamadas por tipo (recebidas ou realizadas)
-     */
     private List<Entity_Call> getCallsByType(boolean received) {
         List<Entity_Call> callsList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.openDatabase();

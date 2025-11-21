@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -151,7 +153,6 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
 
         callHolder.itemView.setOnLongClickListener(v -> {
             toggleSelection(callPosition, v);
-            notifyItemChanged(adapterPosition);
             return true;
         });
 
@@ -159,7 +160,6 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
             if (!selectedPositions.isEmpty()) {
 
                 toggleSelection(callPosition, v);
-                notifyItemChanged(adapterPosition);
             }
         });
 
@@ -174,22 +174,42 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
         });
     }
 
-    private void toggleSelection(int position, View view) {
+    private void toggleSelection(int position, View itemView) {
+
         if (selectedPositions.contains(position)) {
+
             selectedPositions.remove(position);
-            view.setBackgroundResource(0);
+            itemView.setBackgroundResource(0);
+
+            if (selectedPositions.size() < 1) {
+                TypedValue outValue = new TypedValue();
+                itemView.getContext().getTheme().resolveAttribute(
+                        android.R.attr.selectableItemBackground, outValue, true
+                );
+                itemView.setForeground(ContextCompat.getDrawable(
+                        itemView.getContext(),
+                        outValue.resourceId
+                ));
+            }
+
         } else {
             selectedPositions.add(position);
-            view.setBackgroundResource(R.drawable.bg_selected_chat);
+            itemView.setBackgroundResource(R.drawable.bg_selected_chat);
+            itemView.setForeground(null);
         }
 
-        if (view.getContext() instanceof Activity_02_Feed) {
-
-            Activity_02_Feed feed = (Activity_02_Feed) view.getContext();
+        if (itemView.getContext() instanceof Activity_02_Feed) {
+            Activity_02_Feed feed = (Activity_02_Feed) itemView.getContext();
 
             if (selectedPositions.isEmpty()) feed.hideOptionsBar();
             else feed.showOptionsBarFragment03();
+
         }
+    }
+
+    public void clearSelection() {
+        selectedPositions.clear();
+        notifyDataSetChanged();
     }
 
     @Override

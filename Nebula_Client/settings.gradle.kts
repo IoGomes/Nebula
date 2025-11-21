@@ -19,9 +19,9 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven(url = URI.create("https://jitpack.io"))
+        maven (url = URI.create("https://maven.google.com"))
     }
 }
 
 rootProject.name = "Nebula"
 include(":app")
- 

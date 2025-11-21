@@ -72,7 +72,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         checkCursor.close();
 
-        String[] nomes = {"Lucas", "Ana", "Mariana", "Carlos", "João", "Bianca", "Pedro", "Julia", "Rafael", "Fernanda"};
+        String[] nomes = {"Lucas Borges", "Ana Castela", "Ana Mariana Braga", "Carlos Eduardo", "João", "Bianca Teles", "Pedro Nunes", "Julia", "Rafael", "Fernanda"};
         String[] mensagens = {
                 "Olá! Como você está?",
                 "Vamos nos encontrar hoje?",

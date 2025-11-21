@@ -25,7 +25,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class git_login_activity extends AppCompatActivity {
+public class Activity_GitAuth extends AppCompatActivity {
 
     private WebView webView;
     private ProgressBar loading;
@@ -38,7 +38,6 @@ public class git_login_activity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
-        // Remove barras e deixa transparente
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         super.onCreate(savedInstanceState);
@@ -46,7 +45,6 @@ public class git_login_activity extends AppCompatActivity {
         try { Objects.requireNonNull(getSupportActionBar()).hide(); }
         catch (Exception ignored) {}
 
-        // ----- LAYOUT PROGRAMÁTICO ----- //
         FrameLayout root = new FrameLayout(this);
         webView = new WebView(this);
         loading = new ProgressBar(this);
@@ -89,7 +87,7 @@ public class git_login_activity extends AppCompatActivity {
                     if (code != null) {
                         trocarCodePorToken(code);
                     } else {
-                        Toast.makeText(git_login_activity.this,
+                        Toast.makeText(Activity_GitAuth.this,
                                 "Erro ao receber código", Toast.LENGTH_SHORT).show();
                     }
 
@@ -149,7 +147,7 @@ public class git_login_activity extends AppCompatActivity {
             @Override
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(() ->
-                        Toast.makeText(git_login_activity.this,
+                        Toast.makeText(Activity_GitAuth.this,
                                 "Erro ao autenticar", Toast.LENGTH_SHORT).show()
                 );
             }
