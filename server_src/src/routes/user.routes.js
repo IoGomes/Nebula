@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, refreshTokenAPI,loginUser } from "../api/user/auth.api.js";
+import { registerUser, refreshTokenAPI,loginUser, getUserById } from "../api/user/auth.api.js";
 
 
 const router = Router();
@@ -11,5 +11,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 router.post("/refresh", refreshTokenAPI);
+
+router.get("/get-by-id", getUserById)
 
 export default router;
