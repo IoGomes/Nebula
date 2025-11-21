@@ -54,7 +54,8 @@ export const loginUser = async (req, res) => {
 
     return res.json({
         success: true,
-        userId: user.user_id
+        userId: user.user_id,
+        userName: user.username
         // accessToken,
         // refreshToken
     });
