@@ -4,7 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
-  base: "./", // 🔥 ESSA LINHA RESOLVE SUA TELA BRANCA NO DIST
+  base: "./", 
 
   server: {
     host: "::",
