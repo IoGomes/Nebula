@@ -47,15 +47,16 @@ export const loginUser = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: "Senha incorreta" });
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    // const accessToken = generateAccessToken(user);
+    // const refreshToken = generateRefreshToken(user);
 
-    await saveRefreshToken(user.user_id, refreshToken);
+    // await saveRefreshToken(user.user_id, refreshToken);
 
     return res.json({
         success: true,
-        accessToken,
-        refreshToken
+        userId: user.user_id
+        // accessToken,
+        // refreshToken
     });
 };
 
