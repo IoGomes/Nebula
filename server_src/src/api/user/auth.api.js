@@ -38,12 +38,11 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
-
     const response = await findUserByEmail(email);
     if (!response.success) return res.status(400).json(response);
 
     const user = response.user
-
+    console.log(response)
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: "Senha incorreta" });
 
@@ -82,7 +81,7 @@ export const refreshTokenAPI = async (req, res) => {
 export const getUserById = async (req, res) => {
     try {
         const id = Number(req.query.id);
-        console.log(id)
+        // console.log(id)
         if (!id) {
             return res.status(400).json({
                 error: "O parâmetro 'id' é obrigatório. Exemplo: ?id=4"

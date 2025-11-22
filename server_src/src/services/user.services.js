@@ -3,7 +3,12 @@ import prisma from "../lib/prisma.js";
 export const createUser = async (data) => {
     try {
         const registerUser = await prisma.user.create({
-            data: data
+            data: data,
+            select: {
+                user_id: true,
+                username: true,
+                password: false
+            }
         })
 
         return {success: true, registerUser}
@@ -25,7 +30,6 @@ export const findUserByEmail = async (email) => {
                 email: email
             }
         })
-        // console.log(user)
         return {success: true, user}
     } catch (err) {
         console.log(err)
