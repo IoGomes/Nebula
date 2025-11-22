@@ -23,6 +23,11 @@ const localVideoEl = document.getElementById('local-video');
 const remoteVideoEl = document.getElementById('remote-video');
 const callBtn = document.getElementById('call');
 const hangupBtn = document.getElementById('hangup');
+
+// --- BOTÕES DE MÍDIA ---
+const toggleCameraBtn = document.getElementById('toggle-camera'); 
+const toggleMicBtn = document.getElementById('toggle-mic'); // NOVO: Botão de Mic
+
 const waitingEl = document.getElementById('waiting');
 const userNameDisplay = document.getElementById('user-name');
 
@@ -47,6 +52,45 @@ const initMedia = async () => {
 }
 
 initMedia();
+
+// --- FUNÇÃO: Alternar Câmera (Liga/Desliga) ---
+const toggleCamera = () => {
+    if (localStream) {
+        const videoTracks = localStream.getVideoTracks();
+        if (videoTracks && videoTracks.length > 0) {
+            const videoTrack = videoTracks[0];
+            videoTrack.enabled = !videoTrack.enabled;
+            
+            if (toggleCameraBtn) {
+                const isCameraOn = videoTrack.enabled;
+                toggleCameraBtn.innerText = isCameraOn ? "Desativar Câmera" : "Ativar Câmera";
+                toggleCameraBtn.classList.toggle('btn-secondary', isCameraOn);
+                toggleCameraBtn.classList.toggle('btn-danger', !isCameraOn);
+            }
+        }
+    }
+};
+
+// --- FUNÇÃO NOVA: Alternar Microfone (Mute/Unmute) ---
+const toggleMic = () => {
+    if (localStream) {
+        const audioTracks = localStream.getAudioTracks(); // Pega faixas de áudio
+        if (audioTracks && audioTracks.length > 0) {
+            const audioTrack = audioTracks[0];
+            // Inverte o estado (Mudo / Ouvindo)
+            audioTrack.enabled = !audioTrack.enabled;
+            
+            // Feedback visual
+            if (toggleMicBtn) {
+                const isMicOn = audioTrack.enabled;
+                toggleMicBtn.innerText = isMicOn ? "Desativar Microfone" : "Ativar Microfone";
+                
+                toggleMicBtn.classList.toggle('btn-secondary', isMicOn);
+                toggleMicBtn.classList.toggle('btn-danger', !isMicOn); // Vermelho se estiver mudo
+            }
+        }
+    }
+};
 
 // --- 3. LÓGICA WEBRTC ---
 
@@ -73,8 +117,6 @@ const createPeerConnection = () => {
     // Envia candidatos ICE locais
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-            // O SEGREDO: Mandar para connectedPeerId (quem está falando comigo agora)
-            // Se connectedPeerId for nulo, usamos o initialTargetId da URL como fallback
             const target = connectedPeerId || initialTargetId;
             
             if (target) {
@@ -92,7 +134,6 @@ const createPeerConnection = () => {
             peerConnection.connectionState === 'failed' || 
             peerConnection.connectionState === 'closed') {
             console.log("Conexão encerrada remotamente.");
-            // Opcional: hangupCall();
         }
     };
 }
@@ -105,7 +146,6 @@ const initiateCall = () => {
     waitingEl.innerText = "Buscando usuário...";
     waitingEl.style.display = 'block';
     
-    // Passo 1: Verifica se o usuário está online antes de tudo
     socket.emit("check-user-online", initialTargetId);
 };
 
@@ -141,7 +181,6 @@ const hangupCall = () => {
         peerConnection = null;
     }
     resetUI();
-    // Nota: Idealmente emitir um evento 'disconnectCall' para o servidor avisar o outro lado
 };
 
 const resetUI = () => {
@@ -172,7 +211,6 @@ const processCandidateQueue = async () => {
 
 socket.on('connect', () => console.log("Socket Conectado:", socket.id));
 
-// Resposta da verificação se usuário existe
 socket.on('user-is-online', (data) => {
     if (data.isOnline) {
         performOffer();
@@ -182,11 +220,8 @@ socket.on('user-is-online', (data) => {
     }
 });
 
-// Recebendo chamada (Offer)
 socket.on('offerResponse', async (offerObj) => {
     console.log("Recebendo chamada de " + offerObj.offererUserName);
-    
-    // IMPORTANTE: Salva quem está ligando para nós, para podermos responder os ICE Candidates
     connectedPeerId = offerObj.offererUserId;
     
     createPeerConnection();
@@ -201,7 +236,7 @@ socket.on('offerResponse', async (offerObj) => {
         await peerConnection.setLocalDescription(answer);
 
         socket.emit('newAnswer', {
-            targetUserId: connectedPeerId, // Responde para quem chamou
+            targetUserId: connectedPeerId,
             sdp: answer.sdp,
             type: answer.type,
             answererUserName: userName
@@ -211,7 +246,6 @@ socket.on('offerResponse', async (offerObj) => {
         hangupBtn.disabled = false;
         callBtn.disabled = true;
         
-        // Processa fila de rede caso tenha chegado dados antes
         processCandidateQueue();
         
     } catch (err) {
@@ -219,7 +253,6 @@ socket.on('offerResponse', async (offerObj) => {
     }
 });
 
-// Recebendo resposta (Answer)
 socket.on('answerResponse', async (answerObj) => {
     console.log("Chamada atendida!");
     waitingEl.style.display = 'none';
@@ -232,7 +265,6 @@ socket.on('answerResponse', async (answerObj) => {
     }
 });
 
-// Recebendo Candidatos de Rede (ICE)
 socket.on('receivedIceCandidate', async (iceObj) => {
     const candidate = iceObj.candidate || iceObj; 
     
@@ -243,7 +275,6 @@ socket.on('receivedIceCandidate', async (iceObj) => {
             console.error("Erro ao adicionar ICE:", e);
         }
     } else {
-        // Se a conexão ainda não está pronta, guarda na fila para depois
         console.log("ICE recebido antes da hora. Enfileirando.");
         candidateQueue.push(candidate);
     }
@@ -252,3 +283,12 @@ socket.on('receivedIceCandidate', async (iceObj) => {
 // --- 5. EVENTOS UI ---
 callBtn.addEventListener('click', initiateCall);
 hangupBtn.addEventListener('click', hangupCall);
+
+if (toggleCameraBtn) {
+    toggleCameraBtn.addEventListener('click', toggleCamera);
+}
+
+// Listener para o novo botão de Mic
+if (toggleMicBtn) {
+    toggleMicBtn.addEventListener('click', toggleMic);
+}
