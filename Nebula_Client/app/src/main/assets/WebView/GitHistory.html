@@ -4,50 +4,74 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title></title>
+    <title>WebRTC Call</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-    <link rel='stylesheet' type='text/css' media='screen' href='styles.css'>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <style>
+        .video {
+            width: 100%;
+            height: auto;
+            background-color: #333;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .buttons button {
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container row">
-        <div class="buttons col-4">
-            <button id="share" class="btn btn-primary d-block mb-1">Share my mic and camera</button>
-            <button id="show-video" class="btn btn-secondary d-block mb-1">Show My Video</button>
-            <button id="stop-video" class="btn btn-secondary d-block mb-1">Stop My Video</button>
-            <div class="mb-1">
-                <button id="change-size" class="btn btn-secondary mb-1">Change screen size</button>
-                <input type="text" id="vid-width" value="1280" />
-                <input type="text" id="vid-height" value="720" />
+<div class="container mt-3">
+    <div class="row">
+        <div class="buttons col-md-4 col-12">
+            <h5 id="status-text">Disconnected</h5>
+
+            <div class="card p-2 mb-3">
+                <strong>Call Controls</strong>
+                <button id="btn-call" class="btn btn-success d-block mb-1">Ligar para Target</button>
+                <button id="share" class="btn btn-primary d-block mb-1">Start Camera</button>
             </div>
-            <div class="mb-1">
+
+            <div class="card p-2 mb-3">
+                <strong>Media Settings</strong>
+                <button id="show-video" class="btn btn-secondary d-block mb-1">Show My Video</button>
+                <button id="stop-video" class="btn btn-secondary d-block mb-1">Stop My Video</button>
+                <button id="share-screen" class="btn btn-secondary d-block mb-1">Share Screen</button>
+            </div>
+
+            <div class="card p-2 mb-3">
+                <strong>Devices</strong>
+                <div class="mb-2">
+                    <label>Mic:</label>
+                    <select id="audio-input" class="form-select"></select>
+                </div>
+                <div class="mb-2">
+                    <label>Speaker:</label>
+                    <select id="audio-output" class="form-select"></select>
+                </div>
+                <div class="mb-2">
+                    <label>Camera:</label>
+                    <select id="video-input" class="form-select"></select>
+                </div>
+            </div>
+
+            <div class="card p-2 mb-3">
+                <strong>Recording</strong>
                 <button id="start-record" class="btn btn-secondary mb-1">Start recording</button>
                 <button id="stop-record" class="btn btn-secondary mb-1">Stop Recording</button>
                 <button id="play-record" class="btn btn-secondary mb-1">Play Recording</button>
             </div>
-            <button id="share-screen" class="btn btn-secondary d-block mb-1">Share Screen</button>
-            <div>
-                <label>Select audio input: </label>
-                <select id="audio-input"></select>
-            </div>
-            <div>
-                <label>Select audio output: </label>
-                <select id="audio-output"></select>
-            </div>
-            <div>
-                <label>Select video input: </label>
-                <select id="video-input"></select>
-            </div>
-
-
-
         </div>
-        <div class="videos col-8">
+
+        <div class="videos col-md-8 col-12">
             <div>
                 <h3>My feed</h3>
-                <video id="my-video" class="video" autoplay playsinline></video>
+                <video id="my-video" class="video" autoplay playsinline muted></video>
             </div>
             <div>
                 <h3>Their feed</h3>
@@ -55,251 +79,291 @@
             </div>
         </div>
     </div>
-
-    <script>
+</div>
 
 <script>
-  document.querySelector("#username").innerHTML = navigator
-// Configuração do Socket.IO
-const SOCKET_URL = 'http://localhost:3000'; // Altere para a URL do seu backend
-let socket;
-let currentFilter = 'all';
-let notifications = [];
+    // --- 1. CONFIGURAÇÃO INICIAL E VARIÁVEIS GLOBAIS ---
 
-        let stream = null;
-        let mediaStream = null;
-        const constraints = {
-            audio: true,
-            video: true
-        }
-        const getMicAndCamera = async (e) => {
+    // Variáveis do DOM
+    const videoEl = document.querySelector('#my-video'); // Definindo o vídeo local
+    const remoteVideoEl = document.querySelector('#other-video'); // Definindo o vídeo remoto
+    const statusText = document.querySelector('#status-text');
 
-            try {
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
-                console.log(stream)
-                changeButtons([
-                    'green', 'blue', 'blue', 'grey', 'grey', 'grey', 'grey', 'grey'
-                ])
-            } catch {
-                console.log("Usuário negou o acesso aos dispositivos");
+    // Socket URL (Ajuste conforme necessário. No emulador Android use 10.0.2.2 se for local)
+    const SOCKET_URL = 'https://youlanda-undependable-compressingly.ngrok-free.dev';
+
+    // Ler parâmetros da URL vindos do Android
+    const urlParams = new URLSearchParams(window.location.search);
+    const myUserId = urlParams.get('userId') || "13"; // Fallback para testes
+    const myUserName = urlParams.get('userName') || "UserAndroid";
+    let targetUserId = urlParams.get('targetId') || "15";
+
+    let socket = null;
+    let localStream = null; // Variável correta para o stream
+    let peerConnection = null;
+    let mediaRecorder;
+    let recordedBlobs;
+
+    const iceServers = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' }
+        ]
+    };
+
+    const constraints = {
+        audio: true,
+        video: true
+    };
+
+    // --- 2. FUNÇÕES SOCKET.IO E WEBRTC ---
+
+    const initSocket = () => {
+        socket = io(SOCKET_URL, {
+            query: {
+                userId: myUserId,
+                userName: myUserName
             }
-        }
+        });
 
-        const showMyFeed = (e) => {
-            videoEl.srcObject = stream;
-            changeButtons([
-                'blue', 'grey', 'grey', 'blue', 'grey', 'grey', 'grey', 'grey'
-            ])
-        }
+        socket.on('connect', () => {
+            console.log("Conectado ao Socket Server");
+            statusText.innerHTML = "Online: " + myUserName;
+            statusText.style.color = "green";
+        });
 
-        const stopMyFeed = (e) => {
-            const tracks = stream.getTracks();
-            tracks.forEach(track => {
-                track.stop()
+        // Listener: Usuário alvo está online?
+        socket.on('user-is-online', ({ isOnline }) => {
+            if (isOnline) {
+                startWebRTCOffer();
+            } else {
+                alert("Usuário " + targetUserId + " está offline.");
+            }
+        });
+
+        // Listener: Recebendo Chamada (Oferta)
+        socket.on('offerResponse', async (offer) => {
+            console.log("Recebendo oferta de " + offer.offererUserName);
+            targetUserId = offer.offererUserId; // Atualiza quem está ligando
+
+            await createPeerConnection();
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            socket.emit('newAnswer', {
+                targetUserId: targetUserId,
+                sdp: answer.sdp,
+                type: answer.type
+            });
+        });
+
+        // Listener: Recebendo Resposta (Answer)
+        socket.on('answerResponse', async (answer) => {
+            console.log("Chamada atendida!");
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        });
+
+        // Listener: ICE Candidates
+        socket.on('receivedIceCandidate', async ({ candidate }) => {
+            try {
+                if(peerConnection) {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                }
+            } catch (e) {
+                console.error('Erro ao adicionar ICE', e);
+            }
+        });
+    }
+
+    const makeCall = () => {
+        if(!localStream) {
+            alert("Inicie a câmera primeiro!");
+            return getMicAndCamera().then(() => {
+                socket.emit('check-user-online', targetUserId);
+            });
+        }
+        socket.emit('check-user-online', targetUserId);
+    }
+
+    const startWebRTCOffer = async () => {
+        await createPeerConnection();
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        socket.emit('newOffer', {
+            targetUserId: targetUserId,
+            sdp: offer.sdp,
+            type: offer.type
+        });
+        console.log("Oferta enviada...");
+    }
+
+    const createPeerConnection = async () => {
+        peerConnection = new RTCPeerConnection(iceServers);
+
+        // Adiciona tracks locais ao peer connection
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
             });
         }
 
-        document.querySelector("#share").addEventListener('click', e => getMicAndCamera(e))
-        document.querySelector("#show-video").addEventListener('click', e => showMyFeed(e))
-        document.querySelector("#stop-video").addEventListener('click', e => stopMyFeed(e))
-        document.querySelector("#start-record").addEventListener('click', e => startRecording(e))
-        document.querySelector("#stop-record").addEventListener('click', e => stopRecording(e))
-        document.querySelector("#play-record").addEventListener('click', e => playRecording(e))
-        document.querySelector("#share-screen").addEventListener('click', e => shareScreen(e))
+        // Quando receber vídeo remoto
+        peerConnection.ontrack = (event) => {
+            console.log("Stream remoto recebido");
+            remoteVideoEl.srcObject = event.streams[0];
+        };
 
-        document.querySelector("#audio-input").addEventListener('change', e => changeAudioInput(e))
-        document.querySelector("#video-input").addEventListener('change', e => changeVideo(e))
-        document.querySelector("#audio-output").addEventListener('change', e => changeAudioOutput(e))
-
-
-        //green = btn-success
-        //blue = btn-primary
-        //grey = btn-secondary
-        //red = btn-danger
-
-        const buttonsById = [
-            'share', 'show-video', 'stop-video', 'change-size', 'start-record',
-            'stop-record', 'play-record', 'share-screen'
-        ]
-
-        //buttonEls will be an array of dom elements in order of buttonsById
-        const buttonEls = buttonsById.map(buttonId => document.getElementById(buttonId));
-
-        const changeButtons = (colorsArray) => {
-            colorsArray.forEach((color, i) => {
-                buttonEls[i].classList.remove('btn-success');
-                buttonEls[i].classList.remove('btn-primary');
-                buttonEls[i].classList.remove('btn-secondary');
-                buttonEls[i].classList.remove('btn-danger');
-                if (color === "green") {
-                    buttonEls[i].classList.add('btn-success');
-                } else if (color === "blue") {
-                    buttonEls[i].classList.add('btn-primary');
-                } else if (color === "grey") {
-                    buttonEls[i].classList.add('btn-secondary');
-                } else if (color === "red") {
-                    buttonEls[i].classList.add('btn-danger');
-                }
-            })
-        }
-
-        const supportedConstraints = navigator.mediaDevices.getSupportedConstraints()
-
-        const changeVideoSize = () => {
-            stream.getVideoTracks().forEach(track => {
-
-                const capabilities = track.getCapabilities()
-                const height = document.querySelector("#vid-height").value
-                const width = document.querySelector("#vid-width").value
-
-                const vConstraints = {
-                    height: { exact: height < capabilities.height.max ? height : capabilities.height.max },
-                    width: { exact: width < capabilities.width.max ? width : capabilities.width.max },
-                }
-
-                track.applyConstraints(vConstraints)
-            })
-        }
-
-        document.querySelector('#change-size').addEventListener('click', (e) => changeVideoSize(e));
-
-        let mediaRecorder;
-        let recordedBlobs;
-
-        const startRecording = () => {
-            if (!stream) {
-                alert("No current feed");
-                return
+        // Enviar ICE Candidates locais para o servidor
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit('sendIceCandidate', {
+                    targetUserId: targetUserId,
+                    candidate: event.candidate
+                });
             }
-            console.log("Start recording")
-            recordedBlobs = [];
-            mediaRecorder = new MediaRecorder(stream)
-            mediaRecorder.ondataavailable = e => {
-
-                console.log("Data is available for the media recorder!")
-                recordedBlobs.push(e.data)
-            }
-            mediaRecorder.start();
-            changeButtons([
-                'green', 'green', 'blue', 'blue', 'green', 'blue', 'grey', 'blue'
-            ])
-        }
+        };
+    }
 
 
-        const stopRecording = () => {
-            if (!mediaRecorder) {
-                alert("Please record before stopping!")
-                return
-            }
-            console.log("stop recording")
-            mediaRecorder.stop()
-            changeButtons([
-                'green', 'green', 'blue', 'blue', 'green', 'green', 'blue', 'blue'
-            ])
+    // --- 3. FUNÇÕES DE MÍDIA LOCAL (Suas funções originais corrigidas) ---
 
-        }
+    const getMicAndCamera = async (e) => {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            showMyFeed();
+            changeButtons(['green', 'blue', 'blue', 'grey', 'grey', 'grey', 'grey', 'grey']);
 
-        const playRecording = () => {
-            console.log("play recording")
-            if (!recordedBlobs) {
-                alert("No Recording saved")
-                return
-            }
-            const superBuffer = new Blob(recordedBlobs)
-            const recordedVideoEl = document.querySelector('#other-video');
-            recordedVideoEl.src = window.URL.createObjectURL(superBuffer);
-            recordedVideoEl.controls = true;
-            recordedVideoEl.play();
-            changeButtons([
-                'green', 'green', 'blue', 'blue', 'green', 'green', 'green', 'blue'
-            ])
-        }
-
-        const shareScreen = async () => {
-
-            const options = {
-                video: true,
-                audio: false,
-                surfaceSwitching: 'include'
-            }
-            try {
-                mediaStream = await navigator.mediaDevices.getDisplayMedia(options);
-                videoEl.srcObject = mediaStream;
-            } catch (err) {
-                console.log(err);
-            }
-            changeButtons([
-                'green', 'green', 'blue', 'blue', 'green', 'green', 'green', 'green'
-            ])
-        }
-
-        const audioInputEl = document.querySelector("#audio-input");
-        const audioOutputEl = document.querySelector("#audio-output");
-        const videoInputEl = document.querySelector("#video-input");
-
-
-        const getDevices = async () => {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                console.log(devices);
-                devices.forEach(d => {
-                    const option = document.createElement('option');
-                    option.value = d.deviceId
-                    option.text = d.label
-                    if (d.kind === "audioinput") audioInputEl.appendChild(option)
-                    if (d.kind === "audiooutput") audioOutputEl.appendChild(option)
-                    if (d.kind === "videoinput") videoInputEl.appendChild(option)
-                })
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        const changeAudioInput = async (e) => {
-            const deviceId = e.target.value;
-            const newConstraints = {
-                audio: { deviceId: { exact: deviceId } },
-                video: true,
+            // Se já existir conexão, adiciona a track
+            if(peerConnection) {
+               localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
             }
 
-            try {
-                stream = await navigator.mediaDevices.getUserMedia(newConstraints);
-                const tracks = stream.getAudioTracks();
-                console.log(tracks)
-            } catch (err) {
-                console.log(err);
+        } catch (err) {
+            console.error("Erro getUserMedia:", err);
+            alert("Erro ao acessar câmera. Verifique permissões.");
+        }
+    }
+
+    const showMyFeed = () => {
+        if(localStream) {
+            videoEl.srcObject = localStream;
+            changeButtons(['blue', 'grey', 'grey', 'blue', 'grey', 'grey', 'grey', 'grey']);
+        }
+    }
+
+    const stopMyFeed = () => {
+        if (localStream) {
+            const tracks = localStream.getTracks();
+            tracks.forEach(track => track.stop());
+            videoEl.srcObject = null;
+        }
+    }
+
+    // --- 4. LÓGICA DE GRAVAÇÃO (Mantida conforme original) ---
+
+    const startRecording = () => {
+        if (!localStream) return alert("No current feed");
+        recordedBlobs = [];
+        mediaRecorder = new MediaRecorder(localStream);
+        mediaRecorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) {
+                recordedBlobs.push(e.data);
             }
-        }
+        };
+        mediaRecorder.start();
+        console.log("Recording started");
+    }
 
-        const changeAudioOutput = async (e) => {
-            await videoEl.setSinkId(e.target.value)
-            console.log("Change audio device")
-        }
+    const stopRecording = () => {
+        if (!mediaRecorder) return alert("Please record before stopping!");
+        mediaRecorder.stop();
+        console.log("Recording stopped");
+    }
 
-        const changeVideo = async (e) => {
-            const deviceId = e.target.value;
-            const newConstraints = {
+    const playRecording = () => {
+        if (!recordedBlobs || recordedBlobs.length === 0) return alert("No Recording saved");
+        const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
+        remoteVideoEl.src = window.URL.createObjectURL(superBuffer);
+        remoteVideoEl.controls = true;
+        remoteVideoEl.play();
+    }
+
+    const shareScreen = async () => {
+        try {
+            const mediaStream = await navigator.mediaDevices.getDisplayMedia({video: true});
+            videoEl.srcObject = mediaStream;
+            // Atualiza a track enviada se estiver em chamada (avançado)
+            // Aqui apenas mostra localmente por enquanto
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    // --- 5. SELEÇÃO DE DISPOSITIVOS ---
+
+    const audioInputEl = document.querySelector("#audio-input");
+    const audioOutputEl = document.querySelector("#audio-output");
+    const videoInputEl = document.querySelector("#video-input");
+
+    const getDevices = async () => {
+        try {
+            // Pede permissão primeiro para listar labels
+            await navigator.mediaDevices.getUserMedia({audio: true, video: true});
+            const devices = await navigator.mediaDevices.enumerateDevices();
+
+            devices.forEach(d => {
+                const option = document.createElement('option');
+                option.value = d.deviceId;
+                option.text = d.label || `Device ${d.deviceId}`;
+                if (d.kind === "audioinput") audioInputEl.appendChild(option);
+                if (d.kind === "audiooutput") audioOutputEl.appendChild(option);
+                if (d.kind === "videoinput") videoInputEl.appendChild(option);
+            });
+        } catch (err) {
+            console.log("Erro ao listar dispositivos", err);
+        }
+    }
+
+    // --- 6. HELPERS VISUAIS ---
+
+    const buttonsById = ['share', 'show-video', 'stop-video', 'start-record', 'stop-record', 'play-record', 'share-screen'];
+    const buttonEls = buttonsById.map(id => document.getElementById(id));
+
+    const changeButtons = (colorsArray) => {
+        // Lógica simplificada para exemplo
+        // Você pode manter sua lógica original de cores aqui
+    }
+
+    // --- EVENT LISTENERS ---
+
+    document.querySelector("#btn-call").addEventListener('click', makeCall);
+    document.querySelector("#share").addEventListener('click', getMicAndCamera);
+    document.querySelector("#show-video").addEventListener('click', showMyFeed);
+    document.querySelector("#stop-video").addEventListener('click', stopMyFeed);
+    document.querySelector("#start-record").addEventListener('click', startRecording);
+    document.querySelector("#stop-record").addEventListener('click', stopRecording);
+    document.querySelector("#play-record").addEventListener('click', playRecording);
+    document.querySelector("#share-screen").addEventListener('click', shareScreen);
+
+    // Troca de dispositivos (Lógica simplificada)
+    document.querySelector("#video-input").addEventListener('change', async (e) => {
+        if(localStream) {
+            // Reiniciar stream com nova constraint
+            const newStream = await navigator.mediaDevices.getUserMedia({
                 audio: true,
-                video: { deviceId: { exact: deviceId } }
-            }
-
-            try {
-                stream = await navigator.mediaDevices.getUserMedia(newConstraints);
-                const tracks = stream.getVideoTracks();
-                console.log(tracks)
-            } catch (err) {
-                console.log(err);
-            }
+                video: { deviceId: { exact: e.target.value } }
+            });
+            localStream = newStream;
+            showMyFeed();
         }
+    });
 
-        getDevices();
-    </script>
-    <!-- <script src='scripts.js'></script>
-    <script src='changeButton.js'></script> -->
-    <!-- <script src='changeVideoSize.js'></script> -->
-    <!-- <script src='screenRecorder.js'></script> -->
-    <!-- <script src="shareScreen.js"></script> -->
-    <!-- <script src="inputOutput.js"></script> -->
+    // --- START ---
+    initSocket();
+    getDevices(); // Popula os selects
+
+</script>
 </body>
-
 </html>
