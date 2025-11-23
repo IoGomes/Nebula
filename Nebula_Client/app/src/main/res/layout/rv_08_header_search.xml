@@ -21,7 +21,6 @@
         android:singleLine="true"
         android:textColorHint="#909090" />
 
-    <!-- Linha inferior -->
     <View
         android:id="@+id/searchLine"
         android:layout_width="match_parent"
@@ -39,6 +38,6 @@
         android:layout_marginTop="14dp"
         android:layout_marginEnd="22dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_close"
+        android:src="@drawable/close_search"
         android:visibility="gone" />
 </FrameLayout>

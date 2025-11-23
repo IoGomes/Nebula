@@ -28,10 +28,18 @@ public class Activity_04_Voice_Call extends AppCompatActivity {
     private Handler toneHandler;
     private Runnable toneRunnable;
 
+    private String SENDER_USER_ID;
+
+    private String RECEIVER_USER_ID;
+    private String RECEIVER_USER_NAME;
+    private String RECEIVER_USER_PHONE_NUMBER;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
         super.onCreate(savedInstanceState);
+
+        intentBuilder();
 
         View rootLayout = findViewById(R.id.root);
         NavBar_Inserts.adjustPaddingForNavigationBar(rootLayout, this);
@@ -43,12 +51,15 @@ public class Activity_04_Voice_Call extends AppCompatActivity {
         bind = Act04VoiceCallBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
+        bind.callContactName.setText(RECEIVER_USER_NAME);
+        bind.contactNumber.setText(RECEIVER_USER_PHONE_NUMBER);
+
         bind.cronometro.start();
 
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         startCallTone();
 
-        bind.dismissCall.setOnClickListener(v->finish());
+        bind.dismissCall.setOnClickListener(v -> finish());
 
         bind.returnButton.setOnClickListener(v -> {
             bind.cronometro.stop();
@@ -58,6 +69,14 @@ public class Activity_04_Voice_Call extends AppCompatActivity {
         });
     }
 
+    public void intentBuilder() {
+        this.SENDER_USER_ID = getIntent().getStringExtra("SENDER_USER_ID");
+
+        this.RECEIVER_USER_ID = getIntent().getStringExtra("RECEIVER_USER_ID");
+        this.RECEIVER_USER_NAME = getIntent().getStringExtra("RECEIVER_USER_NAME");
+        this.RECEIVER_USER_PHONE_NUMBER = getIntent().getStringExtra("RECEIVER_USER_PHONE_NUMBER");
+    }
+
     private void startPulseVibration() {
         if (vibrator == null) return;
 
@@ -65,7 +84,7 @@ public class Activity_04_Voice_Call extends AppCompatActivity {
         final long delayBetweenPulses = 600;
         final long endLoopDelay = 1400;
 
-        long[] pattern = new long[] {
+        long[] pattern = new long[]{
                 0,
                 pulseDuration,
                 delayBetweenPulses,

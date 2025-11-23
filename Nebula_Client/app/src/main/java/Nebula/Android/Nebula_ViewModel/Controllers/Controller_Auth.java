@@ -2,8 +2,6 @@ package Nebula.Android.Nebula_ViewModel.Controllers;
 
 import static android.content.ContentValues.TAG;
 
-import static java.security.AccessController.getContext;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.SwitchCompat;
 
@@ -22,22 +19,17 @@ import com.airbnb.lottie.LottieAnimationView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import Nebula.Android.Nebula_Data.Preferences.SessionPreferences;
 import Nebula.Android.Nebula_Model.Services.Svc_Network_Checker;
 import Nebula.Android.Nebula_Model.Services.Svc_Permission;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_02_Register;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Auth_Login_Credentials;
-import Nebula.Android.Nebula_View.Fragments.Fragment_Auth_01_Login;
 import Nebula.Android.Nebula_View.Utils.ToastWarning;
-import Nebula.Android.Nebula_ViewModel.Services.Service_Online;
-import Nebula.Android.Nebula_ViewModel.Services.Service_SignIn;
-import Nebula.Android.Nebula_ViewModel.Services.Service_SignUp;
+import Nebula.Android.Nebula_ViewModel.Server_Services.Service_Online;
+import Nebula.Android.Nebula_ViewModel.Server_Services.Service_SignIn;
+import Nebula.Android.Nebula_ViewModel.Server_Services.Service_SignUp;
 import Nebula.Android.R;
-import Nebula.Android.databinding.Frg01LoginBinding;
 
 public class Controller_Auth {
 
@@ -147,11 +139,11 @@ public class Controller_Auth {
                     String userName = json.getString("userName");
                     initializeConnection(userId, userName);
 
+                    new SessionPreferences(activity).setKeyId(userId, activity);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                new ToastWarning(activity).showInfo(response);
 
                 new ToastWarning(activity).showInfo("201");
 
@@ -276,8 +268,18 @@ public class Controller_Auth {
             submitUserDataToSignUp(userName, userPassword, userEmail, userPhoneNumber, new SubmitUserDataToSignUpCallback() {
                 @Override
                 public void onResult(String response) {
-                    new ToastWarning(activity)
-                            .showInfo("201");
+                    try {
+                        JSONObject json = new JSONObject(response);
+
+                        String userId = json.getString("userId");
+                        String userName = json.getString("userName");
+                        initializeConnection(userId, userName);
+
+                        new SessionPreferences(activity).setKeyId(userId, activity);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -305,6 +307,5 @@ public class Controller_Auth {
             signupButton.setClickable(true);
         }
     }
-
 }
 

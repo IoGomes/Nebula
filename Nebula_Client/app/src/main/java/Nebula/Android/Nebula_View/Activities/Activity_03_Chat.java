@@ -17,7 +17,6 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.processing.SurfaceProcessorNode;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -40,7 +39,6 @@ import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Video_Call;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Voice_Call;
 import Nebula.Android.Nebula_Model.Services.StompChatService;
-import Nebula.Android.Nebula_ViewModel.Services.Service_Online;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act03ChatBinding;
 
@@ -72,7 +70,6 @@ public class Activity_03_Chat extends AppCompatActivity {
     private int currentChatPosition = 0;
     private String currentChatId;
     private String currentNumber;
-
     private String currentChatWith;
 
     @Override
@@ -88,11 +85,12 @@ public class Activity_03_Chat extends AppCompatActivity {
         currentChatPosition = getIntent().getIntExtra("CHAT_POSITION", 0);
         currentChatId = getIntent().getStringExtra("CHAT_ID");
         currentNumber = getIntent().getStringExtra("ContactNumber");
+        currentChatWith = getIntent().getStringExtra("ChatWith");
 
         Log.e("Teste", "Posição: " + currentChatPosition);
 
-        currentChatWith = getIntent().getStringExtra("ChatWith");
         bind.nomeContato.setText(currentChatWith);
+        bind.contactNumber.setText(currentNumber);
 
         chatStorage = new Repo_Chat_Storage(this);
 
@@ -104,7 +102,8 @@ public class Activity_03_Chat extends AppCompatActivity {
         chatService = new StompChatService();
 
         bind.videoCall.setOnClickListener(v -> {
-            new Controller_Video_Call(this).performVideoCall(this, username);
+            new Controller_Video_Call(this).performVideoCall(this,
+                    currentChatWith, currentChatId, currentNumber);
         });
 
 
@@ -117,14 +116,6 @@ public class Activity_03_Chat extends AppCompatActivity {
             saveMessagesBeforeExit();
             finish();
         });
-    }
-
-
-    public void putExtraIntent(String currentChatId, String currentNumber, Intent intent){
-
-        intent.putExtra("CURRENT_CHAT_ID", currentChatId);
-        intent.putExtra("CURRENT_NUMBER", currentNumber);
-
     }
 
     private void setupBasicUI() {
@@ -142,7 +133,6 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.rvMessage.setAdapter(adapter);
         bind.rvMessage.setItemAnimator(null);
         bind.rvMessage.setHasFixedSize(true);
-        bind.contactNumber.setText(currentNumber);
 
         if (!messageList.isEmpty()) {
             bind.rvMessage.scrollToPosition(messageList.size() - 1);
@@ -151,7 +141,7 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.profilePhoto.setOnClickListener(v ->
                 new Dialog_Feed_Profile_Image(
                         v.getContext(),
-                        currentChatWith
+                        currentChatWith, currentChatId, currentNumber
                 ).show()
         );
     }
@@ -318,7 +308,7 @@ public class Activity_03_Chat extends AppCompatActivity {
 
 
         bind.voiceCall.setOnClickListener(v ->
-                new Controller_Voice_Call(this).performVoiceCall(this));
+                new Controller_Voice_Call(this).performVoiceCall(this, currentChatWith, currentChatId, currentNumber ));
 
         bind.send.setOnClickListener(v -> {
             String text = bind.messageTextfield.getText().toString().trim();
@@ -407,11 +397,9 @@ public class Activity_03_Chat extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // ✅ ADICIONAR - Marcar mensagens como lidas quando voltar ao chat
         if (currentChatId != null) {
             chatStorage.markAllAsRead(currentChatId);
 
-            // Atualizar o status de não lidas no repositório
             if (Repo_Chat.getChats() != null && currentChatPosition < Repo_Chat.getChats().size()) {
                 Repo_Chat.getChats().get(currentChatPosition).setHasUnread(false);
 

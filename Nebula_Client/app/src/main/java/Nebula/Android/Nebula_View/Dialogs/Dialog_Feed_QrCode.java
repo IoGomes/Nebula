@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
+import Nebula.Android.Nebula_Data.Preferences.SessionPreferences;
 import Nebula.Android.databinding.DlgQrCodeBinding;
 
 public class Dialog_Feed_QrCode extends Dialog {
@@ -27,6 +29,13 @@ public class Dialog_Feed_QrCode extends Dialog {
 
         bind = DlgQrCodeBinding.inflate(LayoutInflater.from(context));
         setContentView(bind.getRoot());
+
+        SessionPreferences session = new SessionPreferences(context);
+        String id = session.getKeyId();
+
+        Bitmap qr = session.generateQrCode(context, id);
+
+        bind.qrCode.setImageBitmap(qr);
 
         Objects.requireNonNull(getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 

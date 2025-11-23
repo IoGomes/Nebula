@@ -40,9 +40,9 @@ import java.io.IOException;
 
 public class Activity_06_Git_WebHook extends AppCompatActivity {
 
-    // --- CONFIGURAÇÕES ---
+
     private static final String BASE_DOMAIN = "https://youlanda-undependable-compressingly.ngrok-free.dev";
-    private static final String VIDEO_ROUTE = "/video-call"; // Rota nova
+    private static final String VIDEO_ROUTE = "/video-call";
     private static final String TAG = "NEBULA_LOG";
 
     private static final int CAMERA_REQUEST = 1001;
@@ -51,7 +51,7 @@ public class Activity_06_Git_WebHook extends AppCompatActivity {
     private ValueCallback<Uri[]> filePathCallback;
     private Uri tempPhotoUri;
     private WebView webView;
-    private TextView debugConsole; // Console visual
+    private TextView debugConsole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +121,6 @@ public class Activity_06_Git_WebHook extends AppCompatActivity {
         webView.setFitsSystemWindows(true);
         webView.addJavascriptInterface(new WebBridge(), "Android");
 
-        // Client de Navegação (Logs)
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {

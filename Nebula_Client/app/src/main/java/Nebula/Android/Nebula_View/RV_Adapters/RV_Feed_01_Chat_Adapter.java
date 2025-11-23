@@ -63,6 +63,12 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    // ==================== Variáveis para atualização sem flick ====================
+    private CategoryViewHolder cachedCategoryViewHolder;
+    private int cachedUnreadCount = 0;
+    private int cachedFavoriteCount = 0;
+    private int cachedGroupCount = 0;
+
     public RV_Feed_01_Chat_Adapter(List<Entity_Pv_Chat> chats) {
         this.displayedChats = new ArrayList<>();
         if (chats != null) {
@@ -126,6 +132,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
 
             case VIEW_TYPE_CATEGORY:
                 CategoryViewHolder categoryViewHolder = (CategoryViewHolder) holder;
+                cachedCategoryViewHolder = categoryViewHolder; // ← Salva referência
                 setupCategory(categoryViewHolder);
                 break;
 
@@ -140,23 +147,50 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private void setupFooter(FooterViewHolder footerHolder) {
-
         footerHolder.textView.setText(Html.fromHtml(
                 "Suas mensagens pessoais <font color='#EC407A'>não</font> são protegidas com <font color='#EC407A'>criptografia de ponta a ponta</font>"
         ));
     }
 
-    private void setupFooter(FooterViewHolder footerHolder, String text) {
+    private void setupCategory(CategoryViewHolder categoryViewHolder) {
+        recalculateCounts();
 
-        footerHolder.textView.setText(Html.fromHtml(text
-        ));
+        categoryViewHolder.notRead.setText("Não Lidas " + cachedUnreadCount);
+        categoryViewHolder.allCategory.setText("Todas " + displayedChats.size());
+        categoryViewHolder.favorite.setText("Favoritadas " + cachedFavoriteCount);
+        categoryViewHolder.groups.setText("Grupos " + cachedGroupCount);
     }
 
-    private void setupCategory(CategoryViewHolder categoryViewHolder) {
-        categoryViewHolder.notRead.setText("Não Lidas 5");
-        categoryViewHolder.allCategory.setText("Todas");
-        categoryViewHolder.favorite.setText("Favoritadas 5");
-        categoryViewHolder.groups.setText("Grupos 5");
+
+    private void recalculateCounts() {
+        cachedUnreadCount = 0;
+        cachedFavoriteCount = 0;
+        cachedGroupCount = 0;
+
+        for (Entity_Pv_Chat chat : displayedChats) {
+            if (chat.hasUnread()) cachedUnreadCount++;
+            if (chat.isFavorite()) cachedFavoriteCount++;
+        }
+    }
+
+
+    public void updateCategoryCounts() {
+        if (cachedCategoryViewHolder != null) {
+            recalculateCounts();
+
+            cachedCategoryViewHolder.notRead.setText("Não Lidas " + cachedUnreadCount);
+            cachedCategoryViewHolder.allCategory.setText("Todas " + displayedChats.size());
+            cachedCategoryViewHolder.favorite.setText("Favoritadas " + cachedFavoriteCount);
+            cachedCategoryViewHolder.groups.setText("Grupos " + cachedGroupCount);
+        }
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof CategoryViewHolder) {
+            cachedCategoryViewHolder = null;
+        }
     }
 
     private void setupChatItem(ChatViewHolder chatHolder, Entity_Pv_Chat chatSession, int chatPosition, int adapterPosition) {
@@ -191,7 +225,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         });
 
         chatHolder.profileImage.setOnClickListener(v ->
-                new Dialog_Feed_Profile_Image(chatHolder.itemView.getContext(), chatSession.getChatWith()).show());
+                new Dialog_Feed_Profile_Image(chatHolder.itemView.getContext(), chatSession.getChatWith(), chatSession.getChatSessionId(), chatSession.getChatWithNumber()).show());
     }
 
     private void toggleSelection(int position, View itemView) {
@@ -235,6 +269,8 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         new DatabaseHelper(context).updateChat(chatSession);
         chatHolder.unreadIcon.setVisibility(GONE);
 
+        updateCategoryCounts();
+
         Activity_02_Feed feed = (Activity_02_Feed) context;
         feed.updateUnreadCount();
         Intent intent = new Intent(context, Activity_03_Chat.class);
@@ -247,7 +283,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         String chatWithNumber = chatSession.getChatWithNumber();
         intent.putExtra("CHAT_POSITION", position);
         intent.putExtra("CHAT_ID", chatId);
-        intent.putExtra("ContactNumber", chatWithNumber);
+        intent.putExtra("ContactNumber", "12345");
         intent.putExtra("ChatWith", chatSession.getChatWith());
     }
 
@@ -334,14 +370,15 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                     continue;
                 }
 
-                selectedPositions.clear();
-
                 Entity_Pv_Chat chat = displayedChats.get(chatPosition);
 
-                Repo_Chat.removeChat(chat, adapterPosition);
-
                 displayedChats.remove(chatPosition);
+
+                Repo_Chat.removeChat(chat, adapterPosition);
             }
+
+            selectedPositions.clear();
+            updateCategoryCounts();
 
             Activity_02_Feed feed = (Activity_02_Feed) context;
             feed.updateUnreadCount();
@@ -367,6 +404,8 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                 notifyItemChanged(adapterPosition);
             }
         }
+
+        updateCategoryCounts();
     }
 
     @Override
@@ -405,9 +444,6 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                     adapter.selectedCategoryId = button.getId();
                     atualizarAparencia(buttons, adapter.selectedCategoryId);
                     adapter.applyFilters();
-                    if (adapter.displayedChats.isEmpty()) {
-
-                    }
                 });
             }
         }

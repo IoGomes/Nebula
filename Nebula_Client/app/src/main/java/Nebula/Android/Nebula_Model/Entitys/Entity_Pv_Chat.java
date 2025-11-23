@@ -22,9 +22,10 @@ public class Entity_Pv_Chat {
 
 
     public Entity_Pv_Chat(String chatSessionId, List<String> chatUsersId,
-                          List<Date> chatDate, String lastMessage, String chatWith) {
+                          List<Date> chatDate, String lastMessage, String chatWith, String chatWithNumber) {
         this.chatSessionId = chatSessionId;
         this.chatWith = chatWith;
+        this.chatWithNumber = chatWithNumber;
         this.chatUsersId = chatUsersId;
         this.chatDate = chatDate;
         this.lastMessage = lastMessage;

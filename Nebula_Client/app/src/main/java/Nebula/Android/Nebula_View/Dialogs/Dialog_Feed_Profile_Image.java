@@ -22,7 +22,7 @@ public class Dialog_Feed_Profile_Image extends Dialog {
     Dlg05ProfileImageBinding bind;
     private Activity activity;
 
-    public Dialog_Feed_Profile_Image(@NonNull Context context, String chatWith) {
+    public Dialog_Feed_Profile_Image(@NonNull Context context, String chatWith, String chatId, String currentNumber) {
         super(context);
 
         this.activity = getActivityFromContext(context);
@@ -45,12 +45,12 @@ public class Dialog_Feed_Profile_Image extends Dialog {
         //});
 
         bind.voiceCall.setOnClickListener(v -> {
-            new Controller_Voice_Call(activity).performVoiceCall(activity);
+            new Controller_Voice_Call(activity).performVoiceCall(activity, chatWith, chatId, currentNumber);
             dismiss();
         });
 
         bind.textMessage.setOnClickListener(v -> {
-            new Controller_Voice_Call(activity).performVoiceCall(activity);
+            new Controller_Voice_Call(activity).performVoiceCall(activity, chatWith, chatId, currentNumber);
             dismiss();
         });
 

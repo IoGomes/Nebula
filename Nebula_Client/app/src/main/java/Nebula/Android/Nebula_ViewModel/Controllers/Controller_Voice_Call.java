@@ -24,9 +24,18 @@ public class Controller_Voice_Call {
         useCaseVoiceCall = new UseCase_Voice_Call(servicePermission, networkChecker);
     }
 
-    public void performVoiceCall(Activity activity) {
+    private void intentBuilder(Intent intent, String userName, String userId, String contactNumber){
+        intent.putExtra("SENDER_USER_ID", userId);
+
+        intent.putExtra("RECEIVER_USER_ID", userId);
+        intent.putExtra("RECEIVER_USER_NAME", userName);
+        intent.putExtra("RECEIVER_USER_PHONE_NUMBER", contactNumber);
+    }
+
+    public void performVoiceCall(Activity activity, String userName, String userId, String contactNumber) {
         if (useCaseVoiceCall.isEnabled()) {
             Intent intent = new Intent(activity, Activity_04_Voice_Call.class);
+            intentBuilder(intent, userName, userId, contactNumber);
             activity.startActivity(intent);
             activity.overridePendingTransition(
                     R.anim.slide_in_right,

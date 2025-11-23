@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 import Nebula.Android.Nebula_View.Activities.Activity_LandingPage;
 import Nebula.Android.Nebula_View.Activities.Activity_GitAuth;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Auth;
-import Nebula.Android.Nebula_ViewModel.Services.Service_Online;
+import Nebula.Android.Nebula_ViewModel.Server_Services.Service_Online;
 import Nebula.Android.databinding.Frg01LoginBinding;
 
 public class Fragment_Auth_01_Login extends Fragment {

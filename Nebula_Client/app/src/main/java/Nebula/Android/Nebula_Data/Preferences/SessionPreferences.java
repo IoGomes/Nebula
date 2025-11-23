@@ -1,9 +1,16 @@
 package Nebula.Android.Nebula_Data.Preferences;
 
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import Nebula.Android.Nebula_ViewModel.Server_Services.Service_G_QrCode;
+import Nebula.Android.R;
 
 public class SessionPreferences {
+
     private static final String PREF_NAME = "UserPrefs";
     private static final String KEY_LOGGED_IN = "isLoggedIn";
     private static final String KEY_DID_ONBOARD_TUTORIAL = "isOnboardTutorialDone";
@@ -12,15 +19,30 @@ public class SessionPreferences {
 
     private SharedPreferences prefs;
 
-    public void generateQrCode(){
+    public Bitmap generateQrCode(Context context, String id) {
 
+        Bitmap logo = BitmapFactory.decodeResource(
+                context.getResources(),
+                R.drawable.logo_place_holder
+        );
+
+        int size = 300;
+        float cornerRadius = 12f;
+
+        return Service_G_QrCode.generate(
+                id,
+                size,
+                logo,
+                cornerRadius
+        );
     }
 
-    public void setKeyId(String id) {
+
+    public void setKeyId(String id, Context context) {
         prefs.edit().putString(KEY_ID, id).apply();
     }
 
-    public String getKeyId(){
+    public String getKeyId() {
         return prefs.getString(KEY_ID, null);
     }
 

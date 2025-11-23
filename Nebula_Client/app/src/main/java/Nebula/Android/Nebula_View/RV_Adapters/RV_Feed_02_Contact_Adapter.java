@@ -1,5 +1,7 @@
 package Nebula.Android.Nebula_View.RV_Adapters;
 
+import static Nebula.Android.Nebula_ViewModel.Controllers.Controller_Contact.removeContactFromRepo;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -29,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import Nebula.Android.Nebula_Data.Repository.Repo_Contact;
 import Nebula.Android.Nebula_Model.Entitys.Entity_Contact;
 import Nebula.Android.Nebula_Model.Services.Svc_Search_Query;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
@@ -52,9 +53,10 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private TitleViewHolder cachedTitleViewHolder;
+
     public enum Adapter_Mode {
-        MODE_A,
-        /// Modo Adapter Recycler
+        MODE_A, /// Modo Adapter Recycler
         MODE_B /// Modo Adapter Recycler Apartir do FeedFragment
     }
 
@@ -92,7 +94,6 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
                 "#EC407A"
         );
 
-        // Destacar número
         String highlightedNumber = Svc_Search_Query.highlightTextHtml(
                 number,
                 query,
@@ -100,12 +101,10 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
         );
 
         new Thread(() -> {
-
             new Handler(Looper.getMainLooper()).post(() -> {
                 holder.tvName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
                 holder.tvNumber.setText(Html.fromHtml(highlightedNumber, Html.FROM_HTML_MODE_LEGACY));
             });
-
         }).start();
     }
 
@@ -146,61 +145,55 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
 
         } else if (holder instanceof TitleViewHolder) {
             TitleViewHolder titleHolder = (TitleViewHolder) holder;
+            cachedTitleViewHolder = titleHolder; // ← Salva referência
             titleHolder.bind(contactList.size());
 
         } else if (holder instanceof ItemViewHolder) {
 
             int index = position - 2;
-            Entity_Contact contact = contactList.get(index);
 
+            if (index < 0 || index >= contactList.size()) {
+                return;
+            }
+
+            Entity_Contact contact = contactList.get(index);
             ItemViewHolder itemHolder = (ItemViewHolder) holder;
 
             bindContactData(itemHolder, contact);
 
-            if (selectedPositions.contains(position)) {
-                itemHolder.itemView.setBackgroundResource(R.drawable.bg_selected_chat);
-            } else {
-                itemHolder.itemView.setBackgroundResource(0);
+            itemHolder.itemView.setBackgroundResource(
+                    selectedPositions.contains(index) ? R.drawable.bg_selected_chat : 0
+            );
+
+
+            if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
+                itemHolder.profile.setOnClickListener(v ->
+                        new Dialog_Feed_Profile_Image(v.getContext(), contact.getContactName(), contact.getContactId(), contact.getContactNumber()).show()
+                );
             }
 
-            if (rvFeed02ContactMode == Adapter_Mode.MODE_B) {
-                itemHolder.itemView.setOnClickListener(v -> {
+            if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
+                itemHolder.itemView.setOnLongClickListener(v -> {
+                    itemHolder.profile.setClickable(false);
+                    toggleSelection(index, v);
+                    notifyItemChanged(position);
+                    return true;
+                });
+            }
+
+            itemHolder.itemView.setOnClickListener(v -> {
+                if (rvFeed02ContactMode == Adapter_Mode.MODE_A && !selectedPositions.isEmpty()) {
+                    toggleSelection(index, v);
+                } else {
+
                     Context context = v.getContext();
                     Intent intent = new Intent(context, Activity_03_Chat.class);
                     intent.putExtra("CHAT_POSITION", index);
                     intent.putExtra("ChatWith", contact.getContactName());
                     intent.putExtra("ContactNumber", contact.getContactNumber());
                     context.startActivity(intent);
-                });
-            }
-
-            if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
-                itemHolder.profile.setOnClickListener(v ->
-                        new Dialog_Feed_Profile_Image(v.getContext(), contact.getContactName()).show()
-                );
-            }
-
-            if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
-                itemHolder.itemView.setOnLongClickListener(v -> {
-
-                    int pos = holder.getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION) return true;
-
-                    toggleSelection(pos, v);
-                    return true;
-                });
-                itemHolder.itemView.setOnClickListener(v -> {
-
-                    if (selectedPositions.isEmpty()) {
-                        return;
-                    }
-
-                    int pos = holder.getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION) return;
-
-                    toggleSelection(pos, v);
-                });
-            }
+                }
+            });
         }
     }
 
@@ -225,12 +218,10 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
         } else {
             selectedPositions.add(position);
             new Thread(() -> {
-
                 new Handler(Looper.getMainLooper()).post(() -> {
                     itemView.setBackgroundResource(R.drawable.bg_selected_chat);
                     itemView.setForeground(null);
                 });
-
             }).start();
         }
 
@@ -238,12 +229,10 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             Activity_02_Feed feed = (Activity_02_Feed) itemView.getContext();
 
             new Thread(() -> {
-
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (selectedPositions.isEmpty()) feed.hideOptionsBar();
                     else feed.showOptionsBarFragment02();
                 });
-
             }).start();
         }
     }
@@ -251,47 +240,41 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
     public void removeSelected(Context context) {
         mainHandler.post(() -> {
 
-            // Converter e ordenar em ordem reversa
             List<Integer> sortedPositions = new ArrayList<>(selectedPositions);
             Collections.sort(sortedPositions, Collections.reverseOrder());
 
-            Log.d(TAG, "Removendo posições: " + sortedPositions);
-
-            for (int adapterPosition : sortedPositions) {
-
-                int contactIndex = adapterPosition - 2;
-
-                if (contactIndex < 0 || contactIndex >= contactList.size()) {
-                    Log.w(TAG, "Índice inválido: " + contactIndex);
-                    continue;
+            sortedPositions.forEach(pos -> {
+                int idx = pos - 2;
+                if (idx >= 0 && idx < contactList.size()) {
+                    Entity_Contact contact = contactList.get(idx);
+                    removeContactFromRepo(contact, pos, context);
+                    contactList.remove(contact);
+                    fullList.remove(contact);
                 }
+            });
 
-                // Obter o contato
-                Entity_Contact contact = contactList.get(contactIndex);
-
-                Repo_Contact.removeContact(contact, adapterPosition);
-
-                // ⭐ Remover das listas locais DEPOIS
-                contactList.remove(contact);
-                fullList.remove(contact);
-            }
-
-            // Limpar seleções
             selectedPositions.clear();
-
-            // Atualizar UI
-            if (context instanceof Activity_02_Feed) {
-                Activity_02_Feed feed = (Activity_02_Feed) context;
-                feed.hideOptionsBar();
-            }
+            updateContactCount();
         });
     }
 
+    public void updateContactCount() {
+        if (cachedTitleViewHolder != null) {
+            cachedTitleViewHolder.tvTitle.setText("Lista de Contatos (" + contactList.size() + ")");
+        }
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof TitleViewHolder) {
+            cachedTitleViewHolder = null;
+        }
+    }
 
     @Override
     public int getItemCount() {
-        int count = contactList.size() + 2;
-        return count;
+        return contactList.size() + 2;
     }
 
     public Set<Integer> getSelectedPositions() {
@@ -323,6 +306,11 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
         }
 
         notifyDataSetChanged();
+        updateContactCount();
+    }
+
+    public List<Entity_Contact> getContacts() {
+        return new ArrayList<>(contactList);
     }
 
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
@@ -337,7 +325,6 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
         }
 
         private void setupSearch() {
-            // Listener para clicar no drawableEnd (botão de limpar)
             etSearch.setOnTouchListener((v, event) -> {
                 final int DRAWABLE_RIGHT = 2;
 
@@ -345,16 +332,13 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
                     Drawable drawableEnd = etSearch.getCompoundDrawables()[DRAWABLE_RIGHT];
 
                     if (drawableEnd != null && etSearch.getText().length() > 0) {
-                        // Área clicável do drawable (com margem de tolerância)
                         int drawableWidth = drawableEnd.getIntrinsicWidth();
                         int touchAreaWidth = drawableWidth + etSearch.getPaddingEnd();
 
-                        // Verifica se o toque foi na área do drawable (lado direito)
                         if (event.getX() >= (etSearch.getWidth() - touchAreaWidth)) {
                             etSearch.setText("");
                             etSearch.clearFocus();
 
-                            // Esconde o teclado
                             InputMethodManager imm = (InputMethodManager) v.getContext()
                                     .getSystemService(Context.INPUT_METHOD_SERVICE);
                             if (imm != null) {
@@ -368,27 +352,24 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
                 return false;
             });
 
-            // TextWatcher para filtrar o adapter e mostrar/ocultar o botão de limpar
             etSearch.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    // Filtra a lista
                     if (adapter != null) {
                         adapter.filter(s.toString());
                     }
-
-                    // Atualiza o drawable do botão limpar
                     updateClearButton(s);
                 }
 
                 @Override
-                public void afterTextChanged(Editable s) { }
+                public void afterTextChanged(Editable s) {
+                }
             });
 
-            // Inicializa sem o botão de limpar
             updateClearButton("");
         }
 
@@ -397,12 +378,11 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             Drawable searchIcon = etSearch.getContext().getDrawable(R.drawable.ic_search);
             Drawable clearIcon = hasText ? etSearch.getContext().getDrawable(R.drawable.ic_close) : null;
 
-            // Define os drawables
             etSearch.setCompoundDrawablesWithIntrinsicBounds(
-                    searchIcon,  // drawableStart
-                    null,        // drawableTop
-                    clearIcon,   // drawableEnd
-                    null         // drawableBottom
+                    searchIcon,
+                    null,
+                    clearIcon,
+                    null
             );
         }
 

@@ -40,6 +40,8 @@ import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_04_Archived;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_02_Contact_Adapter;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_03_Calls_Adapter;
+import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_04_Archived_Adapter;
+import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Contact;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act02FeedBinding;
 
@@ -88,20 +90,15 @@ public class Activity_02_Feed extends AppCompatActivity {
         this.deleteDatabase("NebulaLocalDB.db");
         dbHelper.copyDatabaseIfNeeded();
 
-        /// Inicializa os Repositórios
-        Repo_Chat.initialize(this);
-
         TimingUtils.stop("onCreate");
     }
-
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
-
-        Repo_Contact.initialize(this);
+        Repo_Chat.initialize(this);
+        new Controller_Contact().initializeContactRepo(this);
         Repo_Calls_History.initialize(this);
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -230,7 +227,34 @@ public class Activity_02_Feed extends AppCompatActivity {
         handler.removeCallbacks(hideNotifyRunnable);
     }
 
-    /// Methods to close and clean selected items from the OptionsBar
+    /// Main Close Methods
+    private void close(Context context) {
+
+        if (context instanceof FragmentActivity) {
+            Fragment currentFragment = ((FragmentActivity) context)
+                    .getSupportFragmentManager()
+                    .findFragmentById(R.id.fragmentContainer);
+
+            switch (currentFragment.getClass().getSimpleName()) {
+                case "Fragment_Feed_01_Inbox":
+                    closeFromFragment01();
+                    break;
+
+                case "Fragment_Feed_02_Contacts":
+                    closeFromFragment02();
+                    break;
+
+                case "Fragment_Feed_03_Calls":
+                    closeFromFragment03();
+                    break;
+
+                case "Fragment_Feed_04_Archived":
+                    closeFromFragment04();
+                    break;
+            }
+        }
+    }
+    // Close Implementations
     private void closeFromFragment01() {
         RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
         adapter.clearSelection();
@@ -247,12 +271,12 @@ public class Activity_02_Feed extends AppCompatActivity {
         hideOptionsBar();
     }
     private void closeFromFragment04() {
-        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
+        RV_Feed_04_Archived_Adapter adapter = Repo_Archived_Chats.getArchivedAdapter();
         adapter.clearSelection();
         hideOptionsBar();
     }
 
-    /// Delete Switch that guide to specific delete Methods Below
+    /// Main Delete Methods
     private void delete(Context context) {
         new Dialog_Feed_Confirm_Chat_Delection(context, () -> {
 
@@ -273,34 +297,15 @@ public class Activity_02_Feed extends AppCompatActivity {
                     case "Fragment_Feed_03_Calls":
                         deleteFromFragment03();
                         break;
+
+                    case "Fragment_Feed_04_Archived":
+                        deleteFromFragment04();
+                        break;
                 }
             }
         }).show();
     }
-    private void close(Context context) {
-
-            if (context instanceof FragmentActivity) {
-                Fragment currentFragment = ((FragmentActivity) context)
-                        .getSupportFragmentManager()
-                        .findFragmentById(R.id.fragmentContainer);
-
-                switch (currentFragment.getClass().getSimpleName()) {
-                    case "Fragment_Feed_01_Inbox":
-                        closeFromFragment01();
-                        break;
-
-                    case "Fragment_Feed_02_Contacts":
-                        closeFromFragment02();
-                        break;
-
-                    case "Fragment_Feed_03_Calls":
-                        closeFromFragment03();
-                        break;
-                }
-            }
-    }
-
-    /// Delete implementations
+    // Delete implementations
     private void deleteFromFragment01() {
         RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
         adapter.removeSelected(this);
@@ -318,6 +323,16 @@ public class Activity_02_Feed extends AppCompatActivity {
         callsAdapter.removeSelected();
         int count = callsAdapter.getSelectedPositions().size();
         notifyAnimation(count, "Call Deleted", "Calls Deleted");
+    }
+    private void deleteFromFragment04() {
+        RV_Feed_04_Archived_Adapter adapter = Repo_Archived_Chats.getArchivedAdapter();
+        adapter.removeSelected();
+        int count = adapter.getSelectedPositions().size();
+        notifyAnimation(count, "Chat Deleted", "Chats Deleted");
+    }
+
+    public void addFromFragment02(){
+        notifyAnimation(1, "New Contact Added", "New Contact Added");
     }
 
     /// Git redirection
@@ -356,7 +371,7 @@ public class Activity_02_Feed extends AppCompatActivity {
     }
 
     /// Methods to hide Default OptionsBar
-    public void hideDefaultOptionBar(){
+    public void hideDefaultOptionBar() {
         bind.git.setVisibility(GONE);
         bind.gitNotification.setVisibility(GONE);
     }
@@ -403,7 +418,7 @@ public class Activity_02_Feed extends AppCompatActivity {
         }
     }
     private void unarchive() {
-        RV_Feed_01_Chat_Adapter adapter = Repo_Chat.getFeedAdapter();
+        RV_Feed_04_Archived_Adapter adapter = Repo_Archived_Chats.getArchivedAdapter();
         if (adapter != null) {
             List<Integer> selectedPositions = new ArrayList<>(adapter.getSelectedPositions());
             List<Entity_Pv_Chat> toUnarchive = new ArrayList<>();
@@ -419,14 +434,13 @@ public class Activity_02_Feed extends AppCompatActivity {
                 Repo_Chat.addChat(chat);
             }
 
-            adapter.removeSelected(this);
+            adapter.removeSelected();
 
             int count = toUnarchive.size();
             notifyAnimation(count, "Chat Unarchived", "Chats Unarchived");
         }
     }
 
-    /// Updates NavBar Badges
     public void updateUnreadCount() {
         int unreadCount = dbHelper.getUnreadCount();
 

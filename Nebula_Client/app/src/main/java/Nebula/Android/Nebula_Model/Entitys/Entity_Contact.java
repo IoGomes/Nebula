@@ -7,15 +7,13 @@ public class Entity_Contact {
     private String contactName;
 
     public Entity_Contact(){
-
     }
 
-    public Entity_Contact(String contactNumber, String contactName) {
-        this.contactNumber = contactNumber;
+    public Entity_Contact(String contactId, String contactName, String contactNumber) {
+        this.contactId = contactId;
         this.contactName = contactName;
+        this.contactNumber = contactNumber;
     }
-
-
 
     public String getContactNumber() {
         return contactNumber;

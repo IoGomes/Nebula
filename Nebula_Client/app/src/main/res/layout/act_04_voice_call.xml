@@ -35,18 +35,30 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/call_contact_name"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_marginTop="100dp"
+
         android:gravity="center"
         android:text="Nome de Contato"
         android:textColor="@color/white"
-        android:textSize="18sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/contact_number"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="Nome de Contato"
+        android:textColor="#808080"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/call_contact_name" />
+
+
 
 
     <ImageButton
@@ -67,11 +79,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/call_contact_name" />
+        app:layout_constraintTop_toBottomOf="@+id/call_Type" />
 
 
     <TextView
-        android:id="@+id/call_contact_name"
+        android:id="@+id/call_Type"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="12dp"

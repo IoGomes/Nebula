@@ -45,11 +45,6 @@ public class Dialog_Feed_Incoming_Call extends Dialog {
         params.height = dpToPx(context, 80);
         params.gravity = Gravity.TOP;
 
-        bind.imageButton2.setOnClickListener(v -> {
-            new Controller_Voice_Call(activity).performVoiceCall(activity);
-            dismiss();
-        });
-
         bind.dismissCall.setOnClickListener(v -> dismiss());
 
         getWindow().setAttributes(params);

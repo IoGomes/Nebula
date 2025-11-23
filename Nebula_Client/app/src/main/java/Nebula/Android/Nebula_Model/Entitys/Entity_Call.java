@@ -5,6 +5,10 @@ import java.util.Date;
 @SuppressWarnings("SpellCheckingInspection")
 public class Entity_Call {
 
+    private String contactNumber;
+    private Date dateTimeCall;
+    private  Boolean reiceved;
+
     public String getCallID() {
         return callID;
     }
@@ -12,18 +16,23 @@ public class Entity_Call {
     public void setCallID(String callID) {
         this.callID = callID;
     }
-
     private String callID;
-    private String nomeDeContato;
-    private Date dateTimeCall;
-    private  Boolean reiceved;
+    private String contactName;
 
     public Entity_Call(){}
 
-    public Entity_Call(String nomeDeContato, Date dateTimeCall, Boolean reiceved) {
-        setNomeDeContato(nomeDeContato);
+    public Entity_Call(String contactName, Date dateTimeCall, Boolean reiceved) {
+        setContactName(contactName);
         setDateTimeCall(dateTimeCall);
         setReiceved(reiceved);
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
     }
 
     public Date getDateTimeCall() {
@@ -34,12 +43,12 @@ public class Entity_Call {
         this.dateTimeCall = dateTimeCall;
     }
 
-    public String getNomeDeContato() {
-        return nomeDeContato;
+    public String getContactName() {
+        return contactName;
     }
 
-    public void setNomeDeContato(String nomeDeContato) {
-        this.nomeDeContato = nomeDeContato;
+    public void setContactName(String nomeDeContato) {
+        this.contactName = nomeDeContato;
     }
 
     public Boolean getReiceved() {
