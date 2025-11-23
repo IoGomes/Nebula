@@ -1,35 +1,39 @@
 // src/public/video-call/script.js
 
-// --- 1. CONFIGURAÇÃO E VARIÁVEIS ---
 const urlParams = new URLSearchParams(window.location.search);
 const userName = urlParams.get('userName') || "Usuario" + Math.floor(Math.random() * 100);
 const userId = urlParams.get('userId') || Math.floor(Math.random() * 100000).toString();
-// Quem eu quero chamar (pode vir vazio se eu for apenas receber)
 const initialTargetId = urlParams.get('targetId');
 
-// Variável dinâmica para saber com quem estamos falando realmente (seja chamando ou atendendo)
 let connectedPeerId = null;
 
-// Conecta ao Socket
 const socket = io('/', {
     query: { userName, userId }
 });
 
 let localStream;
 let peerConnection;
-let candidateQueue = []; // Fila para guardar candidatos que chegam fora de ordem
+let candidateQueue = [];
 
+// UI Elements
 const localVideoEl = document.getElementById('local-video');
 const remoteVideoEl = document.getElementById('remote-video');
 const callBtn = document.getElementById('call');
 const hangupBtn = document.getElementById('hangup');
-
-// --- BOTÕES DE MÍDIA ---
-const toggleCameraBtn = document.getElementById('toggle-camera'); 
-const toggleMicBtn = document.getElementById('toggle-mic'); // NOVO: Botão de Mic
-
 const waitingEl = document.getElementById('waiting');
 const userNameDisplay = document.getElementById('user-name');
+
+const toggleCameraBtn = document.getElementById('toggle-camera'); 
+const toggleMicBtn = document.getElementById('toggle-mic');
+
+const cameraOnIcon = document.getElementById('camera-on-icon');
+const cameraOffIcon = document.getElementById('camera-off-icon');
+const micOnIcon = document.getElementById('mic-on-icon');
+const micOffIcon = document.getElementById('mic-off-icon');
+
+// Remote State Elements
+const remoteAvatar = document.getElementById('remote-avatar');
+const remoteMicStatus = document.getElementById('remote-mic-status');
 
 userNameDisplay.innerText = "Eu: " + userName;
 
@@ -39,7 +43,6 @@ const peerConfiguration = {
     ]
 };
 
-// --- 2. INICIALIZAÇÃO DA MÍDIA ---
 const initMedia = async () => {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
@@ -53,72 +56,87 @@ const initMedia = async () => {
 
 initMedia();
 
-// --- FUNÇÃO: Alternar Câmera (Liga/Desliga) ---
+// --- HELPER: Emit Media State ---
+// Envia para o servidor que mudamos o estado (Ligado/Desligado)
+const emitMediaState = (isCameraOn, isMicOn) => {
+    // Precisamos de um target. Se connectedPeerId for nulo, não há ninguém para avisar ainda.
+    const target = connectedPeerId || initialTargetId;
+    if (target) {
+        socket.emit('mediaStateChange', {
+            targetUserId: target,
+            camera: isCameraOn,
+            mic: isMicOn
+        });
+    }
+};
+
+// --- TOGGLE CAMERA ---
 const toggleCamera = () => {
     if (localStream) {
         const videoTracks = localStream.getVideoTracks();
-        if (videoTracks && videoTracks.length > 0) {
-            const videoTrack = videoTracks[0];
-            videoTrack.enabled = !videoTrack.enabled;
+        if (videoTracks.length > 0) {
+            const track = videoTracks[0];
+            track.enabled = !track.enabled;
             
-            if (toggleCameraBtn) {
-                const isCameraOn = videoTrack.enabled;
-                toggleCameraBtn.innerText = isCameraOn ? "Desativar Câmera" : "Ativar Câmera";
-                toggleCameraBtn.classList.toggle('btn-secondary', isCameraOn);
-                toggleCameraBtn.classList.toggle('btn-danger', !isCameraOn);
-            }
+            const isCameraOn = track.enabled;
+            
+            // Update UI Local
+            cameraOnIcon.style.display = isCameraOn ? 'block' : 'none';
+            cameraOffIcon.style.display = isCameraOn ? 'none' : 'block';
+            toggleCameraBtn.classList.toggle('disabled', !isCameraOn);
+            
+            // Check Mic State to send complete info
+            const isMicOn = localStream.getAudioTracks()[0]?.enabled ?? true;
+            emitMediaState(isCameraOn, isMicOn);
         }
     }
 };
 
-// --- FUNÇÃO NOVA: Alternar Microfone (Mute/Unmute) ---
+// --- TOGGLE MIC ---
 const toggleMic = () => {
     if (localStream) {
-        const audioTracks = localStream.getAudioTracks(); // Pega faixas de áudio
-        if (audioTracks && audioTracks.length > 0) {
-            const audioTrack = audioTracks[0];
-            // Inverte o estado (Mudo / Ouvindo)
-            audioTrack.enabled = !audioTrack.enabled;
+        const audioTracks = localStream.getAudioTracks();
+        if (audioTracks.length > 0) {
+            const track = audioTracks[0];
+            track.enabled = !track.enabled;
             
-            // Feedback visual
-            if (toggleMicBtn) {
-                const isMicOn = audioTrack.enabled;
-                toggleMicBtn.innerText = isMicOn ? "Desativar Microfone" : "Ativar Microfone";
-                
-                toggleMicBtn.classList.toggle('btn-secondary', isMicOn);
-                toggleMicBtn.classList.toggle('btn-danger', !isMicOn); // Vermelho se estiver mudo
-            }
+            const isMicOn = track.enabled;
+            
+            // Update UI Local
+            micOnIcon.style.display = isMicOn ? 'block' : 'none';
+            micOffIcon.style.display = isMicOn ? 'none' : 'block';
+            toggleMicBtn.classList.toggle('disabled', !isMicOn);
+            
+            // Check Camera State to send complete info
+            const isCameraOn = localStream.getVideoTracks()[0]?.enabled ?? true;
+            emitMediaState(isCameraOn, isMicOn);
         }
     }
 };
 
-// --- 3. LÓGICA WEBRTC ---
-
 const createPeerConnection = () => {
-    // Se já existir, fecha a anterior para evitar conflitos
     if (peerConnection) peerConnection.close();
 
     peerConnection = new RTCPeerConnection(peerConfiguration);
 
-    // Adiciona tracks locais
     if (localStream) {
         localStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, localStream);
         });
     }
 
-    // Recebe vídeo remoto
     peerConnection.ontrack = (event) => {
         console.log("Vídeo remoto recebido!");
         waitingEl.style.display = 'none';
         remoteVideoEl.srcObject = event.streams[0];
+        // Reset visuals when connection starts (assume ON until told otherwise)
+        remoteAvatar.style.display = 'none';
+        remoteMicStatus.style.display = 'none';
     };
 
-    // Envia candidatos ICE locais
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
             const target = connectedPeerId || initialTargetId;
-            
             if (target) {
                 socket.emit('sendIceCandidate', {
                     targetUserId: target,
@@ -128,30 +146,24 @@ const createPeerConnection = () => {
         }
     };
     
-    // Monitora estado da conexão
     peerConnection.onconnectionstatechange = () => {
-        if (peerConnection.connectionState === 'disconnected' || 
-            peerConnection.connectionState === 'failed' || 
-            peerConnection.connectionState === 'closed') {
+        if (['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState)) {
             console.log("Conexão encerrada remotamente.");
+            stopCallTimer();
         }
     };
 }
 
-// Inicia a tentativa de chamada
 const initiateCall = () => {
     if(!initialTargetId) return alert("Nenhum ID de destino na URL.");
-    
     callBtn.disabled = true;
     waitingEl.innerText = "Buscando usuário...";
     waitingEl.style.display = 'block';
-    
     socket.emit("check-user-online", initialTargetId);
 };
 
-// Executa a oferta real após confirmação
 const performOffer = async () => {
-    connectedPeerId = initialTargetId; // Definimos o alvo
+    connectedPeerId = initialTargetId;
     createPeerConnection();
 
     try {
@@ -168,7 +180,6 @@ const performOffer = async () => {
         
         waitingEl.innerText = "Chamando...";
         hangupBtn.disabled = false;
-        
     } catch (err) {
         console.error("Erro ao criar oferta:", err);
         resetUI();
@@ -180,6 +191,7 @@ const hangupCall = () => {
         peerConnection.close();
         peerConnection = null;
     }
+    stopCallTimer();
     resetUI();
 };
 
@@ -190,26 +202,46 @@ const resetUI = () => {
     remoteVideoEl.srcObject = null;
     connectedPeerId = null;
     candidateQueue = [];
+    remoteAvatar.style.display = 'none';
+    remoteMicStatus.style.display = 'none';
 };
 
-// Processa fila de candidatos que chegaram cedo demais
 const processCandidateQueue = async () => {
     if (peerConnection && peerConnection.remoteDescription && candidateQueue.length > 0) {
-        console.log(`Processando ${candidateQueue.length} candidatos ICE da fila...`);
         for (const candidate of candidateQueue) {
             try {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-            } catch (e) {
-                console.error("Erro processando ICE da fila:", e);
-            }
+            } catch (e) {}
         }
         candidateQueue = [];
     }
 };
 
-// --- 4. SOCKET LISTENERS ---
+// --- SOCKET LISTENERS ---
 
 socket.on('connect', () => console.log("Socket Conectado:", socket.id));
+
+// Listen for Remote Media Changes
+socket.on('mediaStateChange', (data) => {
+    console.log("Estado de mídia remoto alterado:", data);
+    
+    // Câmera Remota
+    if (data.camera === false) {
+        // Se câmera desligada, mostra avatar e esconde vídeo
+        remoteAvatar.style.display = 'flex';
+        remoteVideoEl.style.opacity = '0';
+    } else {
+        remoteAvatar.style.display = 'none';
+        remoteVideoEl.style.opacity = '1';
+    }
+    
+    // Microfone Remoto
+    if (data.mic === false) {
+        remoteMicStatus.style.display = 'flex';
+    } else {
+        remoteMicStatus.style.display = 'none';
+    }
+});
 
 socket.on('user-is-online', (data) => {
     if (data.isOnline) {
@@ -231,7 +263,6 @@ socket.on('offerResponse', async (offerObj) => {
 
     try {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offerObj));
-        
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
@@ -245,50 +276,53 @@ socket.on('offerResponse', async (offerObj) => {
         waitingEl.style.display = 'none';
         hangupBtn.disabled = false;
         callBtn.disabled = true;
-        
+        startCallTimer();
         processCandidateQueue();
         
+        // Send initial state to caller (so they know if I started muted)
+        if (localStream) {
+            const isCam = localStream.getVideoTracks()[0]?.enabled ?? true;
+            const isMic = localStream.getAudioTracks()[0]?.enabled ?? true;
+            emitMediaState(isCam, isMic);
+        }
+        
     } catch (err) {
-        console.error("Erro ao atender chamada:", err);
+        console.error("Erro ao atender:", err);
     }
 });
 
 socket.on('answerResponse', async (answerObj) => {
     console.log("Chamada atendida!");
     waitingEl.style.display = 'none';
-    
+    startCallTimer();
     try {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(answerObj));
         processCandidateQueue();
+        
+        // Send initial state to callee
+        if (localStream) {
+            const isCam = localStream.getVideoTracks()[0]?.enabled ?? true;
+            const isMic = localStream.getAudioTracks()[0]?.enabled ?? true;
+            emitMediaState(isCam, isMic);
+        }
     } catch (err) {
-        console.error("Erro no setRemoteDescription (Answer):", err);
+        console.error("Erro no Answer:", err);
     }
 });
 
 socket.on('receivedIceCandidate', async (iceObj) => {
     const candidate = iceObj.candidate || iceObj; 
-    
     if (peerConnection && peerConnection.remoteDescription) {
         try {
             await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-        } catch (e) {
-            console.error("Erro ao adicionar ICE:", e);
-        }
+        } catch (e) {}
     } else {
-        console.log("ICE recebido antes da hora. Enfileirando.");
         candidateQueue.push(candidate);
     }
 });
 
-// --- 5. EVENTOS UI ---
 callBtn.addEventListener('click', initiateCall);
 hangupBtn.addEventListener('click', hangupCall);
 
-if (toggleCameraBtn) {
-    toggleCameraBtn.addEventListener('click', toggleCamera);
-}
-
-// Listener para o novo botão de Mic
-if (toggleMicBtn) {
-    toggleMicBtn.addEventListener('click', toggleMic);
-}
+if (toggleCameraBtn) toggleCameraBtn.addEventListener('click', toggleCamera);
+if (toggleMicBtn) toggleMicBtn.addEventListener('click', toggleMic);
