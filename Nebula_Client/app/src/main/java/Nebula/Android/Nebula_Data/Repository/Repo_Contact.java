@@ -24,17 +24,15 @@ public class Repo_Contact {
 
     private static OnContactsChangedListener contactsChangedListener;
 
-    public static void initialize(Context context) {
+    public static Repo_Contact initialize(Context context) {
         if (dbHelper == null) {
             dbHelper = new DatabaseHelper(context);
             dbHelper.copyDatabaseIfNeeded();
             loadContactsFromDatabase();
         }
+        return null;
     }
 
-    /**
-     * Carrega todos os contatos do banco para a memória
-     */
     public static void loadContactsFromDatabase() {
         if (dbHelper == null) {
             Log.e(TAG, "DatabaseHelper não inicializado!");
@@ -52,20 +50,10 @@ public class Repo_Contact {
             feedAdapter.notifyDataSetChanged();
         }
         notifyContactsChanged();
-
-        Log.i(TAG, "✅ " + contacts.size() + " contatos carregados do banco");
     }
 
     public static List<Entity_Contact> getContacts() {
         return contacts;
-    }
-
-    public static void setContacts(List<Entity_Contact> contactList) {
-        contacts = contactList;
-        if (feedAdapter != null) {
-            feedAdapter.notifyDataSetChanged();
-        }
-        notifyContactsChanged();
     }
 
     public static RV_Feed_02_Contact_Adapter getFeedAdapter() {
@@ -76,27 +64,25 @@ public class Repo_Contact {
         feedAdapter = adapter;
     }
 
-    /**
-     * Adiciona um contato novo no banco E na memória
-     */
     public static void addContact(Entity_Contact contact) {
-        if (contact != null && dbHelper != null) {
-            // Primeiro insere no banco
-            dbHelper.insertContact(contact);
+        if (contact != null) {
 
-            // Depois adiciona na lista local (o insertContact já faz isso via syncContactToRepository)
-            Log.i(TAG, "✅ Contato adicionado: " + contact.getContactName());
+            if (dbHelper != null) {
+                dbHelper.insertContact(contact);
+            }
+
+            if (feedAdapter != null) {
+                feedAdapter.notifyItemInserted(contacts.size()+1);
+                notifyContactsChanged();
+            }
         }
     }
 
-    /**
-     * Usado apenas quando carregando do banco (não insere novamente)
-     */
     public static void addContactFromDatabase(Entity_Contact contact) {
         if (contact != null) {
             contacts.add(contact);
             if (feedAdapter != null) {
-                feedAdapter.notifyItemInserted(contacts.size() - 1);
+
             }
             notifyContactsChanged();
         }
@@ -112,7 +98,6 @@ public class Repo_Contact {
 
             if (feedAdapter != null) {
                 feedAdapter.notifyItemRemoved(adapterPosition);
-
                 feedAdapter.notifyItemRangeChanged(adapterPosition,
                         feedAdapter.getItemCount());
             }
@@ -123,9 +108,6 @@ public class Repo_Contact {
         }
     }
 
-    /**
-     * Remove contato por posição
-     */
     public static void removeContactAt(int position) {
         if (position >= 0 && position < contacts.size()) {
             Entity_Contact contact = contacts.get(position);
@@ -133,46 +115,9 @@ public class Repo_Contact {
         }
     }
 
-    /**
-     * Atualiza um contato no banco E na memória
-     */
-    public static void updateContact(Entity_Contact contact) {
-        if (contact != null && dbHelper != null) {
-            // Atualiza no banco
-            dbHelper.updateContact(contact);
-
-            // Atualiza na lista local (o updateContact do DB já faz isso)
-            Log.i(TAG, "✏️ Contato atualizado: " + contact.getContactName());
-        }
-    }
-
-    /**
-     * Limpa todos os contatos (apenas da memória, não do banco)
-     */
-    public static void clearContacts() {
-        contacts.clear();
-        if (feedAdapter != null) {
-            feedAdapter.notifyDataSetChanged();
-        }
-        notifyContactsChanged();
-    }
-
-    /**
-     * Sincroniza um contato específico do banco para o repositório
-     */
-    public static void syncContactFromDatabase(String contactId) {
-        if (dbHelper != null) {
-            dbHelper.syncContactToRepository(contactId);
-        }
-    }
-
     private static void notifyContactsChanged() {
         if (contactsChangedListener != null) {
             contactsChangedListener.onContactsChanged();
         }
-    }
-
-    public static void setOnContactsChangedListener(OnContactsChangedListener listener) {
-        contactsChangedListener = listener;
     }
 }

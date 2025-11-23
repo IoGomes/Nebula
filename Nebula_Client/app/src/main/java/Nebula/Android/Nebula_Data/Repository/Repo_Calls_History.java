@@ -121,7 +121,7 @@ public class Repo_Calls_History {
         SQLiteDatabase db = dbHelper.openDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(COL_CONTACT_NAME, call.getNomeDeContato());
+        values.put(COL_CONTACT_NAME, call.getContactName());
         values.put(COL_DATE_TIME, dateFormat.format(call.getDateTimeCall()));
         values.put(COL_RECEIVED, call.getReiceved() ? 1 : 0);
 
@@ -130,7 +130,7 @@ public class Repo_Calls_History {
 
         if (id != -1) {
             addCall(call);
-            Log.i(TAG, "📞 Chamada inserida: " + call.getNomeDeContato());
+            Log.i(TAG, "📞 Chamada inserida: " + call.getContactName());
         }
 
         return id;
@@ -184,9 +184,6 @@ public class Repo_Calls_History {
         return callsList;
     }
 
-    /**
-     * Busca apenas chamadas recebidas
-     */
     public List<Entity_Call> getReceivedCalls() {
         return getCallsByType(true);
     }
@@ -219,9 +216,6 @@ public class Repo_Calls_History {
         return callsList;
     }
 
-    /**
-     * Busca chamadas em um intervalo de datas
-     */
     public List<Entity_Call> getCallsBetweenDates(Date startDate, Date endDate) {
         List<Entity_Call> callsList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.openDatabase();
@@ -347,9 +341,6 @@ public class Repo_Calls_History {
         Log.i(TAG, "📞 " + calls.size() + " chamadas carregadas no repositório");
     }
 
-    /**
-     * Converte um cursor em Entity_05_call
-     */
     private Entity_Call cursorToCall(Cursor cursor) {
         try {
             String contactName = cursor.getString(cursor.getColumnIndexOrThrow(COL_CONTACT_NAME));

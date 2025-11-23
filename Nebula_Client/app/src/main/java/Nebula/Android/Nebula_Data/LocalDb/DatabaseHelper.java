@@ -36,9 +36,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         USER_TABLE,
         VIDEO_CALL_TABLE,
         VOICE_CALL_TABLE,
-
-
-
     }
 
 
@@ -56,8 +53,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private String getDatabasePath() {
         return context.getDatabasePath(DB_NAME).getPath();
     }
-
-
 
     private void populateSampleData(SQLiteDatabase db) {
 
@@ -91,6 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put("chatSessionId", "sessao_" + i);
             values.put("chatWith", nomes[i]);
             values.put("hasUnread", (i % 2));
+
             values.put("isFavorited", (i % 3 == 0) ? 1 : 0);
             values.put("lastMessage", mensagens[i]);
 

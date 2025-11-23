@@ -90,6 +90,13 @@ public class Repo_Chat {
         notifyChatsChanged();
     }
 
+    public static void removeChat(Entity_Pv_Chat chat) {
+        synchronized (chats) {
+            chats.remove(chat);
+            notifyChatsChanged();
+        }
+    }
+
     public static void removeChat(Entity_Pv_Chat chat, int adapterPosition) {
         if (chat == null || dbHelper == null) return;
 
@@ -103,8 +110,6 @@ public class Repo_Chat {
                 feedAdapter.notifyItemRangeChanged(adapterPosition,
                         feedAdapter.getItemCount());
             }
-
-            notifyChatsChanged();
 
             dbHelper.deleteChat(chat.getChatSessionId());
         }

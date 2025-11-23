@@ -1,14 +1,15 @@
 package Nebula.Android.Nebula_View.Fragments;
 
+import static android.content.ContentValues.TAG;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-
 import static Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_02_Contact_Adapter.Adapter_Mode.MODE_A;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +19,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import Nebula.Android.Nebula_Data.Repository.Repo_Contact;
-import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_Add_Contact;
-import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_QrCode;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Contact;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_02_Contact_Adapter;
+import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Contact;
+import Nebula.Android.Nebula_ViewModel.Server_Services.Service_QrCode;
 import Nebula.Android.databinding.Frg04ContactListBinding;
 
 /// @author Ítalo Oliveira Gomes
@@ -44,7 +49,10 @@ public class Fragment_Feed_02_Contacts extends Fragment {
         loadContacts();
     }
 
-    @Nullable @Override
+
+
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -73,7 +81,7 @@ public class Fragment_Feed_02_Contacts extends Fragment {
     private void loadContacts() {
         executorService.execute(() -> {
 
-            var contacts = Repo_Contact.getContacts();
+            var contacts = Controller_Contact.loadContactFromRepo();
             boolean isEmpty = contacts.isEmpty();
 
             RV_Feed_02_Contact_Adapter newAdapter =
@@ -91,23 +99,10 @@ public class Fragment_Feed_02_Contacts extends Fragment {
     }
 
     private void openAddContactDialog() {
-        if (getContext() == null) return;
-
-        executorService.execute(() -> {
-            mainHandler.post(() -> {
-                Dialog_Feed_Add_Contact dialog =
-                        new Dialog_Feed_Add_Contact(requireContext(), Repo_Contact.getContacts());
-
-                dialog.setOnDismissListener(dialogInterface -> refreshContacts());
-                dialog.show();
-            });
-        });
+        new Controller_Contact().openAddContactDialog(requireContext()).show();
     }
-
     private void openQrCodeDialog() {
-        if (getContext() == null) return;
-
-        new Dialog_Feed_QrCode(requireContext()).show();
+        new Controller_Contact().openQrCodeDialog(requireContext()).show();
     }
 
     private void refreshContacts() {
@@ -138,19 +133,5 @@ public class Fragment_Feed_02_Contacts extends Fragment {
 
     public RV_Feed_02_Contact_Adapter getAdapter() {
         return adapter;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        bind = null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
     }
 }

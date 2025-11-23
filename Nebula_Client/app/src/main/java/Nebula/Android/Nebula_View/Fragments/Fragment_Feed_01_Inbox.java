@@ -25,10 +25,9 @@ import Nebula.Android.databinding.Frg03FeedBinding;
 /// @author Ítalo Oliveira Gomes
 public class Fragment_Feed_01_Inbox extends Fragment {
 
-    // ViewBinding do Fragment
+
     private Frg03FeedBinding bind;
 
-    // Obtem o Adapter para utilizar no Fragment
     public RV_Feed_01_Chat_Adapter getAdapter() {
         return adapter;
     }

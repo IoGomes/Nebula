@@ -34,21 +34,17 @@ import Nebula.Android.R;
 public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-    // TAG para Depuração de Classe
     private static final String TAG = "RV_Feed_03_Calls_Adapter";
 
-    // Declaração dos ViewHolders
     private static final int HEADER_VIEW = 0;
     private static final int ITEM_VIEW = 1;
 
-    // Builda a Adapter e atrela a Lista Local da Classe
     public RV_Feed_03_Calls_Adapter(List<Entity_Call> calls) {
         this.calls = calls;
     }
 
     private final List<Entity_Call> calls;
 
-    // Lista que guarda as Posições Selecionadas
     private final Set<Integer> selectedPositions = new HashSet<>();
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -114,7 +110,7 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
 
     private void setupCallData(CallViewHolder holder, Entity_Call call) {
 
-        holder.callContactName.setText(call.getNomeDeContato());
+        holder.callContactName.setText(call.getContactName());
 
         if (call.getDateTimeCall() != null) {
             holder.callTextDate.setText(dateFormat.format(call.getDateTimeCall()));
@@ -163,14 +159,9 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
             }
         });
 
-        callHolder.profileImage.setOnClickListener(v ->
-                new Dialog_Feed_Profile_Image(callHolder.itemView.getContext(),
-                        call.getNomeDeContato()
-                ).show());
-
         callHolder.callButton.setOnClickListener(v -> {
             Activity activity = (Activity) v.getContext();
-            new Controller_Voice_Call(activity).performVoiceCall(activity);
+            new Controller_Voice_Call(activity).performVoiceCall(activity, call.getContactName(), call.getCallID(), call.getCallID());
         });
     }
 

@@ -61,7 +61,7 @@ public class Repo_Archived_Chats {
     public static void addArchivedChat(List<Entity_Pv_Chat> chats) {
         if (chats == null || chats.isEmpty()) return;
 
-        int startPos = archivedChats.size(); // posição inicial antes da adição
+        int startPos = archivedChats.size();
 
         for (Entity_Pv_Chat chat : chats) {
             if (chat != null) {
@@ -88,42 +88,12 @@ public class Repo_Archived_Chats {
         }
     }
 
-    public static void removeArchivedChatAt(int position) {
-        if (position >= 0 && position < archivedChats.size()) {
-            archivedChats.remove(position);
-            if (archivedAdapter != null) {
-                archivedAdapter.notifyItemRemoved(position);
-            }
-        }
-    }
-
-    public static void archiveChat(Entity_Pv_Chat chat, int position) {
-        if (chat != null) {
-
-            Repo_Chat.removeChat(chat, position);
-
-            addArchivedChat(chat);
-        }
-    }
-
-
     public static void unarchiveChat(Entity_Pv_Chat chat) {
         if (chat != null) {
-
             removeArchivedChat(chat);
-
             Repo_Chat.addChat(chat);
         }
     }
-
-
-    public static void archiveChatAt(int position) {
-        if (position >= 0 && position < Repo_Chat.getChats().size()) {
-            Entity_Pv_Chat chat = Repo_Chat.getChats().get(position);
-            archiveChat(chat, position);
-        }
-    }
-
 
     public static void unarchiveChatAt(int position) {
         if (position >= 0 && position < archivedChats.size()) {
@@ -131,18 +101,4 @@ public class Repo_Archived_Chats {
             unarchiveChat(chat);
         }
     }
-
-
-    public static void clearAllArchivedChats() {
-        archivedChats.clear();
-        if (archivedAdapter != null) {
-            archivedAdapter.notifyDataSetChanged();
-        }
-    }
-
-
-    public static boolean isChatArchived(Entity_Pv_Chat chat) {
-        return archivedChats.contains(chat);
-    }
-
 }
