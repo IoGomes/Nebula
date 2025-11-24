@@ -5,5 +5,7 @@ import lombok.*;
 public enum MessageType {
     CHAT,
     JOIN,
-    LEAVE
+    LEAVE,
+    TYPING,
+    ROOM_CREATED
 }

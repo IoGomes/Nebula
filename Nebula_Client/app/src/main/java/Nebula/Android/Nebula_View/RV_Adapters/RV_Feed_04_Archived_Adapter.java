@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Chat;
 import Nebula.Android.Nebula_Data.Repository.Repo_Archived_Chats;
 import Nebula.Android.Nebula_Model.Services.Svc_Search_Query;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
@@ -41,7 +41,7 @@ import Nebula.Android.R;
     ///@author Ítalo Oliveira Gomes
     public class RV_Feed_04_Archived_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private final List<Entity_Pv_Chat> archivedChats;
+        private final List<Entity_Chat> archivedChats;
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 
         private static final int VIEW_TYPE_HEADER = 0;
@@ -60,7 +60,7 @@ import Nebula.Android.R;
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
         private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-        public RV_Feed_04_Archived_Adapter(List<Entity_Pv_Chat> archivedChats) {
+        public RV_Feed_04_Archived_Adapter(List<Entity_Chat> archivedChats) {
             this.archivedChats = archivedChats;
         }
 
@@ -121,7 +121,7 @@ import Nebula.Android.R;
 
                 if (chatPosition >= 0 && chatPosition < Repo_Archived_Chats.getArchivedChats().size()) {
 
-                    Entity_Pv_Chat chatSession = Repo_Archived_Chats.getArchivedChats().get(chatPosition);
+                    Entity_Chat chatSession = Repo_Archived_Chats.getArchivedChats().get(chatPosition);
 
                     bindChatData(chatHolder, chatSession);
 
@@ -152,31 +152,32 @@ import Nebula.Android.R;
                     });
 
                     chatHolder.itemView.setOnClickListener(v -> {
-                        chatSession.setHasUnread(false);
+                        chatSession.setRead(false);
                         chatHolder.unreadIcon.setVisibility(View.GONE);
 
                         Intent intent = new Intent(v.getContext(), Activity_03_Chat.class);
                         intent.putExtra("CHAT_POSITION", chatPosition);
-                        intent.putExtra("CHAT_ID", chatSession.getChatSessionId());
-                        intent.putExtra("ChatWith", chatSession.getChatWith());
+                        intent.putExtra("CHAT_ID", chatSession.getChatId());
+                        intent.putExtra("ChatWith", chatSession.getReceiverName());
                         intent.putExtra("IS_ARCHIVED", true);
                         v.getContext().startActivity(intent);
                     });
 
-                    chatHolder.profileImage.setOnClickListener(v -> {
+                    chatHolder.profileImage.setOnClickListener(v ->
                         new Dialog_Feed_Profile_Image(
                                 chatHolder.itemView.getContext(),
-                                chatSession.getChatWith(),
-                                chatSession.getChatWithNumber(),
-                                chatSession.getChatSessionId()
-                        ).show();
-                    });
+                                chatSession.getReceiverName(),
+                                chatSession.getReceiverNumber(),
+                                chatSession.getChatId(),
+                                chatSession.getReceiverNumber()
+                        ).show()
+                    );
                 }
             }
         }
 
-        private void bindChatData(ChatViewHolder holder, Entity_Pv_Chat chatSession) {
-            String lastMessage = chatSession.getLastMessage();
+        private void bindChatData(ChatViewHolder holder, Entity_Chat chatSession) {
+            String lastMessage = chatSession.getLastMessageSend();
 
             if (currentSearchQuery != null && !currentSearchQuery.trim().isEmpty()) {
                 String highlightedMessage = Svc_Search_Query.highlightTextHtml(
@@ -187,18 +188,18 @@ import Nebula.Android.R;
                 holder.lastText.setText(Html.fromHtml(highlightedMessage, Html.FROM_HTML_MODE_LEGACY));
 
                 String highlightedName = Svc_Search_Query.highlightTextHtml(
-                        chatSession.getChatWith(),
+                        chatSession.getReceiverName(),
                         currentSearchQuery,
                         "#EC407A"
                 );
                 holder.contactName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
             } else {
                 holder.lastText.setText(lastMessage != null ? lastMessage : "No messages");
-                holder.contactName.setText(chatSession.getChatWith());
+                holder.contactName.setText(chatSession.getReceiverName());
             }
 
-            if (chatSession.getChatDate() != null && !chatSession.getChatDate().isEmpty()) {
-                List<Date> dates = chatSession.getChatDate();
+            if (chatSession.getLastMessageSendDate() != null && !chatSession.getLastMessageSendDate().isEmpty()) {
+                List<Date> dates = chatSession.getLastMessageSendDate();
                 Date lastDate = dates.get(dates.size() - 1);
                 holder.textDate.setText(dateFormat.format(lastDate));
             } else {
@@ -232,7 +233,7 @@ import Nebula.Android.R;
             // Executa busca e ordenação em background
             executor.execute(() -> {
                 // Usa o SVC_Search_Query para fazer a pesquisa com filtros de categoria
-                List<Entity_Pv_Chat> results = Svc_Search_Query.searchWithCategory(
+                List<Entity_Chat> results = Svc_Search_Query.searchWithCategory(
                         query,
                         categoryId,
                         R.id.all_category,
@@ -255,11 +256,11 @@ import Nebula.Android.R;
             notifyDataSetChanged();
         }
 
-        private void sortResults(List<Entity_Pv_Chat> chats) {
+        private void sortResults(List<Entity_Chat> chats) {
             for (int i = 0; i < chats.size() - 1; i++) {
                 for (int j = 0; j < chats.size() - i - 1; j++) {
-                    Entity_Pv_Chat current = chats.get(j);
-                    Entity_Pv_Chat next = chats.get(j + 1);
+                    Entity_Chat current = chats.get(j);
+                    Entity_Chat next = chats.get(j + 1);
 
                     // Prioridade 1: Mensagens não lidas
                     if (!current.hasUnread() && next.hasUnread()) {
@@ -274,15 +275,15 @@ import Nebula.Android.R;
             }
         }
 
-        private void swap(List<Entity_Pv_Chat> chats, int i, int j) {
-            Entity_Pv_Chat temp = chats.get(i);
+        private void swap(List<Entity_Chat> chats, int i, int j) {
+            Entity_Chat temp = chats.get(i);
             chats.set(i, chats.get(j));
             chats.set(j, temp);
         }
 
-        private long getLastMessageTime(Entity_Pv_Chat chat) {
-            if (chat.getChatDate() != null && !chat.getChatDate().isEmpty()) {
-                List<Date> dates = chat.getChatDate();
+        private long getLastMessageTime(Entity_Chat chat) {
+            if (chat.getLastMessageSendDate() != null && !chat.getLastMessageSendDate().isEmpty()) {
+                List<Date> dates = chat.getLastMessageSendDate();
                 return dates.get(dates.size() - 1).getTime();
             }
             return 0;

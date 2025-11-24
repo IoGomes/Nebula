@@ -1,12 +1,11 @@
 package Nebula.Android.Nebula_Model.Entitys;
 
-import java.util.UUID;
-
 import Nebula.Android.Nebula_Model.Services.Svc_Alert_Dialog;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class Entity_User {
-    private UUID userId;
+
+    private String userId;
     private String userName;
     private String userEmail;
     private String userTelefoneNumber;
@@ -35,11 +34,11 @@ public class Entity_User {
     }
 
 
-    public UUID getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(UUID userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

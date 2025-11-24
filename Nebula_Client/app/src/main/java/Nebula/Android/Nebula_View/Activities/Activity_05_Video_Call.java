@@ -24,7 +24,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,12 +39,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+import Nebula.Android.Nebula_Data.Preferences.SessionPreferences;
+import Nebula.Android.databinding.Act05VideoCallBinding;
 
 public class Activity_05_Video_Call extends AppCompatActivity {
 
-    private static final String TAG = "NEBULA_LOG";
+    private static final String TAG = "Activity_05_Video_Call";
 
-    private static final String BASE_DOMAIN = "https://youlanda-undependable-compressingly.ngrok-free.dev";
+    private static final String BASE_DOMAIN = "https://nebula.app.br";
     private static final String VIDEO_ROUTE = "/video-call";
 
     private static final int CAMERA_REQUEST = 1001;
@@ -55,37 +57,29 @@ public class Activity_05_Video_Call extends AppCompatActivity {
     private WebView webView;
     private TextView debugConsole;
 
-    /// Strings contendo todos os dados necessários para a chamada de vídeo solicitada por Ezdraz.
-    /// Ao clicar no botão de chamada, todas as variáveis abaixo já estarão preenchidas.
-    /// Basta verificar onde cada valor é utilizado e realizar as substituições adequadas.
-    ///
-    /// OBS:válido apenas para Testes nos botões de chamada da Lista de Contatos e com contas novas.
-    /// os mocks não contém IDs corretos.
-    ///
-    /// @author Ítalo Gomes
+    private Act05VideoCallBinding binding;
 
-    public String SENDER_USER_ID;
-
-    public String RECEIVER_USER_ID;
-    public String RECEIVER_USER_NAME;
-    public String RECEIVER_USER_PHONE_NUMBER;
+    public String SENDER_ID;
+    public String RECEIVER_ID;
+    public String RECEIVER_NAME;
+    public String RECEIVER_NUMBER;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setupBasicUI();
+        setTheme(androidx.appcompat.R.style.Theme_AppCompat);
 
+        // ✅ Infla o layout XML
+        binding = Act05VideoCallBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        setupBasicUI();
         intentBuilder();
 
-        Log.e(TAG, "SENDER_USER_ID: " + SENDER_USER_ID);
+        Log.e(TAG, "SENDER_USER_ID: " + SENDER_ID);
 
-        // Layout Principal (LinearLayout para caber Console + WebView)
-        LinearLayout layout = new LinearLayout(this);
-        layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        // 1. CONSOLE VISUAL (Debugger na tela)
+        // ✅ Debug Console
         debugConsole = new TextView(this);
         debugConsole.setTextColor(Color.GREEN);
         debugConsole.setBackgroundColor(Color.argb(220, 0, 0, 0));
@@ -94,17 +88,25 @@ public class Activity_05_Video_Call extends AppCompatActivity {
         debugConsole.setMovementMethod(new ScrollingMovementMethod());
         debugConsole.setText("--- DEBUG INICIADO ---\n");
 
-        // Adiciona console (ocupa pouco espaço no topo)
-        layout.addView(debugConsole, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 250));
+        // Adiciona console no container do XML
+        binding.debugContainer.addView(debugConsole);
 
-        // 2. WEBVIEW
+        // ✅ WebView
         webView = new WebView(this);
-        webView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        webView.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
 
         setupWebViewSettings();
 
-        layout.addView(webView);
-        setContentView(layout);
+        // Adiciona WebView no container do XML
+        binding.webviewContainer.addView(webView);
+        binding.contactName.setText(RECEIVER_NAME);
+        binding.contactNumber.setText(RECEIVER_NUMBER);
+
+        // ✅ Configura botões do XML
+        setupButtons();
 
         if (checkPermissions()) {
             loadUrlWithParams();
@@ -112,6 +114,29 @@ public class Activity_05_Video_Call extends AppCompatActivity {
             logToScreen("Solicitando permissões...");
             requestPermissions();
         }
+    }
+
+    private void setupButtons() {
+
+        binding.btnMute.setOnClickListener(v -> {
+            webView.evaluateJavascript("toggleMute()", null);
+            logToScreen("🔇 Mute toggle");
+        });
+
+        binding.btnCamera.setOnClickListener(v -> {
+            webView.evaluateJavascript("toggleCamera()", null);
+            logToScreen("📷 Camera toggle");
+        });
+
+        binding.dismissCall.setOnClickListener(v -> {
+            webView.evaluateJavascript("endCall()", null);
+            logToScreen("📞 Encerrando chamada");
+            finish();
+        });
+
+        binding.returnButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void logToScreen(String msg) {
@@ -129,7 +154,6 @@ public class Activity_05_Video_Call extends AppCompatActivity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        // --- LIMPEZA NUCLEAR DE CACHE (Para o Vite não atrapalhar) ---
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.clearCache(true);
         webView.clearHistory();
@@ -138,7 +162,7 @@ public class Activity_05_Video_Call extends AppCompatActivity {
         CookieManager.getInstance().flush();
 
         webView.setFitsSystemWindows(true);
-        webView.addJavascriptInterface(new Activity_05_Video_Call.WebBridge(), "Android");
+        webView.addJavascriptInterface(new WebBridge(), "Android");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -159,10 +183,7 @@ public class Activity_05_Video_Call extends AppCompatActivity {
             }
         });
 
-        // Chrome Client (Câmera + Upload + Logs JS)
         webView.setWebChromeClient(new WebChromeClient() {
-
-            // Permissão de WebRTC
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
                 runOnUiThread(() -> {
@@ -173,14 +194,12 @@ public class Activity_05_Video_Call extends AppCompatActivity {
                 });
             }
 
-            // Logs do JavaScript (Console.log do site)
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 logToScreen("[JS] " + consoleMessage.message());
                 return true;
             }
 
-            // Upload de Arquivos (Mantido seu código original)
             @Override
             public boolean onShowFileChooser(WebView webView,
                                              ValueCallback<Uri[]> filePathCallback,
@@ -212,22 +231,23 @@ public class Activity_05_Video_Call extends AppCompatActivity {
     }
 
     private void loadUrlWithParams() {
-        String myUserId = "15";
-        String myUserName = "AndroidApp";
-        String targetUserId = "13";
+        // Exemplo de URL real
+        String realUrl = BASE_DOMAIN+VIDEO_ROUTE;
 
-        // URL CORRETA + Timestamp anti-cache
-        String fullUrl = BASE_DOMAIN + VIDEO_ROUTE +
-                "?userId=" + myUserId +
-                "&userName=" + myUserName +
-                "&targetId=" + targetUserId +
-                "&t=" + System.currentTimeMillis();
+        logToScreen("🚀 Carregando URL real: " + realUrl);
 
-        logToScreen("🚀 Indo para: " + fullUrl);
-        webView.loadUrl(fullUrl);
+        // Configurações do WebView (importante)
+        webView.getSettings().setJavaScriptEnabled(true); // habilita JS se necessário
+        webView.getSettings().setDomStorageEnabled(true); // habilita armazenamento local
+
+        // Mantém a navegação dentro do WebView
+        webView.setWebViewClient(new WebViewClient());
+
+        // Carrega a URL
+        webView.loadUrl(realUrl);
     }
 
-    // --- PERMISSÕES ---
+
     private boolean checkPermissions() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
@@ -249,7 +269,6 @@ public class Activity_05_Video_Call extends AppCompatActivity {
         }
     }
 
-    // --- UPLOAD RESULT ---
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -270,17 +289,24 @@ public class Activity_05_Video_Call extends AppCompatActivity {
         }
     }
 
-    public void setupBasicUI(){
+    public void setupBasicUI() {
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         Objects.requireNonNull(getSupportActionBar()).hide();
     }
 
-    public void intentBuilder(){
-        this.SENDER_USER_ID = getIntent().getStringExtra("SENDER_USER_ID");
+    public void intentBuilder() {
+        this.SENDER_ID = new SessionPreferences(this).getKeyId();
+        this.RECEIVER_ID = getIntent().getStringExtra("RECEIVER_ID");
+        this.RECEIVER_NAME = getIntent().getStringExtra("RECEIVER_NAME");
+        this.RECEIVER_NUMBER = getIntent().getStringExtra("RECEIVER_NUMBER");
+    }
 
-        this.RECEIVER_USER_ID = getIntent().getStringExtra("RECEIVER_USER_ID");
-        this.RECEIVER_USER_NAME = getIntent().getStringExtra("RECEIVER_USER_NAME");
-        this.RECEIVER_USER_PHONE_NUMBER = getIntent().getStringExtra("RECEIVER_USER_PHONE_NUMBER");
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (webView != null) {
+            webView.destroy();
+        }
     }
 }

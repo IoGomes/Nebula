@@ -3,7 +3,6 @@ package Nebula.Android.Nebula_View.RV_Adapters;
 import static android.view.View.GONE;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -36,11 +35,11 @@ import java.util.concurrent.Executors;
 
 import Nebula.Android.Nebula_Data.LocalDb.DatabaseHelper;
 import Nebula.Android.Nebula_Data.Repository.Repo_Chat;
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Chat;
 import Nebula.Android.Nebula_Model.Services.Svc_Search_Query;
 import Nebula.Android.Nebula_View.Activities.Activity_02_Feed;
-import Nebula.Android.Nebula_View.Activities.Activity_03_Chat;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_Profile_Image;
+import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Chat;
 import Nebula.Android.R;
 
 /// @author Ítalo Oliveira Gomes
@@ -48,7 +47,7 @@ import Nebula.Android.R;
 public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = "RV_Feed_01_Chat_Adapter";
-    private final List<Entity_Pv_Chat> displayedChats;
+    private final List<Entity_Chat> displayedChats;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 
     private static final int VIEW_TYPE_HEADER = 0;
@@ -63,17 +62,19 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    // ==================== Variáveis para atualização sem flick ====================
     private CategoryViewHolder cachedCategoryViewHolder;
     private int cachedUnreadCount = 0;
     private int cachedFavoriteCount = 0;
     private int cachedGroupCount = 0;
+    private int cachedTotalCount = 0;
+    private boolean countsCalculated = false;
 
-    public RV_Feed_01_Chat_Adapter(List<Entity_Pv_Chat> chats) {
+    public RV_Feed_01_Chat_Adapter(List<Entity_Chat> chats) {
         this.displayedChats = new ArrayList<>();
         if (chats != null) {
             this.displayedChats.addAll(chats);
         }
+        recalculateCounts();
     }
 
     @Override
@@ -125,14 +126,14 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                 ChatViewHolder chatHolder = (ChatViewHolder) holder;
                 int chatPosition = position - 2;
 
-                Entity_Pv_Chat chatSession = displayedChats.get(chatPosition);
+                Entity_Chat chatSession = displayedChats.get(chatPosition);
 
                 setupChatItem(chatHolder, chatSession, chatPosition, position);
                 break;
 
             case VIEW_TYPE_CATEGORY:
                 CategoryViewHolder categoryViewHolder = (CategoryViewHolder) holder;
-                cachedCategoryViewHolder = categoryViewHolder; // ← Salva referência
+                cachedCategoryViewHolder = categoryViewHolder;
                 setupCategory(categoryViewHolder);
                 break;
 
@@ -153,35 +154,40 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private void setupCategory(CategoryViewHolder categoryViewHolder) {
-        recalculateCounts();
-
+        // Apenas atualiza a UI com os valores já calculados no cache
         categoryViewHolder.notRead.setText("Não Lidas " + cachedUnreadCount);
-        categoryViewHolder.allCategory.setText("Todas " + displayedChats.size());
+        categoryViewHolder.allCategory.setText("Todas " + cachedTotalCount);
         categoryViewHolder.favorite.setText("Favoritadas " + cachedFavoriteCount);
-        categoryViewHolder.groups.setText("Grupos " + cachedGroupCount);
+        //categoryViewHolder.groups.setText("Grupos " + cachedGroupCount);
     }
 
 
     private void recalculateCounts() {
+        // Calcula contadores baseado em TODOS os chats (não apenas os exibidos)
         cachedUnreadCount = 0;
         cachedFavoriteCount = 0;
         cachedGroupCount = 0;
 
-        for (Entity_Pv_Chat chat : displayedChats) {
+        List<Entity_Chat> allChats = Repo_Chat.getChats();
+        cachedTotalCount = allChats.size();
+
+        for (Entity_Chat chat : allChats) {
             if (chat.hasUnread()) cachedUnreadCount++;
             if (chat.isFavorite()) cachedFavoriteCount++;
         }
+
+        countsCalculated = true;
     }
 
 
     public void updateCategoryCounts() {
-        if (cachedCategoryViewHolder != null) {
-            recalculateCounts();
+        recalculateCounts();
 
+        if (cachedCategoryViewHolder != null) {
             cachedCategoryViewHolder.notRead.setText("Não Lidas " + cachedUnreadCount);
-            cachedCategoryViewHolder.allCategory.setText("Todas " + displayedChats.size());
+            cachedCategoryViewHolder.allCategory.setText("Todas " + cachedTotalCount);
             cachedCategoryViewHolder.favorite.setText("Favoritadas " + cachedFavoriteCount);
-            cachedCategoryViewHolder.groups.setText("Grupos " + cachedGroupCount);
+            //cachedCategoryViewHolder.groups.setText("Grupos " + cachedGroupCount);
         }
     }
 
@@ -193,7 +199,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void setupChatItem(ChatViewHolder chatHolder, Entity_Pv_Chat chatSession, int chatPosition, int adapterPosition) {
+    private void setupChatItem(ChatViewHolder chatHolder, Entity_Chat chatSession, int chatPosition, int adapterPosition) {
 
         bindChatData(chatHolder, chatSession);
 
@@ -207,7 +213,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         setupChatClickListeners(chatHolder, chatSession, chatPosition, adapterPosition);
     }
 
-    private void setupChatClickListeners(ChatViewHolder chatHolder, Entity_Pv_Chat chatSession, int chatPosition, int adapterPosition) {
+    private void setupChatClickListeners(ChatViewHolder chatHolder, Entity_Chat chatSession, int chatPosition, int adapterPosition) {
 
         chatHolder.itemView.setOnLongClickListener(v -> {
 
@@ -225,7 +231,12 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         });
 
         chatHolder.profileImage.setOnClickListener(v ->
-                new Dialog_Feed_Profile_Image(chatHolder.itemView.getContext(), chatSession.getChatWith(), chatSession.getChatSessionId(), chatSession.getChatWithNumber()).show());
+                new Dialog_Feed_Profile_Image(chatHolder.itemView.getContext(),
+                        chatSession.getChatId(),
+                        "13",
+                        chatSession.getReceiverName(),
+                        "12")
+                        .show());
     }
 
     private void toggleSelection(int position, View itemView) {
@@ -263,9 +274,9 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
 
-    private void openChat(Context context, ChatViewHolder chatHolder, Entity_Pv_Chat chatSession, int position) {
+    private void openChat(Context context, ChatViewHolder chatHolder, Entity_Chat chatSession, int position) {
 
-        chatSession.setHasUnread(false);
+        chatSession.setRead(false);
         new DatabaseHelper(context).updateChat(chatSession);
         chatHolder.unreadIcon.setVisibility(GONE);
 
@@ -273,44 +284,36 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
 
         Activity_02_Feed feed = (Activity_02_Feed) context;
         feed.updateUnreadCount();
-        Intent intent = new Intent(context, Activity_03_Chat.class);
-        putExtraIntents(chatSession, position, intent);
-        context.startActivity(intent);
+        new Controller_Chat().performChat(feed,
+                chatSession.getReceiverName(),
+                chatSession.getReceiverName(),
+                chatSession.getReceiverNumber());
     }
 
-    public void putExtraIntents(Entity_Pv_Chat chatSession, int position, Intent intent) {
-        String chatId = chatSession.getChatSessionId();
-        String chatWithNumber = chatSession.getChatWithNumber();
-        intent.putExtra("CHAT_POSITION", position);
-        intent.putExtra("CHAT_ID", chatId);
-        intent.putExtra("ContactNumber", "12345");
-        intent.putExtra("ChatWith", chatSession.getChatWith());
-    }
 
     public void clearSelection() {
         selectedPositions.clear();
         notifyDataSetChanged();
     }
 
-    private void bindChatData(ChatViewHolder holder, Entity_Pv_Chat chatSession) {
+    private void bindChatData(ChatViewHolder holder, Entity_Chat chatSession) {
 
-        String lastMessage = chatSession.getLastMessage();
-        String chatWith = chatSession.getChatWith();
+        String lastMessage = chatSession.getLastMessageSend();
+        String chatWith = chatSession.getReceiverName();
 
         if (currentSearchQuery == null || currentSearchQuery.trim().isEmpty()) {
             holder.lastText.setText(lastMessage);
             holder.contactName.setText(chatWith);
-            return;
+        } else {
+            String highlightedMessage = Svc_Search_Query.highlightTextHtml(lastMessage, currentSearchQuery.trim(), "#EC407A");
+            String highlightedName = Svc_Search_Query.highlightTextHtml(chatWith, currentSearchQuery.trim(), "#EC407A");
+
+            holder.lastText.setText(Html.fromHtml(highlightedMessage, Html.FROM_HTML_MODE_LEGACY));
+            holder.contactName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
         }
 
-        String highlightedMessage = Svc_Search_Query.highlightTextHtml(lastMessage, currentSearchQuery.trim(), "#EC407A");
-        String highlightedName = Svc_Search_Query.highlightTextHtml(chatWith, currentSearchQuery.trim(), "#EC407A");
-
-        holder.lastText.setText(Html.fromHtml(highlightedMessage, Html.FROM_HTML_MODE_LEGACY));
-        holder.contactName.setText(Html.fromHtml(highlightedName, Html.FROM_HTML_MODE_LEGACY));
-
-        if (chatSession.getChatDate() != null && !chatSession.getChatDate().isEmpty()) {
-            List<Date> dates = chatSession.getChatDate();
+        if (chatSession.getLastMessageSendDate() != null && !chatSession.getLastMessageSendDate().isEmpty()) {
+            List<Date> dates = chatSession.getLastMessageSendDate();
             Date lastDate = dates.get(dates.size() - 1);
             holder.textDate.setText(dateFormat.format(lastDate));
         } else holder.textDate.setText("12:49");
@@ -342,15 +345,28 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         final int categoryId = selectedCategoryId;
 
         executor.execute(() -> {
-            List<Entity_Pv_Chat> results = Svc_Search_Query.searchWithCategory(
+            List<Entity_Chat> results = Svc_Search_Query.searchWithCategory(
                     query, categoryId, R.id.all_category, R.id.not_read, R.id.favorite
             );
 
             mainHandler.post(() -> {
+                int oldSize = displayedChats.size();
                 displayedChats.clear();
                 displayedChats.addAll(results);
+                int newSize = displayedChats.size();
 
-                notifyDataSetChanged();
+                if (oldSize > newSize) {
+                    // Itens removidos
+                    notifyItemRangeChanged(2, newSize);
+                    notifyDataSetChanged();
+                } else if (newSize > oldSize) {
+                    // Itens adicionados
+                    notifyItemRangeChanged(2, oldSize);
+                    notifyDataSetChanged();
+                } else {
+                    // Mesmo tamanho, apenas mudou conteúdo
+                    notifyDataSetChanged();
+                }
             });
         });
     }
@@ -370,9 +386,10 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
                     continue;
                 }
 
-                Entity_Pv_Chat chat = displayedChats.get(chatPosition);
+                Entity_Chat chat = displayedChats.get(chatPosition);
 
                 displayedChats.remove(chatPosition);
+                notifyItemRemoved(adapterPosition);
 
                 Repo_Chat.removeChat(chat, adapterPosition);
             }
@@ -396,7 +413,7 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
             int chatPosition = adapterPosition - 2;
 
             if (chatPosition >= 0 && chatPosition < displayedChats.size()) {
-                Entity_Pv_Chat chatSession = displayedChats.get(chatPosition);
+                Entity_Chat chatSession = displayedChats.get(chatPosition);
 
                 boolean newFavoriteState = !chatSession.isFavorite();
                 chatSession.setFavorite(newFavoriteState);
@@ -426,17 +443,18 @@ public class RV_Feed_01_Chat_Adapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+
+
     static class CategoryViewHolder extends RecyclerView.ViewHolder {
-        private final Button allCategory, favorite, groups, notRead;
+        private final Button allCategory, favorite, notRead;
 
         public CategoryViewHolder(@NonNull View itemView, RV_Feed_01_Chat_Adapter adapter) {
             super(itemView);
             allCategory = itemView.findViewById(R.id.all_category);
             notRead = itemView.findViewById(R.id.not_read);
             favorite = itemView.findViewById(R.id.favorite);
-            groups = itemView.findViewById(R.id.groups);
 
-            Button[] buttons = new Button[]{allCategory, notRead, favorite, groups};
+            Button[] buttons = new Button[]{allCategory, notRead, favorite};
             atualizarAparencia(buttons, adapter.selectedCategoryId);
 
             for (Button button : buttons) {

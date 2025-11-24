@@ -10,7 +10,7 @@ public class Service_QrCode{
 
         Log.e("Service_QrCode", "Enviando userId = " + userId);
 
-        URL url = new URL("https://youlanda-undependable-compressingly.ngrok-free.dev/api/user/get-by-id?id=" + userId);
+        URL url = new URL("https://nebula.app.br/api/user/get-by-id?id=" + userId);
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");

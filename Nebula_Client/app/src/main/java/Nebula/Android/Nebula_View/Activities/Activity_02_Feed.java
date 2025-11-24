@@ -7,6 +7,7 @@ import static android.view.View.VISIBLE;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,7 +32,7 @@ import Nebula.Android.Nebula_Data.Repository.Repo_Archived_Chats;
 import Nebula.Android.Nebula_Data.Repository.Repo_Calls_History;
 import Nebula.Android.Nebula_Data.Repository.Repo_Chat;
 import Nebula.Android.Nebula_Data.Repository.Repo_Contact;
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Chat;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_Confirm_Chat_Delection;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_01_Inbox;
 import Nebula.Android.Nebula_View.Fragments.Fragment_Feed_02_Contacts;
@@ -69,6 +70,9 @@ public class Activity_02_Feed extends AppCompatActivity {
     private Runnable hideNotifyRunnable;
     Handler handler = new Handler(Looper.getMainLooper());
     DatabaseHelper dbHelper = new DatabaseHelper(this);
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private Drawable selectedDrawable;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceBundle) {
@@ -84,10 +88,8 @@ public class Activity_02_Feed extends AppCompatActivity {
         bind = Act02FeedBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        /// Configura o Fragment Inicial
         replaceFragment(fragment01);
 
-        this.deleteDatabase("NebulaLocalDB.db");
         dbHelper.copyDatabaseIfNeeded();
 
         TimingUtils.stop("onCreate");
@@ -95,7 +97,6 @@ public class Activity_02_Feed extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        Repo_Chat.initialize(this);
         new Controller_Contact().initializeContactRepo(this);
         Repo_Calls_History.initialize(this);
     }
@@ -123,7 +124,6 @@ public class Activity_02_Feed extends AppCompatActivity {
         changeButtonBg();
     }
 
-    /// Methods to Load UI aspects
     private void setupUI() {
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -136,14 +136,15 @@ public class Activity_02_Feed extends AppCompatActivity {
                 .commit();
     }
     private void selectButton(ImageButton imageButton) {
-        if (imageButton != null) {
+        if (imageButton == null) return;
 
+        imageButton.post(() -> {
             if (lastClickedButton != null && lastClickedButton != imageButton) {
                 lastClickedButton.setBackground(null);
             }
             imageButton.setBackground(ContextCompat.getDrawable(this, R.drawable.bg_selected_highlight));
             lastClickedButton = imageButton;
-        }
+        });
     }
     private void changeButtonBg() {
         int[] buttonsIds = {
@@ -402,7 +403,7 @@ public class Activity_02_Feed extends AppCompatActivity {
 
             List<Integer> selectedPositions = new ArrayList<>(adapter.getSelectedPositions());
 
-            List<Entity_Pv_Chat> toArchive = new ArrayList<>();
+            List<Entity_Chat> toArchive = new ArrayList<>();
             for (int pos : selectedPositions) {
                 if (pos >= 0 && pos < Repo_Chat.getChats().size()) {
                     toArchive.add(Repo_Chat.getChats().get(pos));
@@ -421,7 +422,7 @@ public class Activity_02_Feed extends AppCompatActivity {
         RV_Feed_04_Archived_Adapter adapter = Repo_Archived_Chats.getArchivedAdapter();
         if (adapter != null) {
             List<Integer> selectedPositions = new ArrayList<>(adapter.getSelectedPositions());
-            List<Entity_Pv_Chat> toUnarchive = new ArrayList<>();
+            List<Entity_Chat> toUnarchive = new ArrayList<>();
 
             for (int pos : selectedPositions) {
                 if (pos >= 0 && pos < Repo_Archived_Chats.getArchivedChats().size()) {
@@ -429,7 +430,7 @@ public class Activity_02_Feed extends AppCompatActivity {
                 }
             }
 
-            for (Entity_Pv_Chat chat : toUnarchive) {
+            for (Entity_Chat chat : toUnarchive) {
                 Repo_Archived_Chats.removeArchivedChat(chat);
                 Repo_Chat.addChat(chat);
             }

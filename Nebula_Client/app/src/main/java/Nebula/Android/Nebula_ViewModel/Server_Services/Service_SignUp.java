@@ -22,7 +22,7 @@ public class Service_SignUp {
         Gson gson = new Gson();
         String json = gson.toJson(userData);
 
-        URL url = new URL("https://youlanda-undependable-compressingly.ngrok-free.dev/api/user/register");
+        URL url = new URL("https://nebula.app.br/api/user/register");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");

@@ -161,7 +161,7 @@ public class RV_Feed_03_Calls_Adapter extends RecyclerView.Adapter<RecyclerView.
 
         callHolder.callButton.setOnClickListener(v -> {
             Activity activity = (Activity) v.getContext();
-            new Controller_Voice_Call(activity).performVoiceCall(activity, call.getContactName(), call.getCallID(), call.getCallID());
+            new Controller_Voice_Call(activity).performVoiceCall(activity, call.getContactName(), call.getCallID(), call.getCallID(), call.getContactNumber());
         });
     }
 
