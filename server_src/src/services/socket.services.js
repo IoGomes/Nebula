@@ -15,6 +15,7 @@ export const initializeSocketIO = (io) => {
             if (existingIndex !== -1) {
                 connectedSockets.splice(existingIndex, 1);
             }
+            
             connectedSockets.push({ socketId: socket.id, userId, userName });
             userSocketMap[userId] = socket.id;
             console.log(`Usuário registrado: ${userName} (${userId})`);
@@ -29,43 +30,50 @@ export const initializeSocketIO = (io) => {
             });
         });
 
-        // 2. Offer
+        // 2. Offer (PASS-THROUGH PARA NOTIFICAÇÃO ANDROID)
         socket.on("newOffer", (data) => {
-            const { targetUserId, sdp, type, offererUserName, offererUserId } = data;
+            // Separamos o ID de destino (targetUserId) do resto dos dados (offerPayload)
+            // offerPayload conterá: sdp, type, offererUserName, notificationType, etc.
+            const { targetUserId, ...offerPayload } = data; 
             const targetSocketId = userSocketMap[targetUserId];
 
             if (targetSocketId) {
-                io.to(targetSocketId).emit("offerResponse", {
-                    sdp, type, offererUserId, offererUserName
-                });
+                // Envia TUDO para o destinatário
+                io.to(targetSocketId).emit("offerResponse", offerPayload);
+                console.log(`Oferta enviada de ${offerPayload.offererUserName} para ${targetUserId}`);
+            } else {
+                console.log(`Falha: Usuário alvo ${targetUserId} não encontrado no mapa de sockets.`);
             }
         });
 
         // 3. Answer
         socket.on("newAnswer", (data) => {
-            const { targetUserId, sdp, type, answererUserName } = data;
+            const { targetUserId, ...answerPayload } = data;
             const targetSocketId = userSocketMap[targetUserId];
 
             if (targetSocketId) {
+                // Repassa a resposta WebRTC (SDP)
                 io.to(targetSocketId).emit("answerResponse", {
-                    sdp, type, answererUserId: userId, answererUserName
+                    ...answerPayload,
+                    answererUserId: userId 
                 });
             }
         });
 
-        // 4. ICE Candidates
+        // 4. ICE Candidates (Troca de rotas de rede)
         socket.on("sendIceCandidate", (data) => {
             const { targetUserId, candidate } = data;
             const targetSocketId = userSocketMap[targetUserId];
 
             if (targetSocketId) {
                 io.to(targetSocketId).emit("receivedIceCandidate", {
-                    candidate, senderUserId: userId
+                    candidate, 
+                    senderUserId: userId
                 });
             }
         });
         
-        // 5. Media State Change (Camera/Mic Toggle) - NOVO
+        // 5. Media State Change (Sincronia de Câmera/Mic)
         socket.on("mediaStateChange", (data) => {
             const { targetUserId, camera, mic } = data;
             const targetSocketId = userSocketMap[targetUserId];
@@ -81,11 +89,18 @@ export const initializeSocketIO = (io) => {
 
         // 6. Disconnect
         socket.on("disconnect", () => {
+            console.log(`Socket desconectado: ${socket.id}`);
+            
             const index = connectedSockets.findIndex(s => s.socketId === socket.id);
             if (index !== -1) {
                 connectedSockets.splice(index, 1);
             }
-            if (userId) delete userSocketMap[userId];
+            
+            // Só remove do mapa global se o socket desconectado for o atual registrado para aquele user
+            // (Evita bugs se o usuário reconectar rapidamente antes do evento de disconnect disparar)
+            if (userId && userSocketMap[userId] === socket.id) {
+                delete userSocketMap[userId];
+            }
         });
     });
 };
