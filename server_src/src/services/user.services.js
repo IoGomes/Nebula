@@ -50,7 +50,7 @@ export const findByUserId = async (userId) => {
             }
         })
 
-        console.log(user)
+        // console.log(user)
         if (user === null) {
             return {success: false, reason: 'Não existe usuário cadastrado com esse ID fornecido'}
         }
