@@ -1,7 +1,6 @@
 package Nebula.Android.Nebula_Data.Repository;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +8,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import Nebula.Android.Nebula_Data.LocalDb.DatabaseHelper;
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Chat;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Feed_01_Chat_Adapter;
 
 public class Repo_Chat {
 
-    private static List<Entity_Pv_Chat> chats = new ArrayList<>();
+    private static List<Entity_Chat> chats = new ArrayList<>();
     private static RV_Feed_01_Chat_Adapter feedAdapter;
     private static DatabaseHelper dbHelper;
 
@@ -50,11 +49,11 @@ public class Repo_Chat {
         chatsChangedListener = listener;
     }
 
-    public static List<Entity_Pv_Chat> getChats() {
+    public static List<Entity_Chat> getChats() {
         return chats;
     }
 
-    public static void setChats(List<Entity_Pv_Chat> chatList) {
+    public static void setChats(List<Entity_Chat> chatList) {
         if (chatList == null) return;
         chats = chatList;
         if (feedAdapter != null) {
@@ -71,7 +70,7 @@ public class Repo_Chat {
         feedAdapter = adapter;
     }
 
-    public static void addChat(Entity_Pv_Chat chat) {
+    public static void addChat(Entity_Chat chat) {
         if (chat == null || dbHelper == null) return;
         chats.add(chat);
         dbHelper.insertChat(chat);
@@ -81,7 +80,7 @@ public class Repo_Chat {
         notifyChatsChanged();
     }
 
-    public static void addChatFromDatabase(Entity_Pv_Chat chat) {
+    public static void addChatFromDatabase(Entity_Chat chat) {
         if (chat == null) return;
         chats.add(chat);
         if (feedAdapter != null) {
@@ -90,14 +89,14 @@ public class Repo_Chat {
         notifyChatsChanged();
     }
 
-    public static void removeChat(Entity_Pv_Chat chat) {
+    public static void removeChat(Entity_Chat chat) {
         synchronized (chats) {
             chats.remove(chat);
             notifyChatsChanged();
         }
     }
 
-    public static void removeChat(Entity_Pv_Chat chat, int adapterPosition) {
+    public static void removeChat(Entity_Chat chat, int adapterPosition) {
         if (chat == null || dbHelper == null) return;
 
         if (chats.indexOf(chat) != -1) {
@@ -111,12 +110,12 @@ public class Repo_Chat {
                         feedAdapter.getItemCount());
             }
 
-            dbHelper.deleteChat(chat.getChatSessionId());
+            dbHelper.deleteChat(chat.getChatId());
         }
     }
 
 
-    public static void favoriteChat(Entity_Pv_Chat chat) {
+    public static void favoriteChat(Entity_Chat chat) {
         if (chat == null || dbHelper == null) return;
         int index = chats.indexOf(chat);
         if (index != -1) {

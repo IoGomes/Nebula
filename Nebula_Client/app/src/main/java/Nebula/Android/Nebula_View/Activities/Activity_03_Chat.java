@@ -1,9 +1,7 @@
 package Nebula.Android.Nebula_View.Activities;
 
-import static android.app.PendingIntent.getActivity;
 import static android.view.View.VISIBLE;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -14,7 +12,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -23,28 +20,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
-import Nebula.Android.Nebula_Model.Entitys.Entity_Message;
+import Nebula.Android.Nebula_Data.Preferences.SessionPreferences;
 import Nebula.Android.Nebula_Data.Repository.Repo_Chat;
 import Nebula.Android.Nebula_Data.Repository.Repo_Chat_Storage;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Message;
+import Nebula.Android.Nebula_Model.Services.StompChatService;
 import Nebula.Android.Nebula_View.Dialogs.Dialog_Feed_Profile_Image;
 import Nebula.Android.Nebula_View.RV_Adapters.RV_Chat_01_Msg_Adapter;
 import Nebula.Android.Nebula_View.Utils.NavBar_Inserts;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Video_Call;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Voice_Call;
-import Nebula.Android.Nebula_Model.Services.StompChatService;
 import Nebula.Android.R;
 import Nebula.Android.databinding.Act03ChatBinding;
 
-/// @author Ítalo Oliveira Gomes
-
 public class Activity_03_Chat extends AppCompatActivity {
+
+    private static final String TAG = "Activity_03_Chat";
 
     private RV_Chat_01_Msg_Adapter adapter;
     private List<Entity_Message> messageList;
@@ -54,58 +54,48 @@ public class Activity_03_Chat extends AppCompatActivity {
     private Handler mainHandler;
 
     private StompChatService chatService;
-    private String username = "User_" + System.currentTimeMillis();
-    private String chatRoomId = "public";
-
-    private List<Entity_Pv_Chat> chatSessions;
-
     private Repo_Chat_Storage chatStorage;
 
     private static final String SERVER_URL = "wss://malinda-poetless-manipulatively.ngrok-free.dev/ws/websocket";
-    private static final String TOPIC_PATTERN = "/topic/chat/%s";
-    private static final String SEND_DESTINATION = "/app/chat.send";
-    private static final String JOIN_DESTINATION = "/app/chat.join";
-    private static final String LEAVE_DESTINATION = "/app/chat.leave";
 
-    private int currentChatPosition = 0;
-    private String currentChatId;
-    private String currentNumber;
-    private String currentChatWith;
+    private static final String PRIVATE_TOPIC_PATTERN = "/user/%s/queue/messages";
+    private static final String SEND_DESTINATION = "/app/chat.sendPrivate";
+    private static final String JOIN_DESTINATION = "/app/chat.joinPrivate";
+    private static final String LEAVE_DESTINATION = "/app/chat.leavePrivate";
+
+    private String CHAT_ID;
+    private int CHAT_POS;
+    private String SENDER_ID;
+    private String RECEIVER_ID;
+    private String RECEIVER_NAME;
+    private String RECEIVER_NUMBER;
 
     @Override
     protected void onCreate(Bundle savedInstanceBundle) {
+        super.onCreate(savedInstanceBundle);
 
         setTheme(androidx.appcompat.R.style.Theme_AppCompat);
-
-        super.onCreate(savedInstanceBundle);
 
         bind = Act03ChatBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        currentChatPosition = getIntent().getIntExtra("CHAT_POSITION", 0);
-        currentChatId = getIntent().getStringExtra("CHAT_ID");
-        currentNumber = getIntent().getStringExtra("ContactNumber");
-        currentChatWith = getIntent().getStringExtra("ChatWith");
+        CHAT_ID = getIntent().getStringExtra("CHAT_ID");
+        CHAT_POS = getIntent().getIntExtra("CHAT_POS", 0);
+        SENDER_ID = new SessionPreferences(this).getKeyId();
+        RECEIVER_ID = getIntent().getStringExtra("RECEIVER_ID");
+        RECEIVER_NAME = getIntent().getStringExtra("RECEIVER_NAME");
+        RECEIVER_NUMBER = getIntent().getStringExtra("RECEIVER_NUMBER");
 
-        Log.e("Teste", "Posição: " + currentChatPosition);
-
-        bind.nomeContato.setText(currentChatWith);
-        bind.contactNumber.setText(currentNumber);
+        setupUI();
 
         chatStorage = new Repo_Chat_Storage(this);
-
-        setupBasicUI();
 
         executorService = Executors.newSingleThreadExecutor();
         mainHandler = new Handler(Looper.getMainLooper());
 
         chatService = new StompChatService();
 
-        bind.videoCall.setOnClickListener(v -> {
-            new Controller_Video_Call(this).performVideoCall(this,
-                    currentChatWith, currentChatId, currentNumber);
-        });
-
+        loadSavedMessages();
 
         bind.getRoot().post(() -> {
             initializeHeavyComponents();
@@ -118,11 +108,18 @@ public class Activity_03_Chat extends AppCompatActivity {
         });
     }
 
-    private void setupBasicUI() {
+    private String generateRoomId(String userId1, String userId2) {
+        List<String> ids = Arrays.asList(userId1, userId2);
+        Collections.sort(ids);
+        return String.join("_", ids);
+    }
 
+    private void setupUI() {
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         Objects.requireNonNull(getSupportActionBar()).hide();
 
+        bind.nomeContato.setText(RECEIVER_NAME);
+        bind.contactNumber.setText(RECEIVER_NUMBER);
 
         messageList = new ArrayList<>();
         adapter = new RV_Chat_01_Msg_Adapter(messageList);
@@ -134,20 +131,30 @@ public class Activity_03_Chat extends AppCompatActivity {
         bind.rvMessage.setItemAnimator(null);
         bind.rvMessage.setHasFixedSize(true);
 
-        if (!messageList.isEmpty()) {
-            bind.rvMessage.scrollToPosition(messageList.size() - 1);
-        }
-
         bind.profilePhoto.setOnClickListener(v ->
                 new Dialog_Feed_Profile_Image(
                         v.getContext(),
-                        currentChatWith, currentChatId, currentNumber
+                        SENDER_ID, RECEIVER_ID, RECEIVER_NAME, RECEIVER_NUMBER
                 ).show()
         );
     }
 
-    private void initializeHeavyComponents() {
+    // ✅ ADICIONAR: Carregar mensagens salvas
+    private void loadSavedMessages() {
+        if (CHAT_ID != null && chatStorage.hasSavedMessages(CHAT_ID)) {
+            List<Entity_Message> savedMessages = chatStorage.loadMessages(CHAT_ID);
+            messageList.addAll(savedMessages);
+            adapter.notifyDataSetChanged();
 
+            if (!messageList.isEmpty()) {
+                bind.rvMessage.scrollToPosition(messageList.size() - 1);
+            }
+
+            Log.d(TAG, "📂 Carregadas " + savedMessages.size() + " mensagens do storage");
+        }
+    }
+
+    private void initializeHeavyComponents() {
         executorService.execute(() -> {
             mainHandler.post(() -> setTheme(androidx.appcompat.R.style.Theme_AppCompat));
         });
@@ -161,25 +168,49 @@ public class Activity_03_Chat extends AppCompatActivity {
     }
 
     private void connectToWebSocket() {
-
         chatService.connect(SERVER_URL, new StompChatService.ConnectionListener() {
             @Override
             public void onConnected() {
                 runOnUiThread(() -> {
-
+                    Log.d(TAG, "✅ Conectado ao servidor");
                     bind.status.setVisibility(VISIBLE);
 
-                    String topic = String.format(TOPIC_PATTERN, chatRoomId);
-                    subscribeToChat(topic);
+                    // ✅ Gera o roomId normalizado
+                    String roomId = generateRoomId(SENDER_ID, RECEIVER_ID);
+                    String roomTopic = "/topic/chat/room/" + roomId;
 
-                    chatService.joinChat(JOIN_DESTINATION, username, chatRoomId);
+                    Log.d(TAG, "🔑 Room ID: " + roomId);
+                    Log.d(TAG, "📡 Inscrevendo em: " + roomTopic);
+
+                    // ✅ Inscreve-se no tópico da room
+                    chatService.subscribe(roomTopic, new StompChatService.MessageListener() {
+                        @Override
+                        public void onMessageReceived(StompChatService.ChatMessage message) {
+                            runOnUiThread(() -> {
+                                Log.d(TAG, "📨 Mensagem recebida na room");
+                                Log.d(TAG, "   De: " + message.getSenderId());
+                                Log.d(TAG, "   Conteúdo: " + message.getContent());
+
+                                // Ignora próprias mensagens
+                                if (!SENDER_ID.equals(message.getSenderId())) {
+                                    receiveMessage(message);
+                                } else {
+                                    Log.d(TAG, "⏭️ Ignorando própria mensagem");
+                                }
+                            });
+                        }
+                    });
+
+                    // Join na room
+                    chatService.joinPrivateChat(JOIN_DESTINATION, SENDER_ID, RECEIVER_ID, RECEIVER_NAME);
                 });
             }
 
             @Override
             public void onDisconnected() {
                 runOnUiThread(() -> {
-                    // ✅ ADICIONAR - Salvar mensagens quando desconectar
+                    Log.d(TAG, "🔌 Desconectado do servidor");
+                    bind.status.setVisibility(View.GONE);
                     saveMessagesBeforeExit();
                 });
             }
@@ -187,25 +218,34 @@ public class Activity_03_Chat extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 runOnUiThread(() -> {
-                    showConnectionStatus("Erro: " + error);
+                    Log.e(TAG, "❌ Erro de conexão: " + error);
+                    bind.status.setVisibility(View.GONE);
+
+                    // Tentar reconectar após 2 segundos
                     mainHandler.postDelayed(() -> {
                         if (!chatService.isConnected()) {
+                            Log.d(TAG, "🔄 Tentando reconectar...");
                             connectToWebSocket();
                         }
-                    }, 1000);
+                    }, 2000);
                 });
             }
         });
     }
 
-    private void subscribeToChat(String topic) {
-        chatService.subscribe(topic, new StompChatService.MessageListener() {
+    // ✅ RENOMEADO: subscribeToPrivateChat
+    private void subscribeToPrivateChat(String privateTopic) {
+        chatService.subscribe(privateTopic, new StompChatService.MessageListener() {
             @Override
             public void onMessageReceived(StompChatService.ChatMessage message) {
                 runOnUiThread(() -> {
+                    Log.d(TAG, "📨 Mensagem privada recebida de: " + message.getSenderId());
 
-                    if (!message.getSender().equals(username)) {
+                    // ✅ CORRIGIDO: Verificar se é mensagem do outro usuário
+                    if (!SENDER_ID.equals(message.getSenderId())) {
                         receiveMessage(message);
+                    } else {
+                        Log.d(TAG, "⏭️ Ignorando própria mensagem");
                     }
                 });
             }
@@ -218,43 +258,53 @@ public class Activity_03_Chat extends AppCompatActivity {
         newMessage.setDateTimeMessage(new Date());
         newMessage.setWasVisualized(false);
         newMessage.setIsSentByMe(true);
-        newMessage.setSenderName(username);
+        newMessage.setSenderName(RECEIVER_NAME); // Nome do destinatário
 
         messageList.add(newMessage);
         adapter.notifyItemInserted(messageList.size() - 1);
         bind.rvMessage.scrollToPosition(messageList.size() - 1);
 
-        if (currentChatId != null) {
-            chatStorage.addMessage(currentChatId, newMessage);
-            Log.d("NebulaChat", "💾 Mensagem salva no storage");
+        // Salvar no storage
+        if (CHAT_ID != null) {
+            chatStorage.addMessage(CHAT_ID, newMessage);
+            Log.d(TAG, "💾 Mensagem salva no storage");
         }
 
-        if (Repo_Chat.getChats() != null && currentChatPosition < Repo_Chat.getChats().size()) {
-            Repo_Chat.getChats().get(currentChatPosition).setLastMessage(text);
-            Log.d("NebulaChat", "✅ LastMessage atualizado na posição: " + currentChatPosition);
+        // Atualizar última mensagem no repositório
+        if (Repo_Chat.getChats() != null && CHAT_POS < Repo_Chat.getChats().size()) {
+            Repo_Chat.getChats().get(CHAT_POS).setLastMessageSend(text);
 
             if (Repo_Chat.getFeedAdapter() != null) {
-                int recyclerViewPosition = currentChatPosition + 2;
+                int recyclerViewPosition = CHAT_POS + 2;
                 Repo_Chat.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
-                Log.d("NebulaChat", "✅ Adapter notificado na posição: " + recyclerViewPosition);
+                Log.d(TAG, "✅ Feed atualizado");
             }
         }
 
+        // Enviar via WebSocket
         if (chatService.isConnected()) {
-            StompChatService.ChatMessage stompMessage = new StompChatService.ChatMessage(
-                    username,
-                    text,
-                    "CHAT",
-                    chatRoomId
-            );
+
+            String roomId = CHAT_ID != null ? CHAT_ID : SENDER_ID + "_" + RECEIVER_ID;
+
+            StompChatService.ChatMessage stompMessage =
+                    new StompChatService.ChatMessage(
+                            SENDER_ID,
+                            text,
+                            "CHAT",
+                            roomId
+                    );
+            stompMessage.setSenderId(SENDER_ID);
+            stompMessage.setReceiverId(RECEIVER_ID);
+            stompMessage.setContent(text);
+            stompMessage.setType("CHAT");
+            stompMessage.setTimestamp(System.currentTimeMillis());
 
             String json = new Gson().toJson(stompMessage);
-            Log.d("NebulaChat", "📤 Enviando mensagem: " + json);
+            Log.d(TAG, "📤 Enviando mensagem privada: " + json);
 
             chatService.sendMessage(SEND_DESTINATION, stompMessage);
         } else {
-            Log.w("NebulaChat", "⚠️ Não conectado! Tentando reconectar...");
-            Toast.makeText(this, "Não conectado. Tentando reconectar...", Toast.LENGTH_SHORT).show();
+            Log.w(TAG, "⚠️ Não conectado! Tentando reconectar...");
             connectToWebSocket();
         }
     }
@@ -264,51 +314,83 @@ public class Activity_03_Chat extends AppCompatActivity {
         newMessage.setMessage(stompMessage.getContent());
         newMessage.setDateTimeMessage(new Date(stompMessage.getTimestamp()));
         newMessage.setWasVisualized(false);
-        newMessage.setSenderName(stompMessage.getSender());
+        newMessage.setSenderName(RECEIVER_NAME);
         newMessage.setIsSentByMe(false);
 
         messageList.add(newMessage);
         adapter.notifyItemInserted(messageList.size() - 1);
         bind.rvMessage.scrollToPosition(messageList.size() - 1);
 
-
-        if (currentChatId != null) {
-            chatStorage.addMessage(currentChatId, newMessage);
-            Log.d("NebulaChat", "💾 Mensagem recebida salva no storage");
+        // Salvar no storage
+        if (CHAT_ID != null) {
+            chatStorage.addMessage(CHAT_ID, newMessage);
+            Log.d(TAG, "💾 Mensagem recebida salva no storage");
         }
 
-        String lastMessageText = stompMessage.getContent();
-        if (Repo_Chat.getChats() != null && currentChatPosition < Repo_Chat.getChats().size()) {
-            Repo_Chat.getChats().get(currentChatPosition).setLastMessage(lastMessageText);
-            Repo_Chat.getChats().get(currentChatPosition).setHasUnread(true);
+        createChatIfNotExists(stompMessage);
 
-            Log.d("NebulaChat", "📥 Mensagem recebida na posição: " + currentChatPosition);
+        String lastMessageText = stompMessage.getContent();
+        if (Repo_Chat.getChats() != null && CHAT_POS < Repo_Chat.getChats().size()) {
+            Repo_Chat.getChats().get(CHAT_POS).setLastMessageSend(lastMessageText);
+            Repo_Chat.getChats().get(CHAT_POS).setRead(true);
 
             if (Repo_Chat.getFeedAdapter() != null) {
-                int recyclerViewPosition = currentChatPosition + 2;
+                int recyclerViewPosition = CHAT_POS + 2;
                 Repo_Chat.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
-                Log.d("NebulaChat", "✅ Feed atualizado na posição: " + recyclerViewPosition);
+                Log.d(TAG, "✅ Feed atualizado");
             }
+        }
+    }
+
+    private void createChatIfNotExists(StompChatService.ChatMessage stompMessage) {
+        // Verifica se o chat já existe
+        boolean chatExists = false;
+        if (Repo_Chat.getChats() != null) {
+            for (Entity_Chat chat : Repo_Chat.getChats()) {
+                if (chat.getChatId() != null && chat.getChatId().equals(CHAT_ID)) {
+                    chatExists = true;
+                    break;
+                }
+            }
+        }
+
+        // Se não existir, cria um novo
+        if (!chatExists) {
+            Entity_Chat newChat = new Entity_Chat();
+            newChat.setChatId(CHAT_ID);
+            newChat.setReceiverName(stompMessage.getSender());
+            newChat.setReceiverNumber(stompMessage.getSenderId());
+            newChat.setLastMessageSend(stompMessage.getContent());
+            newChat.setRead(true); // Marca como não lido
+            newChat.setFavorite(false);
+
+            // Adiciona usando o método que já existe
+            Repo_Chat.addChat(newChat);
+
+            Log.d("NebulaChat", "✅ Novo chat criado no feed: " + CHAT_ID);
         }
     }
 
 
     private void saveMessagesBeforeExit() {
-        if (currentChatId != null && !messageList.isEmpty()) {
-            chatStorage.saveMessages(currentChatId, messageList);
-            Log.d("NebulaChat", "💾 Todas as mensagens salvas: " + messageList.size());
+        if (CHAT_ID != null && !messageList.isEmpty()) {
+            chatStorage.saveMessages(CHAT_ID, messageList);
+            Log.d(TAG, "💾 Todas as mensagens salvas: " + messageList.size());
         }
     }
 
-    private void showConnectionStatus(String status) {
-        Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
-    }
-
     private void setupClickListeners() {
+        bind.videoCall.setOnClickListener(v -> {
+            new Controller_Video_Call(this).performVideoCall(
+                    this, SENDER_ID, RECEIVER_ID, RECEIVER_NAME, RECEIVER_NUMBER
+            );
+        });
 
-
-        bind.voiceCall.setOnClickListener(v ->
-                new Controller_Voice_Call(this).performVoiceCall(this, currentChatWith, currentChatId, currentNumber ));
+        bind.voiceCall.setOnClickListener(v -> {
+            new Controller_Voice_Call(this).performVoiceCall(
+                    this, SENDER_ID, RECEIVER_ID, RECEIVER_NAME, RECEIVER_NUMBER
+            );
+        });
 
         bind.send.setOnClickListener(v -> {
             String text = bind.messageTextfield.getText().toString().trim();
@@ -367,11 +449,17 @@ public class Activity_03_Chat extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        // ✅ ADICIONAR - Salvar mensagens ao destruir
+        Log.d(TAG, "🗑️ Destruindo activity");
+
         saveMessagesBeforeExit();
 
         if (chatService != null) {
-            chatService.leaveChat(LEAVE_DESTINATION, username, chatRoomId);
+            chatService.leavePrivateChat(
+                    LEAVE_DESTINATION,
+                    SENDER_ID,
+                    RECEIVER_ID,
+                    RECEIVER_NAME
+            );
             chatService.disconnect();
         }
 
@@ -384,12 +472,12 @@ public class Activity_03_Chat extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        // ✅ ADICIONAR - Salvar mensagens ao pausar
+        Log.d(TAG, "⏸️ Activity pausada");
+
         saveMessagesBeforeExit();
 
-        // ✅ OPCIONAL - Marcar mensagens como visualizadas
-        if (currentChatId != null) {
-            chatStorage.markAllAsRead(currentChatId);
+        if (CHAT_ID != null) {
+            chatStorage.markAllAsRead(CHAT_ID);
         }
     }
 
@@ -397,14 +485,16 @@ public class Activity_03_Chat extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (currentChatId != null) {
-            chatStorage.markAllAsRead(currentChatId);
+        Log.d(TAG, "▶️ Activity resumida");
 
-            if (Repo_Chat.getChats() != null && currentChatPosition < Repo_Chat.getChats().size()) {
-                Repo_Chat.getChats().get(currentChatPosition).setHasUnread(false);
+        if (CHAT_ID != null) {
+            chatStorage.markAllAsRead(CHAT_ID);
+
+            if (Repo_Chat.getChats() != null && CHAT_POS < Repo_Chat.getChats().size()) {
+                Repo_Chat.getChats().get(CHAT_POS).setRead(false);
 
                 if (Repo_Chat.getFeedAdapter() != null) {
-                    int recyclerViewPosition = currentChatPosition + 2;
+                    int recyclerViewPosition = CHAT_POS + 2;
                     Repo_Chat.getFeedAdapter().notifyItemChanged(recyclerViewPosition);
                 }
             }

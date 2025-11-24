@@ -18,7 +18,6 @@ public class Service_Online {
     private ConnectionListener listener;
     private boolean isConnected = false;
 
-    // Interface para callbacks de conexão
     public interface ConnectionListener {
         void onConnected();
         void onDisconnected();
@@ -26,24 +25,20 @@ public class Service_Online {
         void onDataReceived(JSONObject data);
     }
 
-    // URL do servidor - COLOQUE SUA URL DO NGROK AQUI
-    private static final String SERVER_URL = "https://youlanda-undependable-compressingly.ngrok-free.dev/";
+    private static final String SERVER_URL = "https://nebula.app.br";
 
-    // Construtor
     public Service_Online(String userName, ConnectionListener listener) {
         this.userName = userName;
         this.listener = listener;
         initializeSocket();
     }
 
-    // Construtor alternativo com URL customizada
     public Service_Online(String userName, String serverUrl, ConnectionListener listener) {
         this.userName = userName;
         this.listener = listener;
         initializeSocket(serverUrl);
     }
 
-    // Construtor com userId e userName
     public Service_Online(String userId, String userName, String serverUrl, ConnectionListener listener) {
         this.userName = userName;
         this.listener = listener;

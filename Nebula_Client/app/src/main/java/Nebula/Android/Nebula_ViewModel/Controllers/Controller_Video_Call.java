@@ -2,12 +2,7 @@ package Nebula.Android.Nebula_ViewModel.Controllers;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
-import Nebula.Android.Nebula_View.Activities.Activity_03_Chat;
-import Nebula.Android.Nebula_ViewModel.Server_Services.Service_Online;
 
 import androidx.core.app.ActivityCompat;
 
@@ -16,7 +11,6 @@ import Nebula.Android.Nebula_Model.Services.Svc_Permission;
 import Nebula.Android.Nebula_Model.UseCases.UseCase_Video_Call;
 import Nebula.Android.Nebula_View.Activities.Activity_05_Video_Call;
 import Nebula.Android.R;
-import io.socket.client.Socket;
 
 public class Controller_Video_Call {
 
@@ -30,20 +24,20 @@ public class Controller_Video_Call {
         useCaseVideoCall = new UseCase_Video_Call(servicePermission, networkChecker);
     }
 
-    public void intentPutExtra(Intent intent, String userName, String userId, String contactNumber){
-        intent.putExtra("SENDER_USER_ID", userId);
+    public void intentPutExtra(Intent intent, String senderId, String receiverId, String receiverName, String receiverNumber){
+        intent.putExtra("SENDER_USER_ID", senderId);
 
-        intent.putExtra("RECEIVER_USER_ID", userId);
-        intent.putExtra("RECEIVER_USER_NAME", userName);
-        intent.putExtra("RECEIVER_USER_PHONE_NUMBER", contactNumber);
+        intent.putExtra("RECEIVER_ID", receiverId);
+        intent.putExtra("RECEIVER_NAME", receiverName);
+        intent.putExtra("RECEIVER_NUMBER", receiverNumber);
     }
 
-    public void performVideoCall(Activity activity, String userName, String userId, String contactNumber) {
+    public void performVideoCall(Activity activity, String senderId, String receiverId, String receiverName, String receiverNumber) {
 
         if (useCaseVideoCall.isEnabled())
         {
             Intent intent = new Intent(activity, Activity_05_Video_Call.class);
-            intentPutExtra(intent, userName, userId, contactNumber);
+            intentPutExtra(intent, senderId, receiverId, receiverName, receiverNumber);
             activity.startActivity(intent);
             activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         }

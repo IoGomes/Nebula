@@ -63,31 +63,21 @@ public class Controller_Contact {
 
                     try {
                         JSONObject json = new JSONObject(response);
-
                         if (!json.has("userData")) {
-                            Log.e("QR", "response sem userData");
                             return;
                         }
-
                         JSONObject userData = json.optJSONObject("userData");
                         if (userData == null) {
-                            Log.e("QR", "userData não é um objeto");
                             return;
                         }
-
                         if (!userData.has("user")) {
-                            Log.e("QR", "userData sem user");
                             return;
                         }
-
                         JSONObject user = userData.optJSONObject("user");
                         if (user == null) {
-                            Log.e("QR", "user não é um objeto");
                             return;
                         }
-
                         if (!user.has("user_id") || !user.has("username") || !user.has("phone_number")) {
-                            Log.e("QR", "Campos obrigatórios faltando");
                             return;
                         }
 
@@ -96,7 +86,6 @@ public class Controller_Contact {
                         String userName = user.optString("username", "");
 
                         if (userId.isEmpty() || userName.isEmpty()) {
-                            Log.e("QR", "Valores inválidos no JSON");
                             return;
                         }
                         addContactOnRepo(new Entity_Contact(userId, userName, userNumber));
@@ -111,7 +100,6 @@ public class Controller_Contact {
                         });
 
                     } catch (Exception e) {
-                        Log.e("QR", "Erro ao tratar QR: " + e.getMessage());
                     }
                 }
             @Override

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
+import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Chat;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Video_Call;
 import Nebula.Android.Nebula_ViewModel.Controllers.Controller_Voice_Call;
 import Nebula.Android.databinding.Dlg05ProfileImageBinding;
@@ -22,7 +24,7 @@ public class Dialog_Feed_Profile_Image extends Dialog {
     Dlg05ProfileImageBinding bind;
     private Activity activity;
 
-    public Dialog_Feed_Profile_Image(@NonNull Context context, String chatWith, String chatId, String currentNumber) {
+    public Dialog_Feed_Profile_Image(@NonNull Context context, String senderId, String receiverId, String receiverName, String receiverNumber) {
         super(context);
 
         this.activity = getActivityFromContext(context);
@@ -37,29 +39,27 @@ public class Dialog_Feed_Profile_Image extends Dialog {
         params.height = WindowManager.LayoutParams.WRAP_CONTENT;
         getWindow().setAttributes(params);
 
-        bind.nomeContato.setText(chatWith);
+        bind.nomeContato.setText(receiverName);
 
-        //bind.videoCall.setOnClickListener(v -> {
-        //new Controller_Video_Call(activity).performVideoCall(activity);
-        //dismiss();
-        //});
+        bind.videoCall.setOnClickListener(v -> {
+            new Controller_Video_Call(activity).performVideoCall
+                    (activity, senderId, receiverId, receiverName, receiverNumber);
+            Log.e("Controller_Chat", " " + senderId + receiverId + receiverName + receiverNumber);
+            dismiss();
+        });
 
         bind.voiceCall.setOnClickListener(v -> {
-            new Controller_Voice_Call(activity).performVoiceCall(activity, chatWith, chatId, currentNumber);
+            new Controller_Voice_Call(activity).performVoiceCall
+                    (activity, senderId, receiverId, receiverName, receiverNumber);
             dismiss();
         });
 
         bind.textMessage.setOnClickListener(v -> {
-            new Controller_Voice_Call(activity).performVoiceCall(activity, chatWith, chatId, currentNumber);
+            new Controller_Chat().performChat
+                    (activity, receiverId, receiverName, receiverNumber);
+            Log.e("Controller_Chat", " " + senderId + receiverId + receiverName + receiverNumber);
             dismiss();
         });
-
-        init(context);
-
-    }
-
-    private void init(Context context) {
-
     }
 
     private Activity getActivityFromContext(Context context) {

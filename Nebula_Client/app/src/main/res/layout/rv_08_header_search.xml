@@ -8,10 +8,12 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_marginStart="10dp"
+        android:textColorHighlight="#80EC407A"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="6dp"
-        android:background="@drawable/bg_main_searchfield"
+        android:textCursorDrawable="@drawable/custom_cursor"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/transparent"
         android:drawableStart="@drawable/ic_search"
         android:drawablePadding="20dp"
         android:hint="Pesquisar..."
@@ -22,10 +24,10 @@
         android:textColorHint="#909090" />
 
     <View
+        android:layout_marginTop="4dp"
         android:id="@+id/searchLine"
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:layout_alignBottom="@id/searchGlass"
         android:layout_gravity="bottom"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"

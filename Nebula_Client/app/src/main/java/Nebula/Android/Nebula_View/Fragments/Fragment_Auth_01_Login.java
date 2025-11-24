@@ -29,7 +29,7 @@ import Nebula.Android.databinding.Frg01LoginBinding;
 public class Fragment_Auth_01_Login extends Fragment {
 
     private static final String TAG = "Fragment_Auth_Login";
-    private static final String SERVER_URL = "https://youlanda-undependable-compressingly.ngrok-free.dev/";
+    private static final String SERVER_URL = "https://nebula.app.br";
 
     private Frg01LoginBinding bind;
     private Service_Online connection;

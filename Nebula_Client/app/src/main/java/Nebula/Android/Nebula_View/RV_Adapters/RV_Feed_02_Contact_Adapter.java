@@ -132,10 +132,6 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             HeaderViewHolder header = (HeaderViewHolder) holder;
             header.bind();
             if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
-                header.etSearch.setBackground(
-                        ContextCompat.getDrawable(header.itemView.getContext(),
-                                R.drawable.bg_main_searchfield)
-                );
             } else {
                 header.etSearch.setBackground(
                         ContextCompat.getDrawable(holder.itemView.getContext(),
@@ -168,7 +164,11 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
 
             if (rvFeed02ContactMode == Adapter_Mode.MODE_A) {
                 itemHolder.profile.setOnClickListener(v ->
-                        new Dialog_Feed_Profile_Image(v.getContext(), contact.getContactName(), contact.getContactId(), contact.getContactNumber()).show()
+                        new Dialog_Feed_Profile_Image(v.getContext(),
+                                contact.getContactId(),
+                                contact.getContactNumber(),
+                                contact.getContactName(),
+                                contact.getContactNumber()).show()
                 );
             }
 
@@ -184,13 +184,14 @@ public class RV_Feed_02_Contact_Adapter extends RecyclerView.Adapter<RecyclerVie
             itemHolder.itemView.setOnClickListener(v -> {
                 if (rvFeed02ContactMode == Adapter_Mode.MODE_A && !selectedPositions.isEmpty()) {
                     toggleSelection(index, v);
-                } else {
-
+                }
+                else
+                {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, Activity_03_Chat.class);
-                    intent.putExtra("CHAT_POSITION", index);
-                    intent.putExtra("ChatWith", contact.getContactName());
-                    intent.putExtra("ContactNumber", contact.getContactNumber());
+                    intent.putExtra("RECEIVER_ID", contact.getContactId());
+                    intent.putExtra("RECEIVER_NAME", contact.getContactName());
+                    intent.putExtra("RECEIVER_NUMBER", contact.getContactNumber());
                     context.startActivity(intent);
                 }
             });

@@ -19,7 +19,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="94dp"
-            android:background="#000000"
+            android:background="@android:color/transparent"
             android:orientation="horizontal"
             android:padding="08dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -161,20 +161,6 @@
             android:layout_weight="1"
             android:orientation="vertical"
             tools:context=".Fragments.Fragment_03_AllChats">
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/stars"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:lottie_loop="true"
-                android:scaleX="-1"
-                android:visibility="gone"
-                app:lottie_rawRes="@raw/stars" />
 
         </LinearLayout>
 
@@ -322,24 +308,6 @@
                     android:src="@drawable/ic_call"
                     android:stateListAnimator="@animator/scale_animation" />
 
-                <TextView
-                    android:id="@+id/callsCountUnread"
-                    android:visibility="visible"
-                    android:gravity="center"
-                    android:clickable="false"
-                    android:text="5"
-                    android:focusable="false"
-                    android:textSize="12sp"
-                    android:textColor="@color/black"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="16dp"
-                    android:elevation="1dp"
-                    android:minWidth="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="16dp"
-                    android:layout_gravity="end"
-                    android:background="@drawable/ic_notification"/>
-
             </FrameLayout>
 
             <Space
@@ -387,24 +355,6 @@
                     android:interpolator="@android:anim/accelerate_decelerate_interpolator"
                     android:src="@drawable/ic_archived"
                     android:stateListAnimator="@animator/scale_animation" />
-
-                <TextView
-                    android:id="@+id/archivedCountUnread"
-                    android:visibility="visible"
-                    android:gravity="center"
-                    android:clickable="false"
-                    android:text="5"
-                    android:focusable="false"
-                    android:textSize="12sp"
-                    android:textColor="@color/black"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="16dp"
-                    android:elevation="1dp"
-                    android:minWidth="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="16dp"
-                    android:layout_gravity="end"
-                    android:background="@drawable/ic_notification"/>
 
             </FrameLayout>
 

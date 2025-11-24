@@ -24,24 +24,24 @@ public class Controller_Voice_Call {
         useCaseVoiceCall = new UseCase_Voice_Call(servicePermission, networkChecker);
     }
 
-    private void intentBuilder(Intent intent, String userName, String userId, String contactNumber){
-        intent.putExtra("SENDER_USER_ID", userId);
-
-        intent.putExtra("RECEIVER_USER_ID", userId);
-        intent.putExtra("RECEIVER_USER_NAME", userName);
-        intent.putExtra("RECEIVER_USER_PHONE_NUMBER", contactNumber);
+    private void intentBuilder(Intent intent, String senderId, String receiverId, String receiverName, String receiverNumber){
+        intent.putExtra("SENDER_USER_ID", senderId);
+        intent.putExtra("RECEIVER_USER_ID", receiverId);
+        intent.putExtra("RECEIVER_USER_NAME", receiverName);
+        intent.putExtra("RECEIVER_USER_PHONE_NUMBER", receiverNumber);
     }
 
-    public void performVoiceCall(Activity activity, String userName, String userId, String contactNumber) {
+    public void performVoiceCall(Activity activity, String senderId, String receiverId, String receiverName, String receiverNumber) {
         if (useCaseVoiceCall.isEnabled()) {
             Intent intent = new Intent(activity, Activity_04_Voice_Call.class);
-            intentBuilder(intent, userName, userId, contactNumber);
+            intentBuilder(intent, senderId, receiverId, receiverName, receiverNumber);
             activity.startActivity(intent);
             activity.overridePendingTransition(
                     R.anim.slide_in_right,
                     R.anim.slide_out_left
             );
-        } else {
+        }
+        else {
             ActivityCompat.requestPermissions(
                     activity,
                     new String[]{

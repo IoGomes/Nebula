@@ -19,7 +19,7 @@ import java.util.Locale;
 
 import Nebula.Android.Nebula_Data.Repository.Repo_Calls_History;
 import Nebula.Android.Nebula_Data.Repository.Repo_Contact;
-import Nebula.Android.Nebula_Model.Entitys.Entity_Pv_Chat;
+import Nebula.Android.Nebula_Model.Entitys.Entity_Chat;
 import Nebula.Android.Nebula_Data.Repository.Repo_Chat;
 import Nebula.Android.Nebula_Model.Entitys.Entity_Call;
 import Nebula.Android.Nebula_Model.Entitys.Entity_Contact;
@@ -100,11 +100,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void loadChatsToRepository() {
 
-        List<Entity_Pv_Chat> chatsFromDb = getAllChatSessions();
+        List<Entity_Chat> chatsFromDb = getAllChatSessions();
 
         Repo_Chat.getChats().clear();
 
-        for (Entity_Pv_Chat chat : chatsFromDb) {
+        for (Entity_Chat chat : chatsFromDb) {
             Repo_Chat.addChatFromDatabase(chat);
         }
     }
@@ -115,12 +115,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{chatSessionId});
 
         if (cursor.moveToFirst()) {
-            Entity_Pv_Chat chat = new Entity_Pv_Chat();
-            chat.setChatSessionId(cursor.getString(cursor.getColumnIndexOrThrow("chatSessionId")));
-            chat.setChatWith(cursor.getString(cursor.getColumnIndexOrThrow("chatWith")));
-            chat.setHasUnread(cursor.getInt(cursor.getColumnIndexOrThrow("hasUnread")) == 1);
+            Entity_Chat chat = new Entity_Chat();
+            chat.setChatId(cursor.getString(cursor.getColumnIndexOrThrow("chat")));
+            chat.setReceiverName(cursor.getString(cursor.getColumnIndexOrThrow("chatWith")));
+            chat.setRead(cursor.getInt(cursor.getColumnIndexOrThrow("hasUnread")) == 1);
             chat.setFavorite(cursor.getInt(cursor.getColumnIndexOrThrow("isFavorited")) == 1);
-            chat.setLastMessage(cursor.getString(cursor.getColumnIndexOrThrow("lastMessage")));
+            chat.setLastMessageSend(cursor.getString(cursor.getColumnIndexOrThrow("lastMessage")));
 
             Repo_Chat.addChat(chat);
             Log.i(TAG, "Chat sincronizado: " + chatSessionId);
@@ -130,19 +130,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<Entity_Pv_Chat> getAllChatSessions() {
-        List<Entity_Pv_Chat> chats = new ArrayList<>();
+    public List<Entity_Chat> getAllChatSessions() {
+        List<Entity_Chat> chats = new ArrayList<>();
         SQLiteDatabase db = openDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM ChatSessionTable", null);
 
         if (cursor.moveToFirst()) {
             do {
-                Entity_Pv_Chat chat = new Entity_Pv_Chat();
-                chat.setChatSessionId(cursor.getString(cursor.getColumnIndexOrThrow("chatSessionId")));
-                chat.setChatWith(cursor.getString(cursor.getColumnIndexOrThrow("chatWith")));
-                chat.setHasUnread(cursor.getInt(cursor.getColumnIndexOrThrow("hasUnread")) == 1);
+                Entity_Chat chat = new Entity_Chat();
+                chat.setChatId(cursor.getString(cursor.getColumnIndexOrThrow("chatSessionId")));
+                chat.setReceiverName(cursor.getString(cursor.getColumnIndexOrThrow("chatWith")));
+                chat.setRead(cursor.getInt(cursor.getColumnIndexOrThrow("hasUnread")) == 1);
                 chat.setFavorite(cursor.getInt(cursor.getColumnIndexOrThrow("isFavorited")) == 1);
-                chat.setLastMessage(cursor.getString(cursor.getColumnIndexOrThrow("lastMessage")));
+                chat.setLastMessageSend(cursor.getString(cursor.getColumnIndexOrThrow("lastMessage")));
                 chats.add(chat);
             } while (cursor.moveToNext());
         }
@@ -152,17 +152,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return chats;
     }
 
-    public void insertChat(Entity_Pv_Chat chat) {
+    public void insertChat(Entity_Chat chat) {
         SQLiteDatabase db = openDatabase();
         ContentValues values = new ContentValues();
-        values.put("chatSessionId", chat.getChatSessionId());
-        values.put("chatWith", chat.getChatWith());
+        values.put("chatSessionId", chat.getChatId());
+        values.put("chatWith", chat.getReceiverName());
         values.put("hasUnread", chat.hasUnread() ? 1 : 0);
         values.put("isFavorited", chat.isFavorite() ? 1 : 0);
-        values.put("lastMessage", chat.getLastMessage());
+        values.put("lastMessage", chat.getLastMessageSend());
         db.insert("ChatSessionTable", null, values);
         db.close();
-        syncChatToRepository(chat.getChatSessionId());
+        syncChatToRepository(chat.getChatId());
     }
 
     public void deleteChat(String chatSessionId) {
@@ -171,10 +171,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("ChatSessionTable", "chatSessionId = ?", new String[]{chatSessionId});
         db.close();
 
-        List<Entity_Pv_Chat> chats = Repo_Chat.getChats();
+        List<Entity_Chat> chats = Repo_Chat.getChats();
 
         for (int i = chats.size() - 2; i >= 0; i--) {
-            if (chats.get(i).getChatSessionId().equals(chatSessionId)) {
+            if (chats.get(i).getChatId().equals(chatSessionId)) {
                 Repo_Chat.removeChat(i);
             }
         }
@@ -197,19 +197,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateChat(Entity_Pv_Chat chat) {
+    public void updateChat(Entity_Chat chat) {
         SQLiteDatabase db = openDatabase();
         ContentValues values = new ContentValues();
-        values.put("chatWith", chat.getChatWith());
+        values.put("chatWith", chat.getReceiverName());
         values.put("hasUnread", chat.hasUnread() ? 1 : 0);
         values.put("isFavorited", chat.isFavorite() ? 1 : 0);
-        values.put("lastMessage", chat.getLastMessage());
-        db.update("ChatSessionTable", values, "chatSessionId = ?", new String[]{chat.getChatSessionId()});
+        values.put("lastMessage", chat.getLastMessageSend());
+        db.update("ChatSessionTable", values, "chatSessionId = ?", new String[]{chat.getChatId()});
         db.close();
 
-        List<Entity_Pv_Chat> chats = Repo_Chat.getChats();
+        List<Entity_Chat> chats = Repo_Chat.getChats();
         for (int i = 0; i < chats.size(); i++) {
-            if (chats.get(i).getChatSessionId().equals(chat.getChatSessionId())) {
+            if (chats.get(i).getChatId().equals(chat.getChatId())) {
                 chats.set(i, chat);
                 if (Repo_Chat.getFeedAdapter() != null) {
                     Repo_Chat.getFeedAdapter().notifyItemChanged(i);

@@ -21,19 +21,12 @@ public class SessionPreferences {
 
     public Bitmap generateQrCode(Context context, String id) {
 
-        Bitmap logo = BitmapFactory.decodeResource(
-                context.getResources(),
-                R.drawable.logo_place_holder
-        );
-
         int size = 300;
         float cornerRadius = 12f;
 
         return Service_G_QrCode.generate(
                 id,
-                size,
-                logo,
-                cornerRadius
+                size
         );
     }
 

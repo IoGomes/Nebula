@@ -41,7 +41,7 @@ import java.io.IOException;
 public class Activity_06_Git_WebHook extends AppCompatActivity {
 
 
-    private static final String BASE_DOMAIN = "https://youlanda-undependable-compressingly.ngrok-free.dev";
+    private static final String BASE_DOMAIN = "https://nebula.app.br";
     private static final String VIDEO_ROUTE = "/video-call";
     private static final String TAG = "NEBULA_LOG";
 
