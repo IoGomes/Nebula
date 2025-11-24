@@ -26,7 +26,6 @@ const videoCallPath = path.join(__dirname, 'public/video-call');
 // 📹 ROTA DE VÍDEO CHAMADA (Deve vir ANTES do estático do Vite)
 // ------------------------------------------------
 
-// 1. Serve os arquivos estáticos (JS, CSS) desta pasta na rota /video-call
 app.use('/video-call', express.static(videoCallPath));
 
 // 2. Garante que acessar /video-call entregue o index.html correto
