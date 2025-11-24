@@ -42,7 +42,7 @@ export const loginUser = async (req, res) => {
     if (!response.success) return res.status(400).json(response);
 
     const user = response.user
-    console.log(response)
+    // console.log(response)
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: "Senha incorreta" });
 
