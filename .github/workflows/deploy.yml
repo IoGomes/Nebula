@@ -18,5 +18,5 @@ jobs:
                   REMOTE_HOST: ec2-18-223-149-106.us-east-2.compute.amazonaws.com
                   REMOTE_USER: ubuntu
                   SOURCE: "./"
-                  TARGET: "/home/ec2-user"
+                  TARGET: "/home/ubuntu/app"
                   EXCLUDE: ".gitignore,.idea/"
