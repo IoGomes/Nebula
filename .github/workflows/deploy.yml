@@ -1,0 +1,22 @@
+name: Push-to-EC2
+on:
+    push:
+        branches:
+            - master
+jobs:
+    deploy:
+        name: Deploy to EC2
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the files
+              uses: actions/checkout@v3
+
+            - name: Copy files with SSH
+              uses: easingthemes/ssh-deploy@main
+              with:
+                  SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+                  REMOTE_HOST: ec2-3-143-230-122.us-east-2.compute.amazonaws.com
+                  REMOTE_USER: ubuntu
+                  SOURCE: "./"
+                  TARGET: "/home/ubuntu/app"
+                  EXCLUDE: ".gitignore,.idea/"

@@ -73,10 +73,10 @@ public class Activity_06_Git_WebHook extends AppCompatActivity {
         debugConsole.setPadding(20, 20, 20, 20);
         debugConsole.setMaxLines(6);
         debugConsole.setMovementMethod(new ScrollingMovementMethod());
-        debugConsole.setText("--- DEBUG INICIADO ---\n");
+        // debugConsole.setText("--- DEBUG INICIADO ---\n");
 
         // Adiciona console (ocupa pouco espaço no topo)
-        layout.addView(debugConsole, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 250));
+        // layout.addView(debugConsole, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 250));
 
         // 2. WEBVIEW
         webView = new WebView(this);
@@ -194,10 +194,10 @@ public class Activity_06_Git_WebHook extends AppCompatActivity {
 
     private void loadUrlWithParams() {
         String myUserId = "15";
-        String myUserName = "AndroidApp";
-        String targetUserId = "13";
+        String myUserName = "Esdras";
+        String targetUserId = "";
 
-        // URL CORRETA + Timestamp anti-cache
+        // URL CORRETA + Timestamp 13anti-cache
         String fullUrl = BASE_DOMAIN + VIDEO_ROUTE +
                 "?userId=" + myUserId +
                 "&userName=" + myUserName +

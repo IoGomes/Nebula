@@ -24,67 +24,114 @@
             width: 100vw;
         }
         
-        .container-fluid {
-            height: 100vh;
+        /* ESCONDE OS CONTROLES MAS MANTÉM FUNCIONAIS */
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 16px;
+            z-index: 25;
             display: flex;
-            flex-direction: column;
-            padding: 0 !important;
+            gap: 8px;
+            opacity: 0 !important;
+            pointer-events: auto !important;
         }
         
-        /* Header */
+        .controls *,
+        .control-btn,
+        #call,
+        #hangup,
+        #toggle-camera,
+        #toggle-mic {
+            opacity: 0 !important;
+            background: none !important;
+            background-color: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .control-btn,
+        #call,
+        #hangup,
+        #toggle-camera,
+        #toggle-mic {
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+        }
+        
+        .control-btn svg,
+        #camera-on-icon,
+        #camera-off-icon,
+        #mic-on-icon,
+        #mic-off-icon {
+            display: none !important;
+        }
+        
+        .container-fluid {
+            height: 100vh;
+            width: 100vw;
+            padding: 0 !important;
+            margin: 0 !important;
+            position: relative;
+        }
+        
+        /* Header - INVISÍVEL MAS FUNCIONAL */
         .header {
             display: flex;
             align-items: center;
-            justify-content: center; /* <-- centraliza tudo */
             padding: 12px 16px;
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 30;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+            background: transparent !important;
+            opacity: 0 !important;
+            pointer-events: auto !important;
         }
         
         .back-btn {
-            background: none;
-            border: none;
-            color: white;
+            background: none !important;
+            border: none !important;
+            color: transparent !important;
             font-size: 28px;
             cursor: pointer;
             padding: 0;
             margin-right: 15px;
             font-weight: 300;
+            width: 36px;
+            height: 36px;
+            opacity: 0 !important;
         }
-        
         
         .header-title {
             text-align: center;
-            flex: 1;
+            width: 100%;
+            opacity: 0 !important;
         }
         
         .header-title h1 {
             font-size: 16px;
             font-weight: 500;
-            color: #ffffff;
+            color: transparent !important;
             margin: 0;
         }
         
         .header-title .timer {
             font-size: 13px;
-            color: rgba(255,255,255,0.7);
+            color: transparent !important;
             margin-top: 2px;
         }
         
         /* Videos Area */
         #videos { 
-            flex: 1;
-            position: relative; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            background-color: #000;
-            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100vw;
+            height: 100vh;
+            background-color: #000;
         }
         
         .video-player { 
@@ -105,7 +152,7 @@
         /* Waiting */
         #waiting {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -120,15 +167,16 @@
         
         /* Avatar placeholder */
         .avatar-placeholder {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            top: 40%;
-            left: 53.6%;
-            transform: translate(-50%, -50%);
             z-index: 4;
+            pointer-events: none;
         }
         
         .avatar-ring {
@@ -154,16 +202,16 @@
         
         /* Local video - small preview */
         #video-wrapper { 
-            position: absolute; 
-            bottom: 120px; 
-            right: 16px; 
-            width: 110px; 
-            height: 150px; 
-            z-index: 20; 
-            border-radius: 14px; 
+            position: fixed; 
+            bottom: 32px; 
+            right: 32px; 
+            width: 130px; 
+            height: 200px; 
+            z-index: 9999; 
+            border-radius: 12px; 
             overflow: hidden;
-            background-color: #2c2c2e;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            background-color: transparent;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             border: none;
         }
         
@@ -174,107 +222,9 @@
             transform: scaleX(-1); 
         }
         
-        /* Controls container */
-        .controls { 
-            position: fixed; 
-            bottom: 40px; 
-            left: 16px; 
-            z-index: 25; 
-            display: flex; 
-            gap: 8px;
-            align-items: center;
-            background-color: rgba(58, 58, 60, 0.9);
-            padding: 8px 12px;
-            border-radius: 30px;
-        }
-        
-        .controls #user-name {
-            display: none !important;
-        }
-        
-        /* Control button base style */
-        .control-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background-color: transparent;
-            padding: 0;
-        }
-        
-        .control-btn:hover {
-            background-color: rgba(255,255,255,0.1);
-        }
-        
-        .control-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .control-btn svg {
-            width: 22px;
-            height: 22px;
-            fill: white;
-        }
-        
-        /* Disabled state for camera/mic */
-        .control-btn.disabled {
-            background-color: rgba(255, 59, 48, 0.3);
-        }
-        
-        .control-btn.disabled svg {
-            fill: #ff3b30;
-        }
-        
-        /* Original buttons styled */
-        .controls #call,
-        .controls #hangup {
-            width: 44px;
-            height: 44px;
-            border-radius: 50% !important;
-            border: none !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            padding: 0 !important;
-            font-size: 0;
-            background-size: 22px 22px;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-        
-        .controls #call {
-            background-color: #34c759 !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E");
-        }
-        
-        .controls #hangup {
-            background-color: #ff3b30 !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z'/%3E%3C/svg%3E");
-        }
-        
-        .controls #call:hover,
-        .controls #hangup:hover {
-            opacity: 0.85;
-            transform: scale(1.05);
-        }
-        
-        .controls #call:disabled,
-        .controls #hangup:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
         /* Encryption text */
         .encryption-text {
-            position: absolute;
+            position: fixed;
             bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
@@ -305,17 +255,8 @@
         </div>
         
         <div id="videos">
-            <!-- Avatar placeholder -->
-            <div class="avatar-placeholder">
-                <div class="avatar-ring">
-                    <div class="avatar-circle">
-                        <svg width="70" height="70" viewBox="0 0 60 60" fill="none">
-                            <circle cx="30" cy="20" r="12" fill="#636366"/>
-                            <ellipse cx="30" cy="45" rx="20" ry="14" fill="#636366"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            <!-- Remote video -->
+            <video class="video-player" id="remote-video" autoplay playsinline></video>
             
             <!-- Original waiting element -->
             <div id="waiting" class="btn btn-warning">Aguardando resposta...</div>
@@ -324,11 +265,21 @@
             <div id="video-wrapper">
                 <video class="video-player" id="local-video" autoplay playsinline muted></video>
             </div>
-            
-            <!-- Remote video -->
-            <video class="video-player" id="remote-video" autoplay playsinline></video>
         </div>
         
+        <!-- Avatar placeholder - FORA do #videos para centralizar corretamente -->
+        <div class="avatar-placeholder">
+            <div class="avatar-ring">
+                <div class="avatar-circle">
+                    <svg width="70" height="70" viewBox="0 0 60 60" fill="none">
+                        <circle cx="30" cy="20" r="12" fill="#636366"/>
+                        <ellipse cx="30" cy="45" rx="20" ry="14" fill="#636366"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+       
         
         <!-- Controls -->
         <div class="controls">
