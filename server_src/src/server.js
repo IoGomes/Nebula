@@ -2,7 +2,6 @@ import express from "express";
 import http from "http";
 import userRoutes from "./routes/user.routes.js";
 import { Server } from "socket.io";
-// import { initializeSocketIO } from "./services/socket.service.js"; // Importando o serviço novo
 
 import path from "path";
 import { fileURLToPath } from "url";
