@@ -1,193 +1,117 @@
 // src/public/video-call/script.js
 
-// --- 1. CONFIGURAÇÃO E PARÂMETROS URL ---
+/**
+ * MÓDULO DE VÍDEO CHAMADA
+ * Integração com Android via Socket.IO e WebRTC
+ */
+
+// --- 1. CONFIGURAÇÃO INICIAL ---
 const urlParams = new URLSearchParams(window.location.search);
 const userName = urlParams.get('userName') || "Usuário Web";
 const userId = urlParams.get('userId') || Math.floor(Math.random() * 100000).toString();
 const initialTargetId = urlParams.get('targetId');
 
-console.log(`[System] Iniciando como: ${userName} (${userId})`);
-
-// --- 2. CONFIGURAÇÃO SOCKET.IO ---
-const socket = io('/', {
-    query: { userName, userId },
-    transports: ['websocket', 'polling'], // Força websocket para estabilidade
-    reconnection: true
-});
-
-socket.on('connect', () => {
-    console.log("✅ [Socket] Conectado! ID:", socket.id);
-});
-
-socket.on('connect_error', (err) => {
-    console.error("❌ [Socket] Erro de conexão:", err);
-});
-
-// --- 3. VARIÁVEIS GLOBAIS ---
-let localStream = null;
-let peerConnection = null;
-let candidateQueue = [];
-let connectedPeerId = null;
-
-// Elementos do DOM
+// --- 2. ELEMENTOS UI ---
+const startOverlay = document.getElementById('start-overlay');
+const startBtn = document.getElementById('btn-start-system');
 const localVideoEl = document.getElementById('local-video');
 const remoteVideoEl = document.getElementById('remote-video');
 const callBtn = document.getElementById('call');
 const hangupBtn = document.getElementById('hangup');
 const waitingEl = document.getElementById('waiting');
-const userNameDisplay = document.getElementById('user-name');
+const timerEl = document.getElementById('timer');
+const userDisplayEl = document.getElementById('user-display');
+const remoteAvatar = document.getElementById('remote-avatar');
 const toggleCameraBtn = document.getElementById('toggle-camera'); 
 const toggleMicBtn = document.getElementById('toggle-mic');
-const remoteAvatar = document.getElementById('remote-avatar');
-const remoteMicStatus = document.getElementById('remote-mic-status');
 
-if (userNameDisplay) userNameDisplay.innerText = "Eu: " + userName;
+if(userDisplayEl) userDisplayEl.innerText = userName;
 
-// Configuração STUN (Google)
+// --- 3. VARIÁVEIS DE ESTADO ---
+let localStream = null;
+let peerConnection = null;
+let candidateQueue = [];
+let connectedPeerId = null;
+let callTimerInterval = null;
+let callStartTime = null;
+
+// Socket IO
+const socket = io('/', {
+    query: { userName, userId },
+    transports: ['websocket', 'polling']
+});
+
+socket.on('connect', () => console.log("✅ Socket Conectado:", socket.id));
+
+// Configuração WebRTC (Google STUN)
 const peerConfiguration = {
     iceServers: [
         { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
     ]
 };
 
-// --- 4. TELA DE INICIALIZAÇÃO (CORREÇÃO DO BLOQUEIO DE MÍDIA) ---
-// Criamos uma sobreposição para forçar a interação do usuário
-function showStartScreen() {
-    const overlay = document.createElement('div');
-    overlay.id = 'start-overlay';
-    overlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.9); z-index: 10000;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        color: white; font-family: sans-serif;
-    `;
-    
-    overlay.innerHTML = `
-        <h2 style="margin-bottom: 20px;">Permissão Necessária</h2>
-        <p style="margin-bottom: 30px; text-align: center; max-width: 80%;">
-            Para realizar a chamada, precisamos acessar sua câmera e microfone.
-        </p>
-        <button id="btn-start-system" style="
-            padding: 15px 30px; font-size: 18px; background: #28a745; 
-            color: white; border: none; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
-        ">INICIAR SISTEMA</button>
-    `;
-    
-    document.body.appendChild(overlay);
+// --- 4. INICIALIZAÇÃO DO SISTEMA (Ação do Botão) ---
 
-    document.getElementById('btn-start-system').addEventListener('click', async () => {
-        try {
-            await initMedia(); // Tenta pegar a câmera
-            overlay.remove();  // Se der certo, remove a tela preta
-        } catch (e) {
-            console.error(e);
-        }
-    });
-}
+startBtn.addEventListener('click', async () => {
+    // Feedback visual
+    startBtn.innerText = "Iniciando...";
+    startBtn.disabled = true;
 
-// --- 5. LÓGICA DE MÍDIA ---
+    try {
+        await initMedia(); // Pede permissão da câmera
+        
+        // Se deu certo, esconde o overlay
+        startOverlay.style.opacity = '0';
+        setTimeout(() => startOverlay.style.display = 'none', 500); // Animação
+        
+        console.log("Sistema iniciado com sucesso.");
+    } catch (err) {
+        startBtn.innerText = "Erro: Permissão Negada";
+        startBtn.style.background = "red";
+        console.error(err);
+    }
+});
+
 const initMedia = async () => {
-    console.log("[Media] Solicitando permissão de câmera/mic...");
-    
-    // Verificação de Segurança SSL
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        alert("ERRO CRÍTICO: Câmera requer HTTPS. Você está usando HTTP inseguro.");
-        throw new Error("HTTPS Required");
+    // Checagem de segurança
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        alert("Atenção: A câmera exige HTTPS.");
     }
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-        console.log("[Media] Permissão concedida!");
-        
         localStream = stream;
         localVideoEl.srcObject = stream;
         
-        // Corrige bug de vídeo preto em alguns iPhones/Androids
-        localVideoEl.onloadedmetadata = () => {
-            localVideoEl.play();
-        };
+        // Garante que o vídeo toque (bug fix safari)
+        localVideoEl.onloadedmetadata = () => localVideoEl.play();
 
     } catch (err) {
-        console.error("[Media] Erro:", err);
-        alert("Erro ao acessar câmera: " + err.name + ". Verifique se o dispositivo não está bloqueado.");
-        throw err;
+        throw new Error("Falha ao acessar mídia: " + err.name);
     }
 };
 
-// --- 6. CORE WEBRTC ---
-
-const createPeerConnection = () => {
-    if (peerConnection) {
-        peerConnection.close();
-    }
-    
-    console.log("[WebRTC] Criando nova conexão Peer...");
-    peerConnection = new RTCPeerConnection(peerConfiguration);
-
-    // Adiciona tracks locais
-    if (localStream) {
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-    }
-
-    // Recebe tracks remotos
-    peerConnection.ontrack = (event) => {
-        console.log("[WebRTC] Stream remoto recebido!");
-        waitingEl.style.display = 'none';
-        remoteVideoEl.srcObject = event.streams[0];
-        
-        // Reset de UI
-        if(remoteAvatar) remoteAvatar.style.display = 'none';
-        if(remoteMicStatus) remoteMicStatus.style.display = 'none';
-    };
-
-    // ICE Candidates
-    peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            const target = connectedPeerId || initialTargetId;
-            if (target) {
-                socket.emit('sendIceCandidate', {
-                    targetUserId: target,
-                    candidate: event.candidate
-                });
-            }
-        }
-    };
-
-    // Monitoramento de Estado
-    peerConnection.onconnectionstatechange = () => {
-        console.log("[WebRTC] Estado da conexão:", peerConnection.connectionState);
-        if (['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState)) {
-            stopCallTimer();
-        }
-    };
-};
-
-// --- 7. FLUXO DE CHAMADA E NOTIFICAÇÃO ANDROID ---
+// --- 5. LÓGICA DE CHAMADA (Caller) ---
 
 const initiateCall = () => {
-    if (!initialTargetId) return alert("Erro: ID de destino não encontrado na URL.");
+    if (!initialTargetId) return alert("Erro: URL sem ID de destino.");
     
-    callBtn.disabled = true;
-    waitingEl.innerText = "Localizando usuário...";
+    toggleCallButtonState(true); // Desabilita botão ligar
+    waitingEl.innerText = "Buscando usuário...";
     waitingEl.style.display = 'block';
     
-    console.log(`[Call] Buscando usuário alvo: ${initialTargetId}`);
     socket.emit("check-user-online", initialTargetId);
 };
 
-// Callback de verificação
 socket.on('user-is-online', (data) => {
-    console.log("[Call] Status do usuário:", data);
     if (data.isOnline) {
         performOffer();
     } else {
-        alert("O usuário destino está offline.");
+        alert("Usuário offline.");
         resetUI();
     }
 });
 
-// Enviar Oferta (Com Payload para Android)
 const performOffer = async () => {
     connectedPeerId = initialTargetId;
     createPeerConnection();
@@ -196,50 +120,46 @@ const performOffer = async () => {
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
 
-        console.log("[Call] Enviando oferta e notificação...");
+        console.log("Enviando notificação ao Android...");
 
         socket.emit('newOffer', {
             targetUserId: connectedPeerId,
-            
-            // Dados WebRTC
             sdp: offer.sdp,
             type: offer.type,
             
-            // DADOS ESPECÍFICOS PARA O ANDROID APP
+            // Payload para Android/Java
             offererUserName: userName,       
             offererUserId: userId,           
-            notificationType: 'incoming_call', // Gatilho do Java
+            notificationType: 'incoming_call', 
             callType: 'video',               
             timestamp: Date.now()
         });
         
         waitingEl.innerText = "Chamando...";
-        hangupBtn.disabled = false;
+        enableHangup(true);
+
     } catch (err) {
-        console.error("[Call] Erro ao criar oferta:", err);
+        console.error("Erro na oferta:", err);
         resetUI();
     }
 };
 
-// --- 8. RECEBIMENTO DE CHAMADA (Browser) ---
+// --- 6. RECEBIMENTO DE CHAMADA (Callee) ---
 
 socket.on('offerResponse', async (offerObj) => {
-    console.log("[Call] Recebendo chamada de:", offerObj.offererUserName);
+    console.log("Recebendo chamada de:", offerObj.offererUserName);
     
     connectedPeerId = offerObj.offererUserId;
     createPeerConnection();
     
-    waitingEl.innerText = `Recebendo chamada de ${offerObj.offererUserName}...`;
+    waitingEl.innerText = `Chamada de ${offerObj.offererUserName}...`;
     waitingEl.style.display = 'block';
 
     try {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offerObj));
-        
-        // Aceita automaticamente (no browser) - No Android você tem a tela de aceite
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
-        console.log("[Call] Enviando resposta...");
         socket.emit('newAnswer', {
             targetUserId: connectedPeerId,
             sdp: answer.sdp,
@@ -248,145 +168,183 @@ socket.on('offerResponse', async (offerObj) => {
         });
         
         waitingEl.style.display = 'none';
-        hangupBtn.disabled = false;
-        callBtn.disabled = true;
-        
-        // Inicia cronômetro (função do outro arquivo)
-        if(typeof startCallTimer === 'function') startCallTimer();
+        enableHangup(true);
+        startTimer();
         processCandidateQueue();
-        
-        // Sincroniza estado inicial de mídia
         syncMediaState();
 
     } catch (err) {
-        console.error("[Call] Erro ao atender:", err);
+        console.error("Erro ao atender:", err);
     }
 });
 
 socket.on('answerResponse', async (answerObj) => {
-    console.log("[Call] Chamada atendida!");
     waitingEl.style.display = 'none';
-    
-    if(typeof startCallTimer === 'function') startCallTimer();
-    
+    startTimer();
     try {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(answerObj));
         processCandidateQueue();
         syncMediaState();
-    } catch (err) { 
-        console.error("[Call] Erro na resposta:", err); 
-    }
+    } catch (e) { console.error(e); }
 });
 
+// --- 7. WEBRTC CORE ---
+
+const createPeerConnection = () => {
+    if (peerConnection) peerConnection.close();
+    peerConnection = new RTCPeerConnection(peerConfiguration);
+
+    if (localStream) {
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    }
+
+    peerConnection.ontrack = (event) => {
+        remoteVideoEl.srcObject = event.streams[0];
+        waitingEl.style.display = 'none';
+        remoteAvatar.style.display = 'none';
+    };
+
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate && (connectedPeerId || initialTargetId)) {
+            socket.emit('sendIceCandidate', {
+                targetUserId: connectedPeerId || initialTargetId,
+                candidate: event.candidate
+            });
+        }
+    };
+    
+    peerConnection.onconnectionstatechange = () => {
+        if (['disconnected', 'closed', 'failed'].includes(peerConnection.connectionState)) {
+            hangupCall();
+        }
+    }
+};
+
 socket.on('receivedIceCandidate', async (iceObj) => {
-    const candidate = iceObj.candidate || iceObj; 
+    const candidate = iceObj.candidate || iceObj;
     if (peerConnection && peerConnection.remoteDescription) {
-        try { 
-            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); 
-        } catch (e) { console.error("Erro ICE:", e); }
+        try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {}
     } else {
         candidateQueue.push(candidate);
     }
 });
 
-// --- 9. CONTROLES E HELPERS ---
-
 const processCandidateQueue = async () => {
-    if (peerConnection && peerConnection.remoteDescription && candidateQueue.length > 0) {
-        for (const candidate of candidateQueue) {
-            try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {}
+    if (peerConnection && peerConnection.remoteDescription) {
+        while(candidateQueue.length > 0) {
+            try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidateQueue.shift())); } catch(e){}
         }
-        candidateQueue = [];
     }
 };
+
+// --- 8. CONTROLES DE UI E MÍDIA ---
 
 const hangupCall = () => {
     if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
     }
-    if(typeof stopCallTimer === 'function') stopCallTimer();
+    stopTimer();
     resetUI();
 };
 
 const resetUI = () => {
     waitingEl.style.display = 'none';
-    callBtn.disabled = false;
-    hangupBtn.disabled = true;
     remoteVideoEl.srcObject = null;
+    remoteAvatar.style.display = 'none';
     connectedPeerId = null;
     candidateQueue = [];
-    if(remoteAvatar) remoteAvatar.style.display = 'none';
-    if(remoteMicStatus) remoteMicStatus.style.display = 'none';
+    toggleCallButtonState(false);
+    enableHangup(false);
 };
 
-// Sincronia de Mídia (Câmera/Mic)
-const syncMediaState = () => {
-    if (localStream) {
-        const isCam = localStream.getVideoTracks()[0]?.enabled ?? true;
-        const isMic = localStream.getAudioTracks()[0]?.enabled ?? true;
-        emitMediaState(isCam, isMic);
+// Helpers de Botões
+const toggleCallButtonState = (disabled) => {
+    callBtn.disabled = disabled;
+    callBtn.style.opacity = disabled ? '0.5' : '1';
+};
+
+const enableHangup = (enabled) => {
+    hangupBtn.disabled = !enabled;
+    hangupBtn.style.opacity = enabled ? '1' : '0.5';
+    toggleCallButtonState(enabled); // Se hangup on, call off
+};
+
+// Controle de Câmera/Mic
+const toggleMedia = (type) => {
+    if (!localStream) return;
+    const isVideo = type === 'video';
+    const tracks = isVideo ? localStream.getVideoTracks() : localStream.getAudioTracks();
+    const btn = isVideo ? toggleCameraBtn : toggleMicBtn;
+    
+    if (tracks.length > 0) {
+        tracks[0].enabled = !tracks[0].enabled;
+        const isEnabled = tracks[0].enabled;
+        
+        // Troca classe visual
+        if (isEnabled) {
+            btn.classList.add('active');
+            btn.classList.remove('disabled');
+            btn.querySelector('.icon-on').style.display = 'block';
+            btn.querySelector('.icon-off').style.display = 'none';
+        } else {
+            btn.classList.remove('active');
+            btn.classList.add('disabled');
+            btn.querySelector('.icon-on').style.display = 'none';
+            btn.querySelector('.icon-off').style.display = 'block';
+        }
+
+        // Avisa o par
+        const camState = localStream.getVideoTracks()[0]?.enabled ?? true;
+        const micState = localStream.getAudioTracks()[0]?.enabled ?? true;
+        
+        const target = connectedPeerId || initialTargetId;
+        if (target) {
+            socket.emit('mediaStateChange', { targetUserId: target, camera: camState, mic: micState });
+        }
     }
 };
 
-const emitMediaState = (isCameraOn, isMicOn) => {
-    const target = connectedPeerId || initialTargetId;
-    if (target) {
-        socket.emit('mediaStateChange', { targetUserId: target, camera: isCameraOn, mic: isMicOn });
-    }
-};
-
-// Listeners de Mídia Remota
+// Listeners de estado remoto
 socket.on('mediaStateChange', (data) => {
-    if (remoteAvatar) {
-        remoteAvatar.style.display = (data.camera === false) ? 'flex' : 'none';
-        remoteVideoEl.style.opacity = (data.camera === false) ? '0' : '1';
-    }
-    if (remoteMicStatus) {
-        remoteMicStatus.style.display = (data.mic === false) ? 'flex' : 'none';
+    if (data.camera === false) {
+        remoteAvatar.style.display = 'flex';
+        remoteVideoEl.style.opacity = '0';
+    } else {
+        remoteAvatar.style.display = 'none';
+        remoteVideoEl.style.opacity = '1';
     }
 });
 
-// Botões de Controle Local
-const toggleCamera = () => {
+// Timer
+const startTimer = () => {
+    if (callTimerInterval) clearInterval(callTimerInterval);
+    callStartTime = Date.now();
+    callTimerInterval = setInterval(() => {
+        const diff = Math.floor((Date.now() - callStartTime) / 1000);
+        const m = Math.floor(diff / 60).toString().padStart(2, '0');
+        const s = (diff % 60).toString().padStart(2, '0');
+        if(timerEl) timerEl.innerText = `${m}:${s}`;
+    }, 1000);
+};
+
+const stopTimer = () => {
+    if (callTimerInterval) clearInterval(callTimerInterval);
+    if(timerEl) timerEl.innerText = "00:00";
+};
+
+const syncMediaState = () => {
+    // Força envio do estado atual ao conectar
     if (localStream) {
-        const track = localStream.getVideoTracks()[0];
-        if(track) {
-            track.enabled = !track.enabled;
-            // Atualiza UI
-            const onIcon = document.getElementById('camera-on-icon');
-            const offIcon = document.getElementById('camera-off-icon');
-            if(onIcon) onIcon.style.display = track.enabled ? 'block' : 'none';
-            if(offIcon) offIcon.style.display = track.enabled ? 'none' : 'block';
-            if(toggleCameraBtn) toggleCameraBtn.classList.toggle('disabled', !track.enabled);
-            
-            emitMediaState(track.enabled, localStream.getAudioTracks()[0]?.enabled ?? true);
-        }
+        const camState = localStream.getVideoTracks()[0]?.enabled ?? true;
+        const micState = localStream.getAudioTracks()[0]?.enabled ?? true;
+        const target = connectedPeerId || initialTargetId;
+        if (target) socket.emit('mediaStateChange', { targetUserId: target, camera: camState, mic: micState });
     }
 };
 
-const toggleMic = () => {
-    if (localStream) {
-        const track = localStream.getAudioTracks()[0];
-        if(track) {
-            track.enabled = !track.enabled;
-            // Atualiza UI
-            const onIcon = document.getElementById('mic-on-icon');
-            const offIcon = document.getElementById('mic-off-icon');
-            if(onIcon) onIcon.style.display = track.enabled ? 'block' : 'none';
-            if(offIcon) offIcon.style.display = track.enabled ? 'none' : 'block';
-            if(toggleMicBtn) toggleMicBtn.classList.toggle('disabled', !track.enabled);
-            
-            emitMediaState(localStream.getVideoTracks()[0]?.enabled ?? true, track.enabled);
-        }
-    }
-};
-
-// --- 10. INICIALIZAÇÃO DE EVENTOS ---
-if(callBtn) callBtn.addEventListener('click', initiateCall);
-if(hangupBtn) hangupBtn.addEventListener('click', hangupCall);
-if(toggleCameraBtn) toggleCameraBtn.addEventListener('click', toggleCamera);
-if(toggleMicBtn) toggleMicBtn.addEventListener('click', toggleMic);
-
-// Chama a tela de início assim que carrega
-showStartScreen();
+// --- 9. EVENT LISTENERS ---
+callBtn.addEventListener('click', initiateCall);
+hangupBtn.addEventListener('click', hangupCall);
+toggleCameraBtn.addEventListener('click', () => toggleMedia('video'));
+toggleMicBtn.addEventListener('click', () => toggleMedia('audio'));

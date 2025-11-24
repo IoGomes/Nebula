@@ -1,374 +1,174 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset='utf-8'>
     <title>Nebula Call</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            background-color: #000000; 
-            color: white; 
-            overflow: hidden;
+            background-color: #000; color: white; overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; width: 100vw;
+        }
+
+        /* --- TELA DE INÍCIO (OVERLAY) --- */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 99999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
         }
         
-        /* ESCONDE OS CONTROLES MAS MANTÉM FUNCIONAIS */
-        .controls {
-            position: fixed;
-            bottom: 40px;
-            left: 16px;
-            z-index: 25;
-            display: flex;
-            gap: 8px;
-            opacity: 0 !important;
-            pointer-events: auto !important;
+        #btn-start-system {
+            padding: 15px 40px; font-size: 18px; font-weight: bold;
+            background: #28a745; color: white; border: none;
+            border-radius: 50px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+            transition: transform 0.2s;
         }
-        
-        .controls *,
-        .control-btn,
-        #call,
-        #hangup,
-        #toggle-camera,
-        #toggle-mic {
-            opacity: 0 !important;
-            background: none !important;
-            background-color: transparent !important;
-            background-image: none !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        
-        .control-btn,
-        #call,
-        #hangup,
-        #toggle-camera,
-        #toggle-mic {
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-        }
-        
-        .control-btn svg,
-        #camera-on-icon,
-        #camera-off-icon,
-        #mic-on-icon,
-        #mic-off-icon {
-            display: none !important;
-        }
-        
-        .container-fluid {
-            height: 100vh;
-            width: 100vw;
-            padding: 0 !important;
-            margin: 0 !important;
-            position: relative;
-        }
-        
-        /* Header - INVISÍVEL MAS FUNCIONAL */
+        #btn-start-system:active { transform: scale(0.95); }
+
+        /* HEADER */
         .header {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 30;
-            background: transparent !important;
-            opacity: 0 !important;
-            pointer-events: auto !important;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+            padding: 15px; display: flex; align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
-        
-        .back-btn {
-            background: none !important;
-            border: none !important;
-            color: transparent !important;
-            font-size: 28px;
-            cursor: pointer;
-            padding: 0;
-            margin-right: 15px;
-            font-weight: 300;
-            width: 36px;
-            height: 36px;
-            opacity: 0 !important;
-        }
-        
-        .header-title {
-            text-align: center;
-            width: 100%;
-            opacity: 0 !important;
-        }
-        
-        .header-title h1 {
-            font-size: 16px;
-            font-weight: 500;
-            color: transparent !important;
-            margin: 0;
-        }
-        
-        .header-title .timer {
-            font-size: 13px;
-            color: transparent !important;
-            margin-top: 2px;
-        }
-        
-        /* Videos Area */
+        .header-title { width: 100%; text-align: center; }
+        .header-title h1 { font-size: 16px; margin: 0; font-weight: 500; }
+        .timer { font-size: 13px; color: #ccc; }
+
+        /* VIDEOS */
         #videos { 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 1;
         }
         
-        .video-player { 
-            background-color: #1a1a1a; 
-            object-fit: cover; 
-        }
-        
-        /* Remote video - full screen */
         #remote-video { 
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%; 
-            height: 100%;
-            object-fit: cover;
+            width: 100%; height: 100%; object-fit: cover; 
         }
         
-        /* Waiting */
-        #waiting {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 5;
-            background-color: rgba(58, 58, 60, 0.9) !important;
-            border: none !important;
-            color: white !important;
-            padding: 12px 24px !important;
-            border-radius: 25px !important;
-            font-size: 14px;
-        }
-        
-        /* Avatar placeholder */
-        .avatar-placeholder {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 4;
-            pointer-events: none;
-        }
-        
-        .avatar-ring {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: #ff0080;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .avatar-circle {
-            width: 148px;
-            height: 148px;
-            background-color: #3a3a3c;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        
-        /* Local video - small preview */
         #video-wrapper { 
-            position: fixed; 
-            bottom: 32px; 
-            right: 32px; 
-            width: 130px; 
-            height: 200px; 
-            z-index: 9999; 
-            border-radius: 12px; 
-            overflow: hidden;
-            background-color: transparent;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            border: none;
+            position: fixed; bottom: 100px; right: 20px;
+            width: 120px; height: 180px;
+            z-index: 20; border-radius: 12px;
+            overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            background: #111;
         }
         
         #local-video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transform: scaleX(-1); 
+            width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); 
         }
-        
-        /* Encryption text */
-        .encryption-text {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
+
+        /* WAITING & AVATARS */
+        #waiting {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 10;
+            background: rgba(40,40,40,0.9); padding: 12px 24px;
+            border-radius: 30px; font-size: 14px;
+        }
+
+        .avatar-placeholder {
+            display: none; /* Controlado via JS */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            align-items: center; justify-content: center; z-index: 5;
+            background: #111;
+        }
+
+        /* CONTROLS */
+        .controls {
+            position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%);
-            font-size: 11px;
-            color: rgba(255,255,255,0.5);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            z-index: 15;
+            z-index: 40; display: flex; gap: 15px;
+            padding: 10px 20px;
+            background: rgba(20,20,20,0.8);
+            border-radius: 40px;
+        }
+
+        .control-btn {
+            width: 50px; height: 50px; border-radius: 50%;
+            border: none; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            background: #333; transition: all 0.2s;
         }
         
-        .encryption-text svg {
-            width: 12px;
-            height: 12px;
-            fill: rgba(255,255,255,0.5);
-        }
+        .control-btn svg { width: 24px; height: 24px; fill: white; }
+        .control-btn.active { background: white; }
+        .control-btn.active svg { fill: black; }
+        .control-btn.disabled { background: #ff3b30; }
+        .control-btn.disabled svg { fill: white; }
+
+        .btn-call { background: #34c759; width: 50px; height: 50px; border-radius: 50%; border:none;}
+        .btn-hangup { background: #ff3b30; width: 50px; height: 50px; border-radius: 50%; border:none;}
+        
+        .btn-call svg, .btn-hangup svg { width: 24px; height: 24px; fill: white; }
+
+        /* Ícones de Câmera/Mic */
+        .icon-off { display: none; }
     </style>
 </head>
 <body>
+
+    <div id="start-overlay">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="margin-bottom: 10px;">Bem-vindo</h2>
+            <p style="color: #aaa;">Clique abaixo para permitir câmera e microfone</p>
+        </div>
+        <button id="btn-start-system">INICIAR CHAMADA</button>
+    </div>
+
     <div class="container-fluid p-0">
-        <!-- Header -->
+        
         <div class="header">
-            <button class="back-btn">‹</button>
             <div class="header-title">
-                <h1>Chamada de Vídeo</h1>
-                <div class="timer">00:00</div>
+                <h1 id="user-display">Usuário</h1>
+                <div class="timer" id="timer">--:--</div>
             </div>
         </div>
         
         <div id="videos">
-            <!-- Remote video -->
-            <video class="video-player" id="remote-video" autoplay playsinline></video>
+            <video id="remote-video" autoplay playsinline></video>
             
-            <!-- Original waiting element -->
-            <div id="waiting" class="btn btn-warning">Aguardando resposta...</div>
+            <div id="waiting">Conectando...</div>
             
-            <!-- Local video -->
-            <div id="video-wrapper">
-                <video class="video-player" id="local-video" autoplay playsinline muted></video>
-            </div>
-        </div>
-        
-        <!-- Avatar placeholder - FORA do #videos para centralizar corretamente -->
-        <div class="avatar-placeholder">
-            <div class="avatar-ring">
-                <div class="avatar-circle">
-                    <svg width="70" height="70" viewBox="0 0 60 60" fill="none">
-                        <circle cx="30" cy="20" r="12" fill="#636366"/>
-                        <ellipse cx="30" cy="45" rx="20" ry="14" fill="#636366"/>
-                    </svg>
+            <div id="remote-avatar" class="avatar-placeholder">
+                <div style="width: 100px; height: 100px; background: #555; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 40px;">👤</span>
                 </div>
             </div>
+
+            <div id="video-wrapper">
+                <video id="local-video" autoplay playsinline muted></video>
+            </div>
         </div>
         
-       
-        
-        <!-- Controls -->
         <div class="controls">
-            <div id="user-name" class="badge bg-secondary mb-2 d-block"></div>
-            
-            <!-- Toggle Camera Button -->
-            <button id="toggle-camera" class="control-btn" title="Câmera">
-                <svg id="camera-on-icon" viewBox="0 0 24 24">
-                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                </svg>
-                <svg id="camera-off-icon" viewBox="0 0 24 24" style="display:none;">
-                    <path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/>
-                </svg>
+            <button id="toggle-camera" class="control-btn active" title="Câmera">
+                <svg class="icon-on" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                <svg class="icon-off" viewBox="0 0 24 24"><path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/></svg>
             </button>
             
-            <!-- Toggle Mic Button -->
-            <button id="toggle-mic" class="control-btn" title="Microfone">
-                <svg id="mic-on-icon" viewBox="0 0 24 24">
-                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                </svg>
-                <svg id="mic-off-icon" viewBox="0 0 24 24" style="display:none;">
-                    <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
-                </svg>
+            <button id="toggle-mic" class="control-btn active" title="Microfone">
+                <svg class="icon-on" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                <svg class="icon-off" viewBox="0 0 24 24"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/></svg>
             </button>
             
-            <!-- Original call/hangup buttons -->
-            <button id="call" class="btn btn-success">Ligar</button>
-            <button id="hangup" class="btn btn-danger" disabled>Desligar</button>
+            <button id="call" class="btn-call" title="Ligar">
+                <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-2.2 2.2c-3.23-1.61-5.81-4.19-7.41-7.42l2.2-2.2c.27-.27.35-.66.24-1.01-.36-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 2 3 2.24 3 2.75 3 13.28 11.72 22 22.25 22c.5 0 .75-.65.75-1.19v-4.44c0-.54-.45-.99-.99-.99z"/></svg>
+            </button>
+
+            <button id="hangup" class="btn-hangup" title="Desligar" disabled style="opacity: 0.5;">
+                <svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.36 7.46 6 12 6s8.66 2.36 11.71 5.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+            </button>
         </div>
     </div>
-    
-    <script>
-        // Toggle Camera
-        const toggleCameraBtn = document.getElementById('toggle-camera');
-        const cameraOnIcon = document.getElementById('camera-on-icon');
-        const cameraOffIcon = document.getElementById('camera-off-icon');
-        let cameraEnabled = true;
-        
-        toggleCameraBtn.addEventListener('click', () => {
-            cameraEnabled = !cameraEnabled;
-            const localVideo = document.getElementById('local-video');
-            
-            if (localVideo.srcObject) {
-                const videoTrack = localVideo.srcObject.getVideoTracks()[0];
-                if (videoTrack) {
-                    videoTrack.enabled = cameraEnabled;
-                }
-            }
-            
-            if (cameraEnabled) {
-                cameraOnIcon.style.display = 'block';
-                cameraOffIcon.style.display = 'none';
-                toggleCameraBtn.classList.remove('disabled');
-            } else {
-                cameraOnIcon.style.display = 'none';
-                cameraOffIcon.style.display = 'block';
-                toggleCameraBtn.classList.add('disabled');
-            }
-        });
-        
-        // Toggle Microphone
-        const toggleMicBtn = document.getElementById('toggle-mic');
-        const micOnIcon = document.getElementById('mic-on-icon');
-        const micOffIcon = document.getElementById('mic-off-icon');
-        let micEnabled = true;
-        
-        toggleMicBtn.addEventListener('click', () => {
-            micEnabled = !micEnabled;
-            const localVideo = document.getElementById('local-video');
-            
-            if (localVideo.srcObject) {
-                const audioTrack = localVideo.srcObject.getAudioTracks()[0];
-                if (audioTrack) {
-                    audioTrack.enabled = micEnabled;
-                }
-            }
-            
-            if (micEnabled) {
-                micOnIcon.style.display = 'block';
-                micOffIcon.style.display = 'none';
-                toggleMicBtn.classList.remove('disabled');
-            } else {
-                micOnIcon.style.display = 'none';
-                micOffIcon.style.display = 'block';
-                toggleMicBtn.classList.add('disabled');
-            }
-        });
-    </script>
     
     <script src="script.js"></script>
 </body>
