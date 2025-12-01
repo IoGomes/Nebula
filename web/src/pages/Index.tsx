@@ -48,6 +48,41 @@ const Index = () => {
     { name: "Web App", platform: "Browser" }
   ];
 
+  const buscaUltimaVersaoApp = async () => {
+    try {
+      const response = await fetch('https://hpd79nssya.execute-api.us-east-2.amazonaws.com/default/downloadNebulaApk', {
+        method: 'GET',
+        cache: 'no-store'
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Produtos: ${response.statusText}`)
+      }
+      const data = await response.json()
+      return data.downloadUrl
+    } catch (error) {
+      console.error('Error fetching produtos:', error)
+    }
+
+  }
+
+  const baixarApp = async () => {
+    const url = await buscaUltimaVersaoApp(); // Espera a URL chegar da API
+
+    if (url) {
+      // Cria um link invisível e clica nele programaticamente
+      const link = document.createElement('a');
+      link.href = url;
+      // O atributo download sugere um nome, mas depende do CORS do S3 aceitar
+      link.setAttribute('download', 'NebulaApp.apk'); 
+      link.target = "_blank"; // Opcional: garante que não feche a página atual se der erro
+      document.body.appendChild(link);
+      link.click();
+      
+      // Limpeza
+      document.body.removeChild(link);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Theme Toggle */}
@@ -89,7 +124,9 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start" onClick={(e)=> {
+                    baixarApp()
+                  }}>
                 <Button 
                   size="lg" 
                   className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity glow-effect text-lg px-8 py-6 font-semibold"
