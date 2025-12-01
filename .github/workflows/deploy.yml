@@ -1,26 +1,29 @@
 name: Push-to-EC2
-on:
-    push:
-        branches:
-            - master
-jobs:
-    deploy:
-        name: Deploy to EC2
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout the files
-              uses: actions/checkout@v3
 
-            - name: Copy files with SSH
-              uses: easingthemes/ssh-deploy@main
-              with:
-                  SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-                  REMOTE_HOST: ec2-3-143-230-122.us-east-2.compute.amazonaws.com
-                  REMOTE_USER: ubuntu
-                  SOURCE: "./"
-                  TARGET: "/home/ubuntu/app"
-                  EXCLUDE: ".gitignore,.idea/"
-    - name: Execute Remote Commands
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v3
+
+      - name: Copy files with SSH
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          REMOTE_HOST: ec2-3-143-230-122.us-east-2.compute.amazonaws.com
+          REMOTE_USER: ubuntu
+          SOURCE: "./"
+          TARGET: "/home/ubuntu/app"
+          EXCLUDE: ".gitignore,.idea/"
+
+      - name: Execute Remote Commands
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ec2-3-143-230-122.us-east-2.compute.amazonaws.com
@@ -29,22 +32,17 @@ jobs:
           script: |
             cd /home/ubuntu/app
 
-            # Servidor WEB
             cd web 
-
-            npm install --production
-
+            npm install 
             npm run build
 
-            # Servidor Back
+            # --- Backend ---
             cd ..
-
             cd server_src
-            
+             
+            npm install
             npx prisma generate
-
             npx prisma migrate deploy 
 
-            # Reinicia o servidor no PM2
-            pm2 reload all --update-env
-        
+            # --- PM2 ---
+            # Reinicia e atualiza variáveis de ambiente se mud
